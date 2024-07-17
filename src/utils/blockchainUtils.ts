@@ -36,7 +36,7 @@ export function useTokenLiquidity(tokenAddress: `0x${string}`) {
   return { data: data as [string, boolean, bigint] | undefined, refetch };
 }
 
-export function calcBuyReturn(tokenAddress: `0x${string}`, ethAmount: bigint) {
+export function useCalcBuyReturn(tokenAddress: `0x${string}`, ethAmount: bigint) {
   const { data, isLoading } = useReadContract({
     address: BONDING_CURVE_MANAGER_ADDRESS,
     abi: BondingCurveManagerABI,
@@ -46,7 +46,7 @@ export function calcBuyReturn(tokenAddress: `0x${string}`, ethAmount: bigint) {
   return { data: data as bigint | undefined, isLoading };
 }
 
-export function calcSellReturn(tokenAddress: `0x${string}`, tokenAmount: bigint) {
+export function useCalcSellReturn(tokenAddress: `0x${string}`, tokenAmount: bigint) {
   const { data, isLoading } = useReadContract({
     address: BONDING_CURVE_MANAGER_ADDRESS,
     abi: BondingCurveManagerABI,

@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import TradingViewChart from '@/components/TradingViewChart';
-import { useCurrentTokenPrice, useTokenLiquidity, calcBuyReturn, calcSellReturn, useBuyTokens, useSellTokens, useUserBalance, useTokenAllowance, useApproveTokens } from '@/utils/blockchainUtils';
+import { useCurrentTokenPrice, useTokenLiquidity, useCalcBuyReturn, useCalcSellReturn, useBuyTokens, useSellTokens, useUserBalance, useTokenAllowance, useApproveTokens } from '@/utils/blockchainUtils';
 import { getTokenInfoAndTransactions, getHistoricalPriceData, getTokenUSDPriceHistory, getTokenHolders } from '@/utils/api';
 import { formatTimestamp, formatAmount } from '@/utils/blockchainUtils';
 import { ethers } from 'ethers';
@@ -101,11 +101,11 @@ const TokenDetail: React.FC = () => {
   const { data: liquidityData, refetch: refetchLiquidity } = useTokenLiquidity(address as `0x${string}`);
 
 
-  const { data: buyReturnData, isLoading: isBuyCalculating } = calcBuyReturn(
+  const { data: buyReturnData, isLoading: isBuyCalculating } = useCalcBuyReturn(
     address as `0x${string}`, 
     parseUnits(debouncedFromAmount || '0', 18)
   );
-  const { data: sellReturnData, isLoading: isSellCalculating } = calcSellReturn(
+  const { data: sellReturnData, isLoading: isSellCalculating } = useCalcSellReturn(
     address as `0x${string}`, 
     parseUnits(debouncedFromAmount || '0', 18)
   );

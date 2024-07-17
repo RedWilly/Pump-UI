@@ -21,7 +21,7 @@ const AboutPage: React.FC = () => {
             <h2 className="text-2xl font-semibold text-blue-400 mb-4 neon-text">How It Works</h2>
             <ol className="list-decimal list-inside space-y-2 text-gray-300">
               <li><span className="font-bold text-blue-400">Token Creation:</span> Users create tokens by setting name, symbol, and description.</li>
-              <li><span className="font-bold text-blue-400">Bonding Curve:</span> Each token's price is determined by its unique curve.</li>
+              <li><span className="font-bold text-blue-400">Bonding Curve:</span> Each token&apos;s price is determined by its unique curve.</li>
               <li><span className="font-bold text-blue-400">Buying Tokens:</span> Users buy tokens with BONE, price based on the curve.</li>
               <li><span className="font-bold text-blue-400">Selling Tokens:</span> Users can sell back anytime, also priced by the curve.</li>
               <li><span className="font-bold text-blue-400">Liquidity Pool:</span> Each token has its own pool that grows and shrinks with trades.</li>
