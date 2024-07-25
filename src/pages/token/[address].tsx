@@ -37,6 +37,7 @@ import { parseUnits, formatUnits } from 'viem';
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
 import { useDebounce } from 'use-debounce';
 import { toast } from 'react-toastify';
+import ShareButton from '@/components/ShareButton';
 
 
 const BONDING_CURVE_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
@@ -293,7 +294,8 @@ const TokenDetail: React.FC = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8 text-white min-h-screen">
+      <div className="w-full min-h-screen bg-gray-900 text-white overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row items-center mb-6 gap-4">
           <Image src={tokenInfo.logo} alt={tokenInfo.name} width={64} height={64} className="rounded-full" />
@@ -324,9 +326,9 @@ const TokenDetail: React.FC = () => {
           <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Quick Actions</h2>
           <div className="bg-gray-700 p-4 rounded-lg">
             <div className="mb-4 relative">
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm text-gray-300">From</label>
-                <span className="text-sm text-gray-400">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+                <label className="text-sm text-gray-300 mb-1 sm:mb-0">From</label>
+                <span className="text-xs sm:text-sm text-gray-400">
                   Balance: {isSwapped ? tokenBalance : ethBalance} {fromToken.symbol}
                 </span>
               </div>
@@ -335,20 +337,20 @@ const TokenDetail: React.FC = () => {
                   type="number"
                   value={fromToken.amount}
                   onChange={handleFromAmountChange}
-                  className="flex-grow bg-transparent text-white outline-none pr-8"
+                  className="w-full bg-transparent text-white outline-none text-sm sm:text-base"
                   placeholder="0.00"
                   disabled={isTransacting}
                 />
-                <span className="absolute right-4 text-sm text-gray-300">{fromToken.symbol}</span>
+                <span className="ml-2 text-xs sm:text-sm text-gray-300 whitespace-nowrap">{fromToken.symbol}</span>
               </div>
             </div>
             <button onClick={handleSwap} className="w-full flex justify-center py-2 text-gray-400 hover:text-blue-400 mb-4">
               <ArrowUpDownIcon size={20} />
             </button>
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm text-gray-300">To (Estimated)</label>
-                <span className="text-sm text-gray-400">
+            <div className="mb-4 relative">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+                <label className="text-sm text-gray-300 mb-1 sm:mb-0">To (Estimated)</label>
+                <span className="text-xs sm:text-sm text-gray-400">
                   Balance: {isSwapped ? ethBalance : tokenBalance} {toToken.symbol}
                 </span>
               </div>
@@ -357,15 +359,15 @@ const TokenDetail: React.FC = () => {
                   type="text"
                   value={isCalculating ? 'Calculating...' : toToken.amount ? parseFloat(toToken.amount).toFixed(5) : ''}
                   readOnly
-                  className="flex-grow bg-transparent text-white outline-none pr-8"
+                  className="w-full bg-transparent text-white outline-none text-sm sm:text-base"
                   placeholder="0.00"
                 />
-                <span className="absolute right-4 text-sm text-gray-300">{toToken.symbol}</span>
+                <span className="ml-2 text-xs sm:text-sm text-gray-300 whitespace-nowrap">{toToken.symbol}</span>
               </div>
             </div>
             <button
               onClick={handleAction}
-              className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors disabled:opacity-50"
+              className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition-colors disabled:opacity-50 text-sm sm:text-base"
               disabled={!fromToken.amount || isCalculating || isTransacting}
             >
               {isTransacting ? 'Processing...' : actionButtonText} {isSwapped ? '' : tokenInfo.symbol}
@@ -610,13 +612,9 @@ const TokenDetail: React.FC = () => {
       </div>
 
       {/* Share Button */}
-      {/* Uncomment if you want to include the share button
-      <div className="fixed bottom-4 right-4">
-        <button className="bg-blue-500 text-white p-2 rounded-full shadow-lg hover:bg-blue-600 transition-colors">
-          <Share2Icon size={20} />
-        </button>
-      </div>
-      */}
+      <ShareButton tokenInfo={tokenInfo} />
+     
+    </div>
     </div>
   </Layout>
 );
