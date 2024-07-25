@@ -50,7 +50,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if (response.data.files_details && response.data.files_details.length > 0) {
       const cid = response.data.files_details[0].cid
-      const url = `https://nftstorage.link/ipfs/${cid}`
+      const url = `https://ipfs-chainsafe.dev/ipfs/${cid}`
       res.status(200).json({ url })
     } else {
       res.status(500).json({ error: 'No CID found in the response' })
