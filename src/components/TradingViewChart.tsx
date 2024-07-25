@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { createChart, ColorType, UTCTimestamp, IChartApi, ISeriesApi, CandlestickData } from 'lightweight-charts';
 
 interface ChartProps {
-  data: { time: number; open: number; high: number; low: number; close: number; volume: number }[];
+  data: { time: number; open: number; high: number; low: number; close: number }[];
 }
 
 const TradingViewChart: React.FC<ChartProps> = ({ data }) => {
@@ -56,34 +56,8 @@ const TradingViewChart: React.FC<ChartProps> = ({ data }) => {
 
       candlestickSeries.setData(sortedData);
 
-      // Add volume series
-      const volumeSeries = chart.addHistogramSeries({
-        color: '#26a69a',
-        priceFormat: {
-          type: 'volume',
-        },
-        priceScaleId: '',
-      });
-
-      // Set scale margins for volume series
-      chart.priceScale('').applyOptions({
-        scaleMargins: {
-          top: 0.8,
-          bottom: 0,
-        },
-      });
-
-      const volumeData = sortedData.map((item, index) => ({
-        time: item.time,
-        value: data[index].volume,
-        color: item.close > item.open ? '#26a69a' : '#ef5350',
-      }));
-
-      volumeSeries.setData(volumeData);
-
       chart.timeScale().fitContent();
 
-      // Add price formatter to display small values correctly
       chart.applyOptions({
         localization: {
           priceFormatter: (price: number) => {

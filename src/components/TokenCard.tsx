@@ -86,20 +86,21 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
 
   return (
     <Link href={`/token/${token.address}`}>
-      <div className="w-full max-w-sm bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer">
-        <div className="h-48 overflow-hidden">
+      <div className="w-full bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+        <div className="h-40 sm:h-48 overflow-hidden">
           <img src={token.logo} alt={token.name} className="w-full h-full object-cover" />
         </div>
         <div className="p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="bg-gray-700 rounded-md flex items-center justify-center w-16 h-16 overflow-hidden">
-              <img src={token.logo} alt={token.name} width={64} height={64} className="object-cover" />
+            <div className="bg-gray-700 rounded-md flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 overflow-hidden">
+              <img src={token.logo} alt={token.name} className="w-full h-full object-cover" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-blue-400">{token.name}</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-blue-400">{token.name}</h3>
+              <p className="text-xs sm:text-sm text-gray-400">{token.symbol}</p>
             </div>
           </div>
-          <div className="grid gap-2 text-sm">
+          <div className="grid gap-2 text-xs sm:text-sm">
             <div className="flex items-center text-gray-400">
               <CurrencyDollarIcon className="h-4 w-4 mr-2" />
               <span className="flex items-center">
@@ -107,8 +108,8 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
                 <Image
                   src="/logo/wbone.png"
                   alt="BONE"
-                  width={20}
-                  height={20}
+                  width={16}
+                  height={16}
                   className="inline-block align-middle mr-1"
                 />
                 {formatAmount(currentLiquidity)}
@@ -125,9 +126,8 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
                     window.open(creatorAddressLink, '_blank', 'noopener,noreferrer');
                   }}
                 >
-                  {/* {formatAddressV2(token.creatorAddress)} */}
                   {`${token.creatorAddress.slice(-6)}`}
-                  </span>
+                </span>
               </span>
             </div>
             <div className="flex items-center text-gray-400">

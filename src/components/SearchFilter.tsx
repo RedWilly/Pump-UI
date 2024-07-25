@@ -14,8 +14,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch }) => {
   };
 
   return (
-    <form onSubmit={handleSearch} className="flex items-center mb-6">
-      <div className="relative flex-grow">
+    <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center mb-6 gap-4">
+      <div className="relative flex-grow w-full">
         <input
           type="text"
           placeholder="Search tokens..."
@@ -27,7 +27,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch }) => {
       </div>
       <button
         type="submit"
-        className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
+        className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
       >
         Search
       </button>
