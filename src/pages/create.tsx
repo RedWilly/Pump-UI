@@ -5,7 +5,7 @@ import axios from 'axios';
 import Layout from '@/components/Layout';
 import { useCreateToken } from '@/utils/blockchainUtils';
 import { updateToken } from '@/utils/api';
-import { ChevronDownIcon, ChevronUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 
 const CreateToken: React.FC = () => {
   const router = useRouter();
@@ -144,21 +144,22 @@ const CreateToken: React.FC = () => {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-blue-400 mb-6 neon-text">Create New Token</h1>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-400 mb-6 neon-text text-center">Create New Token</h1>
         
         {/* Info button with tooltip */}
-        <div className="relative mb-4">
+        <div className="relative mb-6 flex justify-center">
           <button
             type="button"
-            className="text-gray-400 hover:text-blue-400 transition-colors duration-200"
+            className="text-gray-400 hover:text-blue-400 transition-colors duration-200 flex items-center bg-gray-800 px-3 py-2 rounded-md shadow-md"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
           >
-            <InformationCircleIcon className="h-6 w-6" />
+            <InformationCircleIcon className="h-5 w-5 mr-2" />
+            <span className="text-sm">Deployment Cost Info</span>
           </button>
           {showTooltip && (
-            <div className="absolute left-0 top-8 bg-gray-800 text-white p-3 rounded-md shadow-lg z-10 w-64">
+            <div className="absolute left-1/2 transform -translate-x-1/2 top-12 bg-gray-800 text-white p-4 rounded-md shadow-lg z-10 w-64 border border-gray-700">
               <p className="text-sm">
                 Cost to deploy: 1 BONE<br />
                 This serves as an initial boost to the bonding curve.
@@ -167,33 +168,38 @@ const CreateToken: React.FC = () => {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 card">
-          <div>
-            <label htmlFor="tokenName" className="block text-sm font-medium text-gray-300 mb-1">
-              Token Name
-            </label>
-            <input
-              type="text"
-              id="tokenName"
-              value={tokenName}
-              onChange={(e) => setTokenName(e.target.value)}
-              required
-              className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
+        <form onSubmit={handleSubmit} className="space-y-8 bg-gray-800 p-6 rounded-lg shadow-xl">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <div>
+              <label htmlFor="tokenName" className="block text-sm font-medium text-gray-300 mb-1">
+                Token Name
+              </label>
+              <input
+                type="text"
+                id="tokenName"
+                value={tokenName}
+                onChange={(e) => setTokenName(e.target.value)}
+                required
+                className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                placeholder="Enter token name"
+              />
+            </div>
+            <div>
+              <label htmlFor="tokenSymbol" className="block text-sm font-medium text-gray-300 mb-1">
+                Token Symbol
+              </label>
+              <input
+                type="text"
+                id="tokenSymbol"
+                value={tokenSymbol}
+                onChange={(e) => setTokenSymbol(e.target.value)}
+                required
+                className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                placeholder="Enter token symbol"
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="tokenSymbol" className="block text-sm font-medium text-gray-300 mb-1">
-              Token Symbol
-            </label>
-            <input
-              type="text"
-              id="tokenSymbol"
-              value={tokenSymbol}
-              onChange={(e) => setTokenSymbol(e.target.value)}
-              required
-              className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
+          
           <div>
             <label htmlFor="tokenDescription" className="block text-sm font-medium text-gray-300 mb-1">
               Token Description
@@ -202,32 +208,53 @@ const CreateToken: React.FC = () => {
               id="tokenDescription"
               value={tokenDescription}
               onChange={(e) => setTokenDescription(e.target.value)}
-              rows={3}
-              className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              rows={4}
+              className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+              placeholder="Describe your token"
             />
           </div>
+
           <div>
-            <label htmlFor="tokenImage" className="block text-sm font-medium text-gray-300 mb-1">
+            <label htmlFor="tokenImage" className="block text-sm font-medium text-gray-300 mb-2">
               Token Image
             </label>
-            <input
-              type="file"
-              id="tokenImage"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              disabled={isUploading}
-            />
-            {isUploading && <p className="text-sm text-gray-400 mt-1">Uploading image to IPFS...</p>}
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md hover:border-blue-500 transition duration-150 ease-in-out">
+              <div className="space-y-1 text-center">
+                <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <div className="flex text-sm text-gray-400">
+                  <label
+                    htmlFor="tokenImage"
+                    className="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 transition duration-150 ease-in-out"
+                  >
+                    <span className="px-3 py-2 rounded-md">Upload a file</span>
+                    <input
+                      id="tokenImage"
+                      name="tokenImage"
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={handleImageChange}
+                      disabled={isUploading}
+                    />
+                  </label>
+                  <p className="pl-1 pt-2">or drag and drop</p>
+                </div>
+                <p className="text-xs text-gray-400">PNG, JPG, GIF up to 10MB</p>
+              </div>
+            </div>
+            {isUploading && <p className="text-sm text-gray-400 mt-2">Uploading image to IPFS...</p>}
           </div>
+
           {tokenImageUrl && (
-            <div className="mt-2">
-              <img
-                src={tokenImageUrl}
-                alt="Token preview"
-                className="h-32 w-32 object-cover rounded-md"
-              />
-              <p className="text-sm text-gray-400 mt-1">IPFS URL: {tokenImageUrl}</p>
+            <div className="mt-4 flex justify-center">
+              <div className="text-center">
+                <img
+                  src={tokenImageUrl}
+                  alt="Token preview"
+                  className="h-32 w-32 object-cover rounded-md mx-auto"
+                />
+                <p className="text-xs text-gray-400 mt-2 break-all max-w-xs mx-auto">IPFS: {tokenImageUrl}</p>
+              </div>
             </div>
           )}
           
@@ -236,7 +263,7 @@ const CreateToken: React.FC = () => {
             <button
               type="button"
               onClick={toggleSocialSection}
-              className="w-full flex justify-between items-center p-3 bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-200"
+              className="w-full flex justify-between items-center p-4 bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-200"
             >
               <span className="font-medium">Social Media Links (Optional)</span>
               {isSocialExpanded ? (
@@ -246,67 +273,28 @@ const CreateToken: React.FC = () => {
               )}
             </button>
             {isSocialExpanded && (
-              <div className="p-4 bg-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="website" className="block text-sm font-medium text-gray-300 mb-1">
-                    Website
-                  </label>
-                  <input
-                    type="url"
-                    id="website"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="telegram" className="block text-sm font-medium text-gray-300 mb-1">
-                    Telegram
-                  </label>
-                  <input
-                    type="url"
-                    id="telegram"
-                    value={telegram}
-                    onChange={(e) => setTelegram(e.target.value)}
-                    className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="discord" className="block text-sm font-medium text-gray-300 mb-1">
-                    Discord
-                  </label>
-                  <input
-                    type="url"
-                    id="discord"
-                    value={discord}
-                    onChange={(e) => setDiscord(e.target.value)}
-                    className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="twitter" className="block text-sm font-medium text-gray-300 mb-1">
-                    Twitter
-                  </label>
-                  <input
-                    type="url"
-                    id="twitter"
-                    value={twitter}
-                    onChange={(e) => setTwitter(e.target.value)}
-                    className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="youtube" className="block text-sm font-medium text-gray-300 mb-1">
-                    YouTube
-                  </label>
-                  <input
-                    type="url"
-                    id="youtube"
-                    value={youtube}
-                    onChange={(e) => setYoutube(e.target.value)}
-                    className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
+              <div className="p-4 bg-gray-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {[
+                  { id: 'website', label: 'Website', value: website, setter: setWebsite },
+                  { id: 'telegram', label: 'Telegram', value: telegram, setter: setTelegram },
+                  { id: 'discord', label: 'Discord', value: discord, setter: setDiscord },
+                  { id: 'twitter', label: 'Twitter', value: twitter, setter: setTwitter },
+                  { id: 'youtube', label: 'YouTube', value: youtube, setter: setYoutube },
+                ].map((item) => (
+                  <div key={item.id}>
+                    <label htmlFor={item.id} className="block text-sm font-medium text-gray-300 mb-1">
+                      {item.label}
+                    </label>
+                    <input
+                      type="url"
+                      id={item.id}
+                      value={item.value}
+                      onChange={(e) => item.setter(e.target.value)}
+                      className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                      placeholder={`Enter ${item.label.toLowerCase()} URL`}
+                    />
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -315,7 +303,11 @@ const CreateToken: React.FC = () => {
             <button
               type="submit"
               disabled={isButtonDisabled}
-              className={`w-full btn ${isButtonDisabled ? 'btn-disabled' : 'btn-primary'}`}
+              className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition duration-150 ease-in-out ${
+                isButtonDisabled
+                  ? 'bg-gray-600 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+              }`}
             >
               {getButtonText()}
             </button>

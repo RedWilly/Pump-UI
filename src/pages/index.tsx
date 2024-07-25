@@ -100,9 +100,9 @@ const Home: React.FC = () => {
 
   return (
     <Layout>
-    <HowItWorksPopup />
+      <HowItWorksPopup />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-blue-400 mb-6 neon-text">Explore Tokens</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 neon-text">Explore Tokens</h1>
         <SearchFilter onSearch={handleSearch} />
         <SortOptions onSort={handleSort} currentSort={sort} />
         {isLoading ? (

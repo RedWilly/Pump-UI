@@ -5,6 +5,7 @@ import Layout from '@/components/Layout';
 import { getTransactionsByAddress, getAllTokenAddresses } from '@/utils/api';
 import { Transaction, PaginatedResponse } from '@/interface/types';
 import { formatTimestamp, formatAddressV2, formatAmount, useERC20Balance } from '@/utils/blockchainUtils';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
 interface TransactionResponse extends Omit<PaginatedResponse<Transaction>, 'data'> {
   transactions: Transaction[];
@@ -29,12 +30,12 @@ const TokenBalanceItem: React.FC<{
 
   return (
     <div 
-      className="card p-4 cursor-pointer hover:bg-gray-700 transition-colors duration-200"
+      className="bg-gray-800 rounded-lg p-4 cursor-pointer hover:bg-gray-700 transition-colors duration-200 shadow-md"
       onClick={onClick}
     >
       <h3 className="text-lg font-semibold text-blue-400 mb-2">{symbol}</h3>
-      <p className="text-gray-300">Balance: {formatAmount(balance.toString())}</p>
-      <p className="text-gray-400 text-sm mt-2">
+      <p className="text-gray-300 text-sm">Balance: {formatAmount(balance.toString())}</p>
+      <p className="text-gray-400 text-xs mt-2">
         Address: 
         <span 
           className="text-blue-400 hover:underline ml-1 cursor-pointer"
@@ -102,10 +103,10 @@ const UserDashboard: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-blue-400 mb-6 neon-text">Your Dashboard</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 neon-text">Your Dashboard</h1>
         
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-blue-400 mb-4 neon-text">Your Tokens</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-blue-400 mb-4 neon-text">Your Tokens</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {tokenAddresses.map((token) => (
               <TokenBalanceItem
@@ -120,53 +121,57 @@ const UserDashboard: React.FC = () => {
         </div>
         
         <div>
-          <h2 className="text-2xl font-semibold text-blue-400 mb-4 neon-text">Recent Transactions</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-blue-400 mb-4 neon-text">Recent Transactions</h2>
           {isLoading ? (
             <p className="text-gray-300">Loading transactions...</p>
           ) : transactions && transactions.length > 0 ? (
-            <div className="overflow-x-auto card">
+            <div className="overflow-x-auto bg-gray-800 rounded-lg shadow-md">
               <table className="min-w-full divide-y divide-gray-700">
-                <thead className="bg-gray-800">
+                <thead className="bg-gray-900">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Token</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Amount</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Token</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Amount</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Price</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date</th>
                   </tr>
                 </thead>
-                <tbody className="bg-gray-900 divide-y divide-gray-800">
+                <tbody className="bg-gray-800 divide-y divide-gray-700">
                   {transactions.map((tx) => (
-                    <tr key={tx.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-300">{tx.type}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-300">{getTokenSymbol(tx.recipientAddress)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-300">{formatAmount(tx.tokenAmount)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-300">{formatAmount(tx.tokenPrice)} ETH</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-300">{formatTimestamp(tx.timestamp)}</td>
+                    <tr key={tx.id} className="hover:bg-gray-700 transition-colors duration-150">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{tx.type}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{getTokenSymbol(tx.recipientAddress)}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{formatAmount(tx.tokenAmount)}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{formatAmount(tx.tokenPrice)} ETH</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{formatTimestamp(tx.timestamp)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="text-gray-300 card p-4">No recent transactions.</p>
+            <p className="text-gray-300 bg-gray-800 rounded-lg p-4 shadow-md">No recent transactions.</p>
           )}
           
           {totalPages > 1 && (
-            <div className="mt-4 flex justify-center">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <button
-                  key={page}
-                  onClick={() => handlePageChange(page)}
-                  className={`mx-1 px-3 py-1 rounded ${
-                    currentPage === page
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+            <div className="mt-4 flex justify-center items-center space-x-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-2 rounded-md bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeftIcon className="h-5 w-5" />
+              </button>
+              <span className="text-gray-400">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-md bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRightIcon className="h-5 w-5" />
+              </button>
             </div>
           )}
         </div>
