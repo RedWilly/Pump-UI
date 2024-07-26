@@ -128,7 +128,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ tokenInfo, className }) => {
 
   return (
     <>
-      <div className={className}>
+      <div className="fixed bottom-4 right-4 z-40">
         <button 
           onClick={() => setIsModalOpen(true)} 
           className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"

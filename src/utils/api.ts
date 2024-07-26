@@ -30,6 +30,22 @@ export async function getRecentTokens(page: number = 1, pageSize: number = 20, h
   }
 }
 
+export async function searchTokens(
+  query: string,
+  page: number = 1,
+  pageSize: number = 20
+): Promise<PaginatedResponse<Token>> {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/tokens/search`, {
+      params: { q: query, page, pageSize }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error searching tokens:', error);
+    throw new Error('Failed to search tokens');
+  }
+}
+
 export async function getTokensWithLiquidity(page: number = 1, pageSize: number = 20): Promise<PaginatedResponse<TokenWithLiquidityEvents>> {
   const response = await axios.get(`${API_BASE_URL}/api/tokens/with-liquidityEvent`, {
     params: { page, pageSize }
