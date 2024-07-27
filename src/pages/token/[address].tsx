@@ -30,7 +30,7 @@ import {
   useTokenAllowance,
   useApproveTokens,
 } from '@/utils/blockchainUtils';
-import { getTokenInfoAndTransactions, getTokenUSDPriceHistory, getTokenHolders } from '@/utils/api';
+import { getTokenInfoAndTransactions, getTokenUSDPriceHistory, getTokenHolders, searchTokens } from '@/utils/api';
 import { formatTimestamp, formatAmount } from '@/utils/blockchainUtils';
 import { ethers } from 'ethers';
 import { parseUnits, formatUnits } from 'viem';
@@ -295,329 +295,329 @@ const TokenDetail: React.FC = () => {
   return (
     <Layout>
       <div className="w-full min-h-screen bg-gray-900 text-white overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row items-center mb-6 gap-4">
-          <Image src={tokenInfo.logo} alt={tokenInfo.name} width={64} height={64} className="rounded-full" />
-          <div className="text-center sm:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 neon-text">{tokenInfo.name}</h1>
-            <p className="text-sm text-gray-300">{tokenInfo.symbol}</p>
-          </div>
-        </div>
-  
-        {/* Price and Liquidity Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-base sm:text-lg font-semibold mb-2 text-blue-300">Current Price</h2>
-            <p className="text-lg sm:text-xl text-blue-400 neon-text">
-              {currentPrice ? formatAmount(currentPrice.toString()) : 'Loading...'} BONE
-            </p>
-          </div>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h2 className="text-base sm:text-lg font-semibold mb-2 text-blue-300">Current Liquidity</h2>
-            <p className="text-lg sm:text-xl text-blue-400 neon-text">
-              {liquidityData && liquidityData[2] ? `${formatAmount(liquidityData[2].toString())} BONE` : '0 BONE'}
-            </p>
-          </div>
-        </div>
-  
-        {/* Quick Actions Section */}
-        <div className="bg-gray-800 p-4 sm:p-6 rounded-lg mb-8">
-          <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Quick Actions</h2>
-          <div className="bg-gray-700 p-4 rounded-lg">
-            <div className="mb-4 relative">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
-                <label className="text-sm text-gray-300 mb-1 sm:mb-0">From</label>
-                <span className="text-xs sm:text-sm text-gray-400">
-                  Balance: {isSwapped ? tokenBalance : ethBalance} {fromToken.symbol}
-                </span>
-              </div>
-              <div className="flex items-center bg-gray-600 rounded p-2">
-                <input
-                  type="number"
-                  value={fromToken.amount}
-                  onChange={handleFromAmountChange}
-                  className="w-full bg-transparent text-white outline-none text-sm sm:text-base"
-                  placeholder="0.00"
-                  disabled={isTransacting}
-                />
-                <span className="ml-2 text-xs sm:text-sm text-gray-300 whitespace-nowrap">{fromToken.symbol}</span>
-              </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header Section */}
+          <div className="flex flex-col sm:flex-row items-center mb-6 gap-4">
+            <Image src={tokenInfo.logo} alt={tokenInfo.name} width={64} height={64} className="rounded-full" />
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 neon-text">{tokenInfo.name}</h1>
+              <p className="text-sm text-gray-300">{tokenInfo.symbol}</p>
             </div>
-            <button onClick={handleSwap} className="w-full flex justify-center py-2 text-gray-400 hover:text-blue-400 mb-4">
-              <ArrowUpDownIcon size={20} />
-            </button>
-            <div className="mb-4 relative">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
-                <label className="text-sm text-gray-300 mb-1 sm:mb-0">To (Estimated)</label>
-                <span className="text-xs sm:text-sm text-gray-400">
-                  Balance: {isSwapped ? ethBalance : tokenBalance} {toToken.symbol}
-                </span>
-              </div>
-              <div className="flex items-center bg-gray-600 rounded p-2">
-                <input
-                  type="text"
-                  value={isCalculating ? 'Calculating...' : toToken.amount ? parseFloat(toToken.amount).toFixed(5) : ''}
-                  readOnly
-                  className="w-full bg-transparent text-white outline-none text-sm sm:text-base"
-                  placeholder="0.00"
-                />
-                <span className="ml-2 text-xs sm:text-sm text-gray-300 whitespace-nowrap">{toToken.symbol}</span>
-              </div>
+          </div>
+
+          {/* Price and Liquidity Section */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <h2 className="text-base sm:text-lg font-semibold mb-2 text-blue-300">Current Price</h2>
+              <p className="text-lg sm:text-xl text-blue-400 neon-text">
+                {currentPrice ? formatAmount(currentPrice.toString()) : 'Loading...'} BONE
+              </p>
             </div>
-            <button
-              onClick={handleAction}
-              className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition-colors disabled:opacity-50 text-sm sm:text-base"
-              disabled={!fromToken.amount || isCalculating || isTransacting}
-            >
-              {isTransacting ? 'Processing...' : actionButtonText} {isSwapped ? '' : tokenInfo.symbol}
-            </button>
+            <div className="bg-gray-800 p-4 rounded-lg">
+              <h2 className="text-base sm:text-lg font-semibold mb-2 text-blue-300">Current Liquidity</h2>
+              <p className="text-lg sm:text-xl text-blue-400 neon-text">
+                {liquidityData && liquidityData[2] ? `${formatAmount(liquidityData[2].toString())} BONE` : '0 BONE'}
+              </p>
+            </div>
           </div>
-        </div>
-  
-        {/* Price Chart Section */}
-        <div className="mb-8">
-  <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Price Chart (USD)</h2>
-  <div className="bg-gray-800 p-2 sm:p-4 rounded-lg shadow">
-    {chartData.length > 0 ? (
-      <TradingViewChart data={chartData} />
-    ) : (
-      <div className="flex justify-center items-center h-48 sm:h-64 md:h-80 text-gray-400 text-sm sm:text-base">
-        {chartError || 'Loading chart data...'}
-      </div>
-    )}
-  </div>
-</div>
-  
-        {/* Token Information Section */}
-        <div className="bg-gray-800 p-4 sm:p-6 rounded-lg mb-8">
-          <div className="flex justify-between items-center cursor-pointer" onClick={() => setShowTokenInfo(!showTokenInfo)}>
-            <h2 className="text-base sm:text-lg font-semibold text-blue-300">Token Information</h2>
-            <Info size={20} className={`${showTokenInfo ? 'transform rotate-180' : ''}`} />
-          </div>
-          {showTokenInfo && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-4">
-              <div>
-                <p>
-                  <span className="text-gray-300">Symbol:</span> <span className="text-blue-400">{tokenInfo?.symbol ?? 'Loading...'}</span>
-                </p>
-                <p>
-                  <span className="text-gray-300">Contract Address:</span>
-                  <span className="text-blue-400">
-                    {tokenInfo?.address ? `${tokenInfo.address.slice(-6)}` : 'Loading...'}
-                  </span>
-                  {tokenInfo?.address && (
-                    <>
-                      <button onClick={() => copyToClipboard(tokenInfo.address)} className="ml-2 text-gray-400 hover:text-blue-400">
-                        <CopyIcon size={14} />
-                      </button>
+
+          {/* Token Information Section */}
+          <div className="bg-gray-800 p-4 sm:p-6 rounded-lg mb-8">
+            <div className="flex justify-between items-center cursor-pointer" onClick={() => setShowTokenInfo(!showTokenInfo)}>
+              <h2 className="text-base sm:text-lg font-semibold text-blue-300">Token Information</h2>
+              <Info size={20} className={`${showTokenInfo ? 'transform rotate-180' : ''}`} />
+            </div>
+            {showTokenInfo && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-4">
+                <div>
+                  <p>
+                    <span className="text-gray-300">Symbol:</span> <span className="text-blue-400">{tokenInfo?.symbol ?? 'Loading...'}</span>
+                  </p>
+                  <p>
+                    <span className="text-gray-300">Contract Address:</span>
+                    <span className="text-blue-400">
+                      {tokenInfo?.address ? `${tokenInfo.address.slice(-6)}` : 'Loading...'}
+                    </span>
+                    {tokenInfo?.address && (
+                      <>
+                        <button onClick={() => copyToClipboard(tokenInfo.address)} className="ml-2 text-gray-400 hover:text-blue-400">
+                          <CopyIcon size={14} />
+                        </button>
+                        <a
+                          href={`https://shibariumscan.io/address/${tokenInfo.address}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="ml-2 text-gray-400 hover:text-blue-400"
+                        >
+                          <ExternalLinkIcon size={14} />
+                        </a>
+                      </>
+                    )}
+                  </p>
+                  <p>
+                    <span className="text-gray-300">Creator:</span>
+                    {tokenInfo?.creatorAddress ? (
                       <a
-                        href={`https://shibariumscan.io/address/${tokenInfo.address}`}
+                        href={`https://shibariumscan.io/address/${tokenInfo.creatorAddress}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="ml-2 text-gray-400 hover:text-blue-400"
+                        className="ml-2 text-blue-400 hover:underline"
                       >
-                        <ExternalLinkIcon size={14} />
+                        {`${tokenInfo.creatorAddress.slice(-6)}`}
+                        <ExternalLinkIcon size={14} className="ml-1" />
                       </a>
-                    </>
-                  )}
-                </p>
-                <p>
-                  <span className="text-gray-300">Creator:</span>
-                  {tokenInfo?.creatorAddress ? (
-                    <a
-                      href={`https://shibariumscan.io/address/${tokenInfo.creatorAddress}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-blue-400 hover:underline"
-                    >
-                      {`${tokenInfo.creatorAddress.slice(-6)}`}
-                      <ExternalLinkIcon size={14} className="ml-1" />
-                    </a>
-                  ) : (
-                    <span className="text-blue-400">Loading...</span>
-                  )}
-                </p>
-                <p>
-                  <span className="text-gray-300">Creation Date:</span>{' '}
-                  <span className="text-blue-400">{tokenInfo?.createdAt ? formatTimestamp(tokenInfo.createdAt) : 'Loading...'}</span>
-                </p>
-              </div>
-              <div>
-                <p>
-                  <span className="text-gray-300">Description:</span> <span className="text-blue-400">{tokenInfo?.description ?? 'Loading...'}</span>
-                </p>
-                <div className="mt-4">
-                  <span className="text-gray-300">Socials:</span>
-                  <div className="flex space-x-4 mt-2">
-                    {tokenInfo?.telegram && (
-                      <a href={tokenInfo.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                        <MessageCircleIcon size={16} />
-                      </a>
+                    ) : (
+                      <span className="text-blue-400">Loading...</span>
                     )}
-                    {tokenInfo?.website && (
-                      <a href={tokenInfo.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                        <GlobeIcon size={16} />
-                      </a>
-                    )}
-                    {tokenInfo?.twitter && (
-                      <a href={tokenInfo.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                        <TwitterIcon size={16} />
-                      </a>
-                    )}
-                    {tokenInfo?.discord && (
-                      <a href={tokenInfo.discord} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                        <MessageCircleIcon size={16} />
-                      </a>
-                    )}
-                    {tokenInfo?.youtube && (
-                      <a href={tokenInfo.youtube} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                        <YoutubeIcon size={16} />
-                      </a>
-                    )}
+                  </p>
+                  <p>
+                    <span className="text-gray-300">Creation Date:</span>{' '}
+                    <span className="text-blue-400">{tokenInfo?.createdAt ? formatTimestamp(tokenInfo.createdAt) : 'Loading...'}</span>
+                  </p>
+                </div>
+                <div>
+                  <p>
+                    <span className="text-gray-300">Description:</span> <span className="text-blue-400">{tokenInfo?.description ?? 'Loading...'}</span>
+                  </p>
+                  <div className="mt-4">
+                    <span className="text-gray-300">Socials:</span>
+                    <div className="flex space-x-4 mt-2">
+                      {tokenInfo?.telegram && (
+                        <a href={tokenInfo.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
+                          <MessageCircleIcon size={16} />
+                        </a>
+                      )}
+                      {tokenInfo?.website && (
+                        <a href={tokenInfo.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
+                          <GlobeIcon size={16} />
+                        </a>
+                      )}
+                      {tokenInfo?.twitter && (
+                        <a href={tokenInfo.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
+                          <TwitterIcon size={16} />
+                        </a>
+                      )}
+                      {tokenInfo?.discord && (
+                        <a href={tokenInfo.discord} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
+                          <MessageCircleIcon size={16} />
+                        </a>
+                      )}
+                      {tokenInfo?.youtube && (
+                        <a href={tokenInfo.youtube} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
+                          <YoutubeIcon size={16} />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* Price Chart Section */}
+          <div className="mb-8">
+            <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Price Chart (USD)</h2>
+            <div className="bg-gray-800 p-2 sm:p-4 rounded-lg shadow">
+              {chartData.length > 0 ? (
+                <TradingViewChart data={chartData} />
+              ) : (
+                <div className="flex justify-center items-center h-48 sm:h-64 md:h-80 text-gray-400 text-sm sm:text-base">
+                  {chartError || 'Loading chart data...'}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-  
-        {/* Transaction History Section */}
-        <div className="mb-8">
-          <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Transaction History</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="bg-gray-700">
-                  <th className="p-2 text-left text-gray-300">Maker</th>
-                  <th className="p-2 text-left text-gray-300">Type</th>
-                  <th className="p-2 text-left text-gray-300">BONE</th>
-                  <th className="p-2 text-left text-gray-300">{tokenInfo.symbol}</th>
-                  <th className="p-2 text-left text-gray-300">Date</th>
-                  <th className="p-2 text-left text-gray-300">Tx</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((tx) => (
-                  <tr key={tx.id} className="border-b border-gray-700">
-                    <td className="p-2 text-blue-400">{tx.senderAddress.slice(0, 6)}...{tx.senderAddress.slice(-4)}</td>
-                    <td className="p-2 text-blue-400">{tx.type}</td>
-                    <td className="p-2 text-blue-400">{formatAmount(tx.ethAmount)}</td>
-                    <td className="p-2 text-blue-400">{formatAmount(tx.tokenAmount)}</td>
-                    <td className="p-2 text-blue-400">{formatTimestamp(tx.timestamp)}</td>
-                    <td className="p-2 text-blue-400">
-                      <a href={`https://shibariumscan.io/tx/${tx.txHash}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      {tx.txHash.slice(-8)}
-                      </a>
-                    </td>
+          </div>
+
+          {/* Quick Actions Section */}
+          <div className="bg-gray-800 p-4 sm:p-6 rounded-lg mb-8">
+            <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Quick Actions</h2>
+            <div className="bg-gray-700 p-4 rounded-lg">
+              <div className="mb-4 relative">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+                  <label className="text-sm text-gray-300 mb-1 sm:mb-0">From</label>
+                  <span className="text-xs sm:text-sm text-gray-400">
+                    Balance: {isSwapped ? tokenBalance : ethBalance} {fromToken.symbol}
+                  </span>
+                </div>
+                <div className="flex items-center bg-gray-600 rounded p-2">
+                  <input
+                    type="number"
+                    value={fromToken.amount}
+                    onChange={handleFromAmountChange}
+                    className="w-full bg-transparent text-white outline-none text-sm sm:text-base"
+                    placeholder="0.00"
+                    disabled={isTransacting}
+                  />
+                  <span className="ml-2 text-xs sm:text-sm text-gray-300 whitespace-nowrap">{fromToken.symbol}</span>
+                </div>
+              </div>
+              <button onClick={handleSwap} className="w-full flex justify-center py-2 text-gray-400 hover:text-blue-400 mb-4">
+                <ArrowUpDownIcon size={20} />
+              </button>
+              <div className="mb-4 relative">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+                  <label className="text-sm text-gray-300 mb-1 sm:mb-0">To (Estimated)</label>
+                  <span className="text-xs sm:text-sm text-gray-400">
+                    Balance: {isSwapped ? ethBalance : tokenBalance} {toToken.symbol}
+                  </span>
+                </div>
+                <div className="flex items-center bg-gray-600 rounded p-2">
+                  <input
+                    type="text"
+                    value={isCalculating ? 'Calculating...' : toToken.amount ? parseFloat(toToken.amount).toFixed(5) : ''}
+                    readOnly
+                    className="w-full bg-transparent text-white outline-none text-sm sm:text-base"
+                    placeholder="0.00"
+                  />
+                  <span className="ml-2 text-xs sm:text-sm text-gray-300 whitespace-nowrap">{toToken.symbol}</span>
+                </div>
+              </div>
+              <button
+                onClick={handleAction}
+                className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition-colors disabled:opacity-50 text-sm sm:text-base"
+                disabled={!fromToken.amount || isCalculating || isTransacting}
+              >
+                {isTransacting ? 'Processing...' : actionButtonText} {isSwapped ? '' : tokenInfo.symbol}
+              </button>
+            </div>
+          </div>
+
+          {/* Transaction History Section */}
+          <div className="mb-8">
+            <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Transaction History</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-gray-700">
+                    <th className="p-2 text-left text-gray-300">Maker</th>
+                    <th className="p-2 text-left text-gray-300">Type</th>
+                    <th className="p-2 text-left text-gray-300">BONE</th>
+                    <th className="p-2 text-left text-gray-300">{tokenInfo.symbol}</th>
+                    <th className="p-2 text-left text-gray-300">Date</th>
+                    <th className="p-2 text-left text-gray-300">Tx</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* Pagination for transactions */}
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => handlePageChange(transactionPage - 1)}
-              disabled={transactionPage === 1}
-              className="px-3 py-1 bg-gray-700 text-gray-300 rounded-l hover:bg-gray-600 disabled:opacity-50"
-            >
-              <ChevronLeftIcon size={20} />
-            </button>
-            <span className="px-4 py-1 bg-gray-800 text-gray-300">
-              {transactionPage} of {totalTransactionPages}
-            </span>
-            <button
-              onClick={() => handlePageChange(transactionPage + 1)}
-              disabled={transactionPage === totalTransactionPages}
-              className="px-3 py-1 bg-gray-700 text-gray-300 rounded-r hover:bg-gray-600 disabled:opacity-50"
-            >
-              <ChevronRightIcon size={20} />
-            </button>
-          </div>
-        </div>
-  
-        {/* Token Holders Section */}
-        <div className="mb-8">
-          <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Token Holders</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="bg-gray-700">
-                  <th className="p-2 text-left text-gray-300">Address</th>
-                  <th className="p-2 text-left text-gray-300">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {/* Add Bonding Curve Manager as the first entry */}
-                <tr className="border-b border-gray-700">
-                  <td className="p-2">
-                    <div className="text-blue-400">Bonding Curve</div>
-                  </td>
-                  <td className="p-2 text-blue-400">Alpha</td>
-                </tr>
-                {currentHolders.map((holder, index) => (
-                  <tr key={index} className="border-b border-gray-700">
-                    <td className="p-2">
-                      {holder.address === tokenInfo?.creatorAddress ? (
-                        <a
-                          href={`https://www.shibariumscan.io/address/${holder.address}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:underline"
-                        >
-                          Creator <ExternalLinkIcon size={14} className="inline ml-1" />
+                </thead>
+                <tbody>
+                  {transactions.map((tx) => (
+                    <tr key={tx.id} className="border-b border-gray-700">
+                      <td className="p-2 text-blue-400">{tx.senderAddress.slice(0, 6)}...{tx.senderAddress.slice(-4)}</td>
+                      <td className="p-2 text-blue-400">{tx.type}</td>
+                      <td className="p-2 text-blue-400">{formatAmount(tx.ethAmount)}</td>
+                      <td className="p-2 text-blue-400">{formatAmount(tx.tokenAmount)}</td>
+                      <td className="p-2 text-blue-400">{formatTimestamp(tx.timestamp)}</td>
+                      <td className="p-2 text-blue-400">
+                        <a href={`https://shibariumscan.io/tx/${tx.txHash}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                          {tx.txHash.slice(-8)}
                         </a>
-                      ) : (
-                        <a
-                          href={`https://www.shibariumscan.io/address/${holder.address}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:underline"
-                        >
-                          {holder.address.slice(0, 6)}...{holder.address.slice(-4)} <ExternalLinkIcon size={14} className="inline ml-1"/>
-                          </a>
-                    )}
-                  </td>
-                  <td className="p-2 text-blue-400">{formatAmount(holder.balance)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {tokenHolders.length === 0 && <p className="text-gray-400 text-center mt-4">No token holder data available</p>}
-
-        {/* Pagination for token holders */}
-        {tokenHolders.length > 0 && (
-          <div className="flex justify-center mt-4">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-700 text-gray-300 rounded-l hover:bg-gray-600 disabled:opacity-50"
-            >
-              <ChevronLeftIcon size={20} />
-            </button>
-            <span className="px-4 py-1 bg-gray-800 text-gray-300">
-              {currentPage} of {Math.ceil(tokenHolders.length / holdersPerPage)}
-            </span>
-            <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === Math.ceil(tokenHolders.length / holdersPerPage)}
-              className="px-3 py-1 bg-gray-700 text-gray-300 rounded-r hover:bg-gray-600 disabled:opacity-50"
-            >
-              <ChevronRightIcon size={20} />
-            </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Pagination for transactions */}
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => handlePageChange(transactionPage - 1)}
+                disabled={transactionPage === 1}
+                className="px-3 py-1 bg-gray-700 text-gray-300 rounded-l hover:bg-gray-600 disabled:opacity-50"
+              >
+                <ChevronLeftIcon size={20} />
+              </button>
+              <span className="px-4 py-1 bg-gray-800 text-gray-300">
+                {transactionPage} of {totalTransactionPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(transactionPage + 1)}
+                disabled={transactionPage === totalTransactionPages}
+                className="px-3 py-1 bg-gray-700 text-gray-300 rounded-r hover:bg-gray-600 disabled:opacity-50"
+              >
+                <ChevronRightIcon size={20} />
+              </button>
+            </div>
           </div>
-        )}
-      </div>
 
-      {/* Share Button */}
-      <ShareButton tokenInfo={tokenInfo} />
-     
-    </div>
-    </div>
-  </Layout>
-);
+          {/* Token Holders Section */}
+          <div className="mb-8">
+            <h2 className="text-base sm:text-lg font-semibold mb-4 text-blue-300">Token Holders</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="bg-gray-700">
+                    <th className="p-2 text-left text-gray-300">Address</th>
+                    <th className="p-2 text-left text-gray-300">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Add Bonding Curve Manager as the first entry */}
+                  <tr className="border-b border-gray-700">
+                    <td className="p-2">
+                      <div className="text-blue-400">Bonding Curve</div>
+                    </td>
+                    <td className="p-2 text-blue-400">Alpha</td>
+                  </tr>
+                  {currentHolders.map((holder, index) => (
+                    <tr key={index} className="border-b border-gray-700">
+                      <td className="p-2">
+                        {holder.address === tokenInfo?.creatorAddress ? (
+                          <a
+                            href={`https://www.shibariumscan.io/address/${holder.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline"
+                          >
+                            Creator <ExternalLinkIcon size={14} className="inline ml-1" />
+                          </a>
+                        ) : (
+                          <a
+                            href={`https://www.shibariumscan.io/address/${holder.address}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline"
+                          >
+                            {holder.address.slice(0, 6)}...{holder.address.slice(-4)} <ExternalLinkIcon size={14} className="inline ml-1" />
+                          </a>
+                        )}
+                      </td>
+                      <td className="p-2 text-blue-400">{formatAmount(holder.balance)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {tokenHolders.length === 0 && <p className="text-gray-400 text-center mt-4">No token holder data available</p>}
+
+            {/* Pagination for token holders */}
+            {tokenHolders.length > 0 && (
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={() => paginate(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 bg-gray-700 text-gray-300 rounded-l hover:bg-gray-600 disabled:opacity-50"
+                >
+                  <ChevronLeftIcon size={20} />
+                </button>
+                <span className="px-4 py-1 bg-gray-800 text-gray-300">
+                  {currentPage} of {Math.ceil(tokenHolders.length / holdersPerPage)}
+                </span>
+                <button
+                  onClick={() => paginate(currentPage + 1)}
+                  disabled={currentPage === Math.ceil(tokenHolders.length / holdersPerPage)}
+                  className="px-3 py-1 bg-gray-700 text-gray-300 rounded-r hover:bg-gray-600 disabled:opacity-50"
+                >
+                  <ChevronRightIcon size={20} />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Share Button */}
+          <ShareButton tokenInfo={tokenInfo} />
+
+        </div>
+      </div>
+    </Layout>
+  );
 };
 
 export default TokenDetail;

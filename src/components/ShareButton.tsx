@@ -120,9 +120,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ tokenInfo, isOpen, onClose }) =
 
 interface ShareButtonProps {
   tokenInfo: TokenInfo;
+  className?: string; 
 }
 
-const ShareButton: React.FC<ShareButtonProps> = ({ tokenInfo }) => {
+const ShareButton: React.FC<ShareButtonProps> = ({ tokenInfo, className }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (

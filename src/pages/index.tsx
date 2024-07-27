@@ -6,7 +6,7 @@ import TokenList from '@/components/TokenList';
 import SearchFilter from '@/components/SearchFilter';
 import HowItWorksPopup from '@/components/HowItWorksPopup';
 import SortOptions, { SortOption } from '@/components/SortOptions';
-import { getAllTokens, getTokensWithLiquidity, getRecentTokens } from '@/utils/api';
+import { getAllTokens, getTokensWithLiquidity, getRecentTokens, searchTokens } from '@/utils/api';
 import { Token, TokenWithLiquidityEvents, PaginatedResponse } from '@/interface/types';
 
 const TOKENS_PER_PAGE = 10;
@@ -22,7 +22,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     console.log('Effect triggered. Current sort:', sort, 'Current page:', currentPage);
     fetchTokens();
-  }, [currentPage, sort]);
+  }, [currentPage, sort, searchQuery]);
 
   const fetchTokens = async () => {
     setIsLoading(true);
@@ -30,30 +30,34 @@ const Home: React.FC = () => {
     let fetchedTokens;
 
     try {
-      switch (sort) {
-        case 'all':
-          fetchedTokens = await getAllTokens(currentPage, TOKENS_PER_PAGE);
-          break;
-        case 'recentCreated':
-          fetchedTokens = await getRecentTokens(currentPage, TOKENS_PER_PAGE, 1);
-          if (fetchedTokens === null) {
-            setNoRecentTokens(true);
-            fetchedTokens = { data: [], totalCount: 0, currentPage: 1, totalPages: 1 };
-          }
-          break;
-        case 'ended':
-          fetchedTokens = await getTokensWithLiquidity(currentPage, TOKENS_PER_PAGE);
-          break;
-        case 'bomper':
-          fetchedTokens = {
-            data: [],
-            totalCount: 0,
-            currentPage: 1,
-            totalPages: 1
-          };
-          break;
-        default:
-          fetchedTokens = await getAllTokens(currentPage, TOKENS_PER_PAGE);
+      if (searchQuery) {
+        fetchedTokens = await searchTokens(searchQuery, currentPage, TOKENS_PER_PAGE);
+      } else {
+        switch (sort) {
+          case 'all':
+            fetchedTokens = await getAllTokens(currentPage, TOKENS_PER_PAGE);
+            break;
+          case 'recentCreated':
+            fetchedTokens = await getRecentTokens(currentPage, TOKENS_PER_PAGE, 1);
+            if (fetchedTokens === null) {
+              setNoRecentTokens(true);
+              fetchedTokens = { data: [], totalCount: 0, currentPage: 1, totalPages: 1 };
+            }
+            break;
+          case 'ended':
+            fetchedTokens = await getTokensWithLiquidity(currentPage, TOKENS_PER_PAGE);
+            break;
+          case 'bomper':
+            fetchedTokens = {
+              data: [],
+              totalCount: 0,
+              currentPage: 1,
+              totalPages: 1
+            };
+            break;
+          default:
+            fetchedTokens = await getAllTokens(currentPage, TOKENS_PER_PAGE);
+        }
       }
 
       const adjustedTokens: PaginatedResponse<Token | TokenWithLiquidityEvents> = {
@@ -91,6 +95,7 @@ const Home: React.FC = () => {
     console.log('Sort option changed:', option);
     setSort(option);
     setCurrentPage(1);
+    setSearchQuery(''); // Clear search query when sorting
   };
 
   const handlePageChange = (page: number) => {

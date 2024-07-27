@@ -126,7 +126,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
                     window.open(creatorAddressLink, '_blank', 'noopener,noreferrer');
                   }}
                 >
-                  {`${token.creatorAddress.slice(-6)}`}
+                  {token.creatorAddress ? `${token.creatorAddress.slice(-6)}` : 'Unknown'}
                 </span>
               </span>
             </div>
