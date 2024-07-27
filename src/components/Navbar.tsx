@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
-
 const CustomConnectButton = () => {
   return (
     <ConnectButton.Custom>
@@ -32,7 +31,7 @@ const CustomConnectButton = () => {
             {(() => {
               if (!connected) {
                 return (
-                  <button onClick={openConnectModal} className="btn btn-primary neon-border text-xs px-2 py-1">
+                  <button onClick={openConnectModal} className="btn btn-primary text-xs px-2 py-1">
                     Connect
                   </button>
                 )
@@ -40,7 +39,7 @@ const CustomConnectButton = () => {
 
               if (chain.unsupported) {
                 return (
-                  <button onClick={openChainModal} className="btn btn-secondary neon-border text-xs px-2 py-1">
+                  <button onClick={openChainModal} className="btn btn-secondary text-xs px-2 py-1">
                     Wrong network
                   </button>
                 )
@@ -50,7 +49,7 @@ const CustomConnectButton = () => {
                 <div className="flex items-center space-x-1 sm:space-x-2">
                   <button
                     onClick={openChainModal}
-                    className="btn btn-secondary neon-border text-xs px-2 py-1"
+                    className="btn btn-secondary text-xs px-2 py-1"
                     style={{ display: 'flex', alignItems: 'center' }}
                   >
                     {chain.hasIcon && (
@@ -76,7 +75,7 @@ const CustomConnectButton = () => {
                     <span className="text-[10px] sm:text-xs">{chain.name}</span>
                   </button>
 
-                  <button onClick={openAccountModal} className="btn btn-primary neon-border text-[10px] sm:text-xs px-2 py-1">
+                  <button onClick={openAccountModal} className="btn btn-primary text-[10px] sm:text-xs px-2 py-1">
                     <span>{account.displayName.slice(0, 4)}...{account.displayName.slice(-4)}</span>
                     {account.displayBalance
                       ? <span className="hidden sm:inline ml-1">({account.displayBalance})</span>
@@ -100,8 +99,25 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-blue-400 neon-text">
-              Pump Fun
+            <Link href="/" className="flex items-center text-xl font-bold text-blue-400">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-white mr-2"
+                style={{ transform: 'rotate(-60deg)' }}
+              >
+                <circle cx="19" cy="5" r="2"/>
+                <circle cx="5" cy="19" r="2"/>
+                <path d="M5 17A12 12 0 0 1 17 5"/>
+              </svg>
+              <span>Bondle.</span>
             </Link>
           </div>
           <div className="hidden md:flex items-center space-x-4">

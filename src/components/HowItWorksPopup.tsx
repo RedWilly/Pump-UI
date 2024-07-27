@@ -34,9 +34,9 @@ const HowItWorksPopup: React.FC = () => {
           <XMarkIcon className="h-5 w-5" />
         </button>
         <div className="p-4 sm:p-5">
-          <h2 className="text-lg sm:text-xl font-bold text-blue-400 mb-2 neon-text text-center">How It Works</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-blue-400 mb-2 text-center">How It Works</h2>
           <p className="text-gray-300 mb-4 text-center text-xs sm:text-sm">
-            Pump ensures safe, fair-launch tokens with no presale or team allocation.
+            Bondle ensures safe, fair-launch tokens with no presale or team allocation.
           </p>
           <div className="space-y-3">
             {steps.map((step, index) => (

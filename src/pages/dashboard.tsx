@@ -106,7 +106,7 @@ const UserDashboard: React.FC = () => {
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 neon-text">Your Dashboard</h1>
         
         <div className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-semibold text-blue-400 mb-4 neon-text">Your Tokens</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-blue-400 mb-4">Your Tokens</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {tokenAddresses.map((token) => (
               <TokenBalanceItem
@@ -121,7 +121,7 @@ const UserDashboard: React.FC = () => {
         </div>
         
         <div>
-          <h2 className="text-xl sm:text-2xl font-semibold text-blue-400 mb-4 neon-text">Recent Transactions</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-blue-400 mb-4">Recent Transactions</h2>
           {isLoading ? (
             <p className="text-gray-300">Loading transactions...</p>
           ) : transactions && transactions.length > 0 ? (
