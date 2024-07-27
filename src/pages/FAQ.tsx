@@ -28,12 +28,12 @@ const FAQPage: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-blue-400 mb-6 neon-text">Frequently Asked Questions</h1>
+        <h1 className="text-3xl font-bold text-blue-400 mb-6">Frequently Asked Questions</h1>
         
         <div className="space-y-6">
           {faqs.map((faq, index) => (
             <div key={index} className="card">
-              <h3 className="text-xl font-semibold text-blue-400 mb-2 neon-text">{faq.question}</h3>
+              <h3 className="text-xl font-semibold text-blue-400 mb-2">{faq.question}</h3>
               <p className="text-gray-300">{faq.answer}</p>
             </div>
           ))}

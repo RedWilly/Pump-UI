@@ -145,7 +145,7 @@ const CreateToken: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-400 mb-6 neon-text text-center">Create New Token</h1>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-400 mb-6 text-center">Create New Token</h1>
         
         {/* Info button with tooltip */}
         <div className="relative mb-6 flex justify-center">

@@ -300,7 +300,7 @@ const TokenDetail: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center mb-6 gap-4">
             <Image src={tokenInfo.logo} alt={tokenInfo.name} width={64} height={64} className="rounded-full" />
             <div className="text-center sm:text-left">
-              <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 neon-text">{tokenInfo.name}</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-blue-400">{tokenInfo.name}</h1>
               <p className="text-sm text-gray-300">{tokenInfo.symbol}</p>
             </div>
           </div>
@@ -309,13 +309,13 @@ const TokenDetail: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div className="bg-gray-800 p-4 rounded-lg">
               <h2 className="text-base sm:text-lg font-semibold mb-2 text-blue-300">Current Price</h2>
-              <p className="text-lg sm:text-xl text-blue-400 neon-text">
+              <p className="text-lg sm:text-xl text-blue-400">
                 {currentPrice ? formatAmount(currentPrice.toString()) : 'Loading...'} BONE
               </p>
             </div>
             <div className="bg-gray-800 p-4 rounded-lg">
               <h2 className="text-base sm:text-lg font-semibold mb-2 text-blue-300">Current Liquidity</h2>
-              <p className="text-lg sm:text-xl text-blue-400 neon-text">
+              <p className="text-lg sm:text-xl text-blue-400">
                 {liquidityData && liquidityData[2] ? `${formatAmount(liquidityData[2].toString())} BONE` : '0 BONE'}
               </p>
             </div>
