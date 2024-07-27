@@ -1,6 +1,4 @@
-// index.tsx
-
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Layout from '@/components/Layout';
 import TokenList from '@/components/TokenList';
 import SearchFilter from '@/components/SearchFilter';
@@ -8,6 +6,8 @@ import HowItWorksPopup from '@/components/HowItWorksPopup';
 import SortOptions, { SortOption } from '@/components/SortOptions';
 import { getAllTokens, getTokensWithLiquidity, getRecentTokens, searchTokens } from '@/utils/api';
 import { Token, TokenWithLiquidityEvents, PaginatedResponse } from '@/interface/types';
+import SEO from '@/components/SEO';
+import { useWebSocket } from '@/components/WebSocketProvider';
 
 const TOKENS_PER_PAGE = 10;
 
@@ -18,13 +18,9 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [noRecentTokens, setNoRecentTokens] = useState(false);
+  const { newTokens } = useWebSocket();
 
-  useEffect(() => {
-    console.log('Effect triggered. Current sort:', sort, 'Current page:', currentPage);
-    fetchTokens();
-  }, [currentPage, sort, searchQuery]);
-
-  const fetchTokens = async () => {
+  const fetchTokens = useCallback(async () => {
     setIsLoading(true);
     setNoRecentTokens(false);
     let fetchedTokens;
@@ -71,11 +67,29 @@ const Home: React.FC = () => {
       setTokens(adjustedTokens);
     } catch (error) {
       console.error('Error fetching tokens:', error);
-      // Handle other types of errors here
+      // Handle errors here (e.g., show an error message to the user)
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, sort, searchQuery]);
+
+  useEffect(() => {
+    fetchTokens();
+  }, [fetchTokens]);
+
+  useEffect(() => {
+    if (newTokens.length > 0 && sort === 'all') {
+      setTokens(prevTokens => {
+        if (!prevTokens) return null;
+        const updatedTokens = [...newTokens, ...prevTokens.data].slice(0, TOKENS_PER_PAGE);
+        return {
+          ...prevTokens,
+          data: updatedTokens,
+          totalCount: prevTokens.totalCount + newTokens.length
+        };
+      });
+    }
+  }, [newTokens, sort]);
 
   const filteredTokens = useMemo(() => {
     if (!tokens || !tokens.data) return [];
@@ -85,26 +99,28 @@ const Home: React.FC = () => {
     );
   }, [tokens, searchQuery]);
 
-  const handleSearch = (query: string) => {
-    console.log('Search query updated:', query);
+  const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
-  };
+  }, []);
 
-  const handleSort = (option: SortOption) => {
-    console.log('Sort option changed:', option);
+  const handleSort = useCallback((option: SortOption) => {
     setSort(option);
     setCurrentPage(1);
-    setSearchQuery(''); // Clear search query when sorting
-  };
+    setSearchQuery('');
+  }, []);
 
-  const handlePageChange = (page: number) => {
-    console.log('Page changed:', page);
+  const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
-  };
+  }, []);
 
   return (
     <Layout>
+      <SEO 
+        title="Create and Trade Memecoins Easily on Bondle."
+        description="The ultimate platform for launching and trading memecoins on Shibarium. Create your own tokens effortlessly and engage in fair, dynamic trading."
+        image="seo/home.jpg"
+      />
       <HowItWorksPopup />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 mb-6">Explore Tokens</h1>

@@ -1,11 +1,14 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
 import Layout from '@/components/Layout';
+import SEO from '@/components/SEO';
 import { useCreateToken } from '@/utils/blockchainUtils';
 import { updateToken } from '@/utils/api';
 import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+
+const MAX_FILE_SIZE = 1024 * 1024; // 1MB
 
 const CreateToken: React.FC = () => {
   const router = useRouter();
@@ -23,10 +26,16 @@ const CreateToken: React.FC = () => {
   const [creationStep, setCreationStep] = useState<'idle' | 'uploading' | 'creating' | 'updating' | 'completed' | 'error'>('idle');
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { createToken, isLoading: isBlockchainLoading } = useCreateToken();
 
   const uploadToIPFS = useCallback(async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('File size exceeds 1MB limit. Please choose a smaller file.');
+      return null;
+    }
+
     setIsUploading(true);
     setCreationStep('uploading');
     const formData = new FormData();
@@ -62,16 +71,32 @@ const CreateToken: React.FC = () => {
     }
   }, []);
 
-  const handleImageChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setTokenImage(file);
-      const newImageUrl = await uploadToIPFS(file);
-      if (newImageUrl) {
-        setTokenImageUrl(newImageUrl);
-      }
+  const handleFileUpload = useCallback(async (file: File) => {
+    setTokenImage(file);
+    const newImageUrl = await uploadToIPFS(file);
+    if (newImageUrl) {
+      setTokenImageUrl(newImageUrl);
     }
   }, [uploadToIPFS]);
+
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0]);
+    }
+  }, [handleFileUpload]);
+
+  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  }, [handleFileUpload]);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,29 +146,26 @@ const CreateToken: React.FC = () => {
 
   const getButtonText = useCallback(() => {
     switch (creationStep) {
-      case 'uploading':
-        return 'Uploading image...';
-      case 'creating':
-        return isBlockchainLoading ? 'Waiting for blockchain confirmation...' : 'Creating token on blockchain...';
-      case 'updating':
-        return 'Updating token in backend...';
-      case 'completed':
-        return 'Token created successfully!';
-      case 'error':
-        return 'Error occurred. Visit Portfolio to Update TokenInfo';
-      default:
-        return 'Create Token';
+      case 'uploading': return 'Uploading image...';
+      case 'creating': return isBlockchainLoading ? 'Waiting for blockchain confirmation...' : 'Creating token on blockchain...';
+      case 'updating': return 'Updating token in backend...';
+      case 'completed': return 'Token created successfully!';
+      case 'error': return 'Error occurred. Visit Portfolio to Update TokenInfo';
+      default: return 'Create Token';
     }
   }, [creationStep, isBlockchainLoading]);
 
   const isButtonDisabled = creationStep !== 'idle' || !tokenName || !tokenSymbol || !tokenImageUrl;
 
-  const toggleSocialSection = () => {
-    setIsSocialExpanded(!isSocialExpanded);
-  };
+  const toggleSocialSection = () => setIsSocialExpanded(!isSocialExpanded);
 
   return (
     <Layout>
+      <SEO 
+        title="Create Your Own Token - Bondle"
+        description="Launch a coin that is instantly tradable without having to seed liquidity. - fair launch"
+        image="/seo/create.jpg"
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-400 mb-6 text-center">Create New Token</h1>
         
@@ -169,6 +191,7 @@ const CreateToken: React.FC = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8 bg-gray-800 p-6 rounded-lg shadow-xl">
+          {/* Token Name and Symbol inputs */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
               <label htmlFor="tokenName" className="block text-sm font-medium text-gray-300 mb-1">
@@ -200,6 +223,7 @@ const CreateToken: React.FC = () => {
             </div>
           </div>
           
+          {/* Token Description textarea */}
           <div>
             <label htmlFor="tokenDescription" className="block text-sm font-medium text-gray-300 mb-1">
               Token Description
@@ -214,37 +238,46 @@ const CreateToken: React.FC = () => {
             />
           </div>
 
+          {/* Token Image upload */}
           <div>
             <label htmlFor="tokenImage" className="block text-sm font-medium text-gray-300 mb-2">
               Token Image
             </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md hover:border-blue-500 transition duration-150 ease-in-out">
+            <div 
+              className="mt-1 flex justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md hover:border-blue-500 transition duration-150 ease-in-out"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
               <div className="space-y-1 text-center">
-                <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <div className="flex text-sm text-gray-400">
-                  <label
-                    htmlFor="tokenImage"
-                    className="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 transition duration-150 ease-in-out"
-                  >
-                    <span className="px-3 py-2 rounded-md">Upload a file</span>
-                    <input
-                      id="tokenImage"
-                      name="tokenImage"
-                      type="file"
-                      accept="image/*"
-                      className="sr-only"
-                      onChange={handleImageChange}
-                      disabled={isUploading}
-                    />
-                  </label>
-                  <p className="pl-1 pt-2">or drag and drop</p>
+                <div className="flex flex-col items-center">
+                  <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+                  <div className="flex text-sm text-gray-400 flex-wrap justify-center">
+                    <label
+                      htmlFor="tokenImage"
+                      className="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 transition duration-150 ease-in-out px-3 py-2 mb-2 sm:mb-0 sm:mr-2"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="tokenImage"
+                        name="tokenImage"
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        onChange={handleImageChange}
+                        disabled={isUploading}
+                        ref={fileInputRef}
+                      />
+                    </label>
+                    <p className="mt-2 sm:mt-0">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF up to 1MB</p>
                 </div>
-                <p className="text-xs text-gray-400">PNG, JPG, GIF up to 10MB</p>
               </div>
             </div>
             {isUploading && <p className="text-sm text-gray-400 mt-2">Uploading image to IPFS...</p>}
           </div>
 
+          {/* Token Image preview */}
           {tokenImageUrl && (
             <div className="mt-4 flex justify-center">
               <div className="text-center">
@@ -253,7 +286,7 @@ const CreateToken: React.FC = () => {
                   alt="Token preview"
                   className="h-32 w-32 object-cover rounded-md mx-auto"
                 />
-                <p className="text-xs text-gray-400 mt-2 break-all max-w-xs mx-auto">IPFS: {tokenImageUrl}</p>
+                {/* <p className="text-xs text-gray-400 mt-2 break-all max-w-xs mx-auto">IPFS: {tokenImageUrl}</p> */}
               </div>
             </div>
           )}
@@ -299,6 +332,7 @@ const CreateToken: React.FC = () => {
             )}
           </div>
 
+          {/* Submit button */}
           <div>
             <button
               type="submit"

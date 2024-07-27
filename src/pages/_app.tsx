@@ -7,6 +7,8 @@ import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { WebSocketProvider } from '@/components/WebSocketProvider';
+
 
 
 const config = getDefaultConfig({
@@ -23,7 +25,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <WagmiConfig config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          <Component {...pageProps} />
+          <WebSocketProvider>
+            <Component {...pageProps} />
+          </WebSocketProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
       <ToastContainer />
