@@ -6,6 +6,7 @@ import { getTransactionsByAddress, getAllTokenAddresses } from '@/utils/api';
 import { Transaction, PaginatedResponse } from '@/interface/types';
 import { formatTimestamp, formatAddressV2, formatAmount, useERC20Balance } from '@/utils/blockchainUtils';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import SEO from '@/components/SEO';
 
 interface TransactionResponse extends Omit<PaginatedResponse<Transaction>, 'data'> {
   transactions: Transaction[];
@@ -102,6 +103,11 @@ const UserDashboard: React.FC = () => {
 
   return (
     <Layout>
+      <SEO 
+        title="Your Token Dashboard - Bondle"
+        description="Manage your tokens and track your transactions in one place. Your personal Bondle dashboard."
+        image="seo/dash.jpg"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 mb-6 neon-text">Your Dashboard</h1>
         

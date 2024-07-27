@@ -38,6 +38,8 @@ import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
 import { useDebounce } from 'use-debounce';
 import { toast } from 'react-toastify';
 import ShareButton from '@/components/ShareButton';
+import SEO from '@/components/SEO';
+// import OGPreview from '@/components/OGPreview'
 
 
 const BONDING_CURVE_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
@@ -294,6 +296,15 @@ const TokenDetail: React.FC = () => {
 
   return (
     <Layout>
+      {/* <SEO token={tokenInfo} /> */}
+      <SEO
+        token={{
+          name: tokenInfo.name,
+          symbol: tokenInfo.symbol,
+          description: tokenInfo.description,
+          logo: tokenInfo.logo
+        }}
+      />
       <div className="w-full min-h-screen bg-gray-900 text-white overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header Section */}
@@ -616,6 +627,7 @@ const TokenDetail: React.FC = () => {
 
         </div>
       </div>
+      {/* {process.env.NODE_ENV === 'development' && <OGPreview />} */}
     </Layout>
   );
 };
