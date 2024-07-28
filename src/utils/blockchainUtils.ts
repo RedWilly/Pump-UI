@@ -277,6 +277,20 @@ export const formatAmount = (amount: string, decimals: number = 18) => {
     return formattedAmount.toFixed(8);
   }
 };
+export const formatAmountV2 = (amount: string, decimals: number = 18) => {
+  const formattedAmount = parseFloat(formatUnits(BigInt(amount), decimals));
+  if (formattedAmount >= 1e12) {
+    return `${(formattedAmount / 1e12).toFixed(1)}T`;
+  } else if (formattedAmount >= 1e9) {
+    return `${(formattedAmount / 1e9).toFixed(2)}B`;
+  } else if (formattedAmount >= 1e6) {
+    return `${(formattedAmount / 1e6).toFixed(2)}M`;
+  } else if (formattedAmount >= 1e3) {
+    return `${(formattedAmount / 1e3).toFixed(2)}k`;
+  } else {
+    return formattedAmount.toFixed(2);
+  }
+};
 
 export function formatAddressV2(address: string): string {
   const lastSix = address.slice(-6);

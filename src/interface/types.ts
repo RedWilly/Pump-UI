@@ -38,6 +38,11 @@ export interface LiquidityEvent {
 
   // Add this new interface to your types file
 export interface TokenWithTransactions extends Token {
+  youtube: string | undefined;
+  discord: string | undefined;
+  twitter: any;
+  website: any;
+  telegram: any;
   transactions: {
     data: Transaction[];
     pagination: {

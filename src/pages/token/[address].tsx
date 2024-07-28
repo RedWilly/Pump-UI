@@ -1,5 +1,5 @@
 //[address].tsx
-
+import { GetServerSideProps } from 'next';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
@@ -39,18 +39,29 @@ import { useDebounce } from 'use-debounce';
 import { toast } from 'react-toastify';
 import ShareButton from '@/components/ShareButton';
 import SEO from '@/components/SEO';
+import { TokenWithTransactions } from '@/interface/types';
 // import OGPreview from '@/components/OGPreview'
 
 
 const BONDING_CURVE_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
 
-const TokenDetail: React.FC = () => {
+interface TokenDetailProps {
+  initialTokenInfo: TokenWithTransactions;
+  initialPriceHistory: any[];
+  initialHolders: any[];
+}
+
+// const TokenDetail: React.FC = () => {
+  const TokenDetail: React.FC<TokenDetailProps> = ({ initialTokenInfo }) => {
+
   const router = useRouter();
   const { address } = router.query;
   const { address: userAddress } = useAccount();
 
   const [isApproved, setIsApproved] = useState(false);
-  const [tokenInfo, setTokenInfo] = useState<any>(null);
+  // const [tokenInfo, setTokenInfo] = useState<any>(null);
+  const [tokenInfo, setTokenInfo] = useState<TokenWithTransactions>(initialTokenInfo);
+
   const [transactions, setTransactions] = useState<any[]>([]);
   const [transactionPage, setTransactionPage] = useState(1);
   const [totalTransactionPages, setTotalTransactionPages] = useState(1);
@@ -630,6 +641,26 @@ const TokenDetail: React.FC = () => {
       {/* {process.env.NODE_ENV === 'development' && <OGPreview />} */}
     </Layout>
   );
+};
+
+//simple server-side rendering  just to get token info for seo - nothing more 
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { address } = context.params as { address: string };
+
+  try {
+    const tokenInfo = await getTokenInfoAndTransactions(address, 1, 1);
+
+    return {
+      props: {
+        initialTokenInfo: tokenInfo,
+      },
+    };
+  } catch (error) {
+    console.error('Error fetching token data:', error);
+    return {
+      notFound: true,
+    };
+  }
 };
 
 export default TokenDetail;

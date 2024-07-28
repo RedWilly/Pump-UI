@@ -140,121 +140,105 @@
 // export default LiveNotifications;
 
 
-//issue to fix event dont finish loading then reset and also stuck- making the notification stuck in a lope 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useWebSocket } from '@/components/WebSocketProvider';
+import { formatAmountV2 } from '@/utils/blockchainUtils';
 
 interface Notification {
-  id: string;
   message: string;
   type: 'buy' | 'sell' | 'tokenCreated';
   logo?: string;
 }
 
-interface Transaction {
-  id: string;
-  tokenId: string;
-  type: 'buy' | 'sell';
-  senderAddress: string;
-  recipientAddress: string;
-  ethAmount: string;
-  tokenAmount: string;
-  txHash: string;
-  timestamp: string;
-  tokenPrice: string;
-  name: string;
-  symbol: string;
-  logo: string;
-}
-
 const LiveNotifications: React.FC = () => {
-  const [activeNotifications, setActiveNotifications] = useState<Notification[]>([]);
+  const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const { newTokens, newTransactions } = useWebSocket();
   const animationRef = useRef<Animation | null>(null);
-  const maxActiveNotifications = 3;
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { newTokens, newTransactions } = useWebSocket();
 
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 640);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const createNotificationMessage = useCallback((data: { type: string; data: any }) => {
-    const addressEnd = data.data.senderAddress?.slice(-6) || 'Unknown';
+  const createNotificationMessage = (data: { type: string; data: any }): Notification => {
+    const addressEnd = data.data.senderAddress?.slice(-6) || data.data.creatorAddress?.slice(-6) || 'Unknown';
     
     switch (data.type) {
       case 'buy':
-        return `${addressEnd} Bought ${formatEth(data.data.ethAmount)} BONE of ${data.data.symbol}`;
+        return {
+          message: `${addressEnd} Bought ${formatAmountV2(data.data.ethAmount)} BONE of ${data.data.symbol}`,
+          type: 'buy',
+          logo: data.data.logo
+        };
       case 'sell':
-        return `${addressEnd} Sold ${formatEth(data.data.ethAmount)} BONE of ${data.data.symbol}`;
+        return {
+          message: `${addressEnd} Sold ${formatAmountV2(data.data.ethAmount)} BONE of ${data.data.symbol}`,
+          type: 'sell',
+          logo: data.data.logo
+        };
       case 'tokenCreated':
-        return `${data.data.symbol} Created by ${addressEnd}`;
+        return {
+          message: `${data.data.symbol} Created by ${addressEnd}`,
+          type: 'tokenCreated',
+          logo: data.data.logo
+        };
       default:
         console.error('Unknown notification type:', data.type);
-        return 'New activity';
+        return {
+          message: 'New activity',
+          type: 'buy',
+          logo: undefined
+        };
     }
-  }, []);
+  };
 
-  const formatEth = useCallback((wei: string) => {
-    return (parseFloat(wei) / 1e18).toFixed(4);
-  }, []);
+  const closeNotification = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+      setCurrentNotification(null);
+    }, 3000); // 3 seconds delay
+  };
 
-  const addNotification = useCallback((notification: Notification) => {
-    setActiveNotifications(prev => {
-      if (prev.length >= maxActiveNotifications) {
-        return [...prev.slice(1), notification];
+  useEffect(() => {
+    const handleNewNotification = (notification: Notification) => {
+      setCurrentNotification(notification);
+      setIsVisible(true);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
-      return [...prev, notification];
-    });
-  }, []);
+    };
 
-  useEffect(() => {
     if (newTokens.length > 0) {
-      newTokens.forEach(token => {
-        addNotification({
-          id: Date.now().toString(),
-          message: createNotificationMessage({ type: 'tokenCreated', data: token }),
-          type: 'tokenCreated',
-          logo: token.logo,
-        });
-      });
+      console.log(newTokens)
+      const notification = createNotificationMessage({ type: 'tokenCreated', data: newTokens[0] });
+      handleNewNotification(notification);
     }
-  }, [newTokens, addNotification, createNotificationMessage]);
+
+    if (newTransactions.length > 0) {
+      console.log(newTransactions)
+      const notification = createNotificationMessage({ type: newTransactions[0].type, data: newTransactions[0] });
+      handleNewNotification(notification);
+    }
+  }, [newTokens, newTransactions]);
 
   useEffect(() => {
-    if (newTransactions.length > 0) {
-      newTransactions.forEach((transaction: Transaction) => {
-        addNotification({
-          id: transaction.id,
-          message: createNotificationMessage({ type: transaction.type, data: transaction }),
-          type: transaction.type,
-          logo: transaction.logo,
-        });
-      });
-    }
-  }, [newTransactions, addNotification, createNotificationMessage]);
-
-  const startAnimation = useCallback(() => {
-    if (containerRef.current && activeNotifications.length > 0) {
+    if (containerRef.current && currentNotification && isVisible) {
       const container = containerRef.current;
       const totalWidth = container.scrollWidth;
       const viewportWidth = container.offsetWidth;
+      const duration = 15000; // 15 seconds for a complete cycle
 
-      const baseDuration = isSmallScreen ? 10000 : 15000;
-      const duration = (totalWidth / viewportWidth) * baseDuration;
+      if (animationRef.current) {
+        animationRef.current.cancel();
+      }
 
       animationRef.current = container.animate(
         [
           { transform: 'translateX(100%)' },
-          { transform: `translateX(-${totalWidth}px)` }
+          { transform: `translateX(-${totalWidth - viewportWidth}px)` }
         ],
         {
           duration: duration,
@@ -262,51 +246,36 @@ const LiveNotifications: React.FC = () => {
         }
       );
 
-      animationRef.current.onfinish = () => {
-        setActiveNotifications(prev => {
-          const newActive = prev.slice(1);
-          return newActive;
-        });
+      animationRef.current.onfinish = closeNotification;
+
+      return () => {
+        if (animationRef.current) {
+          animationRef.current.cancel();
+        }
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+        }
       };
     }
-  }, [activeNotifications, isSmallScreen]);
+  }, [currentNotification, isVisible]);
 
-  useEffect(() => {
-    if (activeNotifications.length > 0) {
-      startAnimation();
-    }
-
-    return () => {
-      if (animationRef.current) {
-        animationRef.current.cancel();
-      }
-    };
-  }, [activeNotifications, startAnimation]);
-
-  if (activeNotifications.length === 0) return null;
+  if (!isVisible || !currentNotification) return null;
 
   return (
     <div className="bg-blue-500 text-white py-1 overflow-hidden sticky top-0 z-50">
       <div ref={containerRef} className="flex whitespace-nowrap items-center">
-        {activeNotifications.map((notification, index) => (
-          <React.Fragment key={`${notification.id}-${index}`}>
-            <div className="flex items-center space-x-2 mx-3 sm:mx-6">
-              <span className="text-xs sm:text-sm font-medium">{notification.message}</span>
-              {notification.type !== 'tokenCreated' && notification.logo && (
-                <Image
-                  src={notification.logo}
-                  alt="Token Logo"
-                  width={16}
-                  height={16}
-                  className="rounded-full hidden sm:inline"
-                />
-              )}
-            </div>
-            {index < activeNotifications.length - 1 && (
-              <div className="h-1 w-1 sm:h-2 sm:w-2 bg-white rounded-full mx-2 sm:mx-4"></div>
-            )}
-          </React.Fragment>
-        ))}
+        <div className="flex items-center space-x-2 mx-3">
+          <span className="text-xs font-medium">{currentNotification.message}</span>
+          {currentNotification.logo && (
+            <Image
+              src={currentNotification.logo}
+              alt="Token Logo"
+              width={12}
+              height={12}
+              className="rounded-full"
+            />
+          )}
+        </div>
       </div>
     </div>
   );
