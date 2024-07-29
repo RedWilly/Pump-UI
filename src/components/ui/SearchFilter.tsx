@@ -14,23 +14,23 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch }) => {
   };
 
   return (
-    <form onSubmit={handleSearch} className="flex flex-col sm:flex-row items-center mb-6 gap-4">
-      <div className="relative flex-grow w-full">
+    <form onSubmit={handleSearch} className="mb-4 w-full max-w-md mx-auto">
+      <div className="relative flex items-center">
         <input
           type="text"
           placeholder="Search tokens..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full py-2 pl-10 pr-4 text-white bg-gray-700 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full py-2.5 pl-10 pr-24 text-sm text-white bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
         />
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+        <button
+          type="submit"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1.5 text-xs font-medium bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
+        >
+          Search
+        </button>
       </div>
-      <button
-        type="submit"
-        className="w-full sm:w-auto px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"
-      >
-        Search
-      </button>
     </form>
   );
 };

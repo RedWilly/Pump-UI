@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import Layout from '@/components/Layout';
-import TokenList from '@/components/TokenList';
-import SearchFilter from '@/components/SearchFilter';
-import HowItWorksPopup from '@/components/HowItWorksPopup';
-import SortOptions, { SortOption } from '@/components/SortOptions';
+import React, { useState, useEffect, useMemo } from 'react';
+import Layout from '@/components/layout/Layout';
+import TokenList from '@/components/tokens/TokenList';
+import SearchFilter from '@/components/ui/SearchFilter';
+import HowItWorksPopup from '@/components/notifications/HowItWorksPopup';
+import SortOptions, { SortOption } from '@/components/ui/SortOptions';
 import { getAllTokens, getTokensWithLiquidity, getRecentTokens, searchTokens } from '@/utils/api';
 import { Token, TokenWithLiquidityEvents, PaginatedResponse } from '@/interface/types';
-import SEO from '@/components/SEO';
-import { useWebSocket } from '@/components/WebSocketProvider';
+import SEO from '@/components/seo/SEO';
+import { useWebSocket } from '@/components/providers/WebSocketProvider';
+import { Switch } from '@/components/ui/switch';
 
 const TOKENS_PER_PAGE = 10;
 
@@ -18,14 +19,55 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [noRecentTokens, setNoRecentTokens] = useState(false);
+  const [showNewTokens, setShowNewTokens] = useState(false);
+  const [newTokensBuffer, setNewTokensBuffer] = useState<Token[]>([]);
+  const [displayedNewTokens, setDisplayedNewTokens] = useState<Token[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const { newTokens } = useWebSocket();
 
-  const fetchTokens = useCallback(async () => {
+  useEffect(() => {
+    console.log('Effect triggered. Current sort:', sort, 'Current page:', currentPage);
+    fetchTokens();
+  }, [currentPage, sort, searchQuery]);
+
+  useEffect(() => {
+    // console.log('New tokens received:', newTokens);
+    if (newTokens.length > 0) {
+      if (showNewTokens) {
+        setTokens(prevTokens => {
+          if (!prevTokens) return null;
+          const newUniqueTokens = newTokens.filter(newToken => 
+            !prevTokens.data.some(existingToken => existingToken.id === newToken.id) &&
+            !displayedNewTokens.some(displayedToken => displayedToken.id === newToken.id)
+          );
+          // console.log('New unique tokens to add:', newUniqueTokens);
+          setDisplayedNewTokens(prev => [...prev, ...newUniqueTokens]);
+          return {
+            ...prevTokens,
+            data: [...newUniqueTokens, ...prevTokens.data],
+            totalCount: prevTokens.totalCount + newUniqueTokens.length
+          };
+        });
+      } else {
+        setNewTokensBuffer(prev => {
+          const uniqueNewTokens = newTokens.filter(newToken => 
+            !prev.some(bufferToken => bufferToken.id === newToken.id)
+          );
+          // console.log('New tokens added to buffer:', uniqueNewTokens);
+          return [...uniqueNewTokens, ...prev];
+        });
+      }
+    }
+  }, [newTokens, showNewTokens]);
+
+  const fetchTokens = async () => {
     setIsLoading(true);
     setNoRecentTokens(false);
+    setError(null);
     let fetchedTokens;
 
     try {
+      // console.log('Fetching tokens...');
       if (searchQuery) {
         fetchedTokens = await searchTokens(searchQuery, currentPage, TOKENS_PER_PAGE);
       } else {
@@ -56,6 +98,8 @@ const Home: React.FC = () => {
         }
       }
 
+      // console.log('Fetched tokens:', fetchedTokens);
+
       const adjustedTokens: PaginatedResponse<Token | TokenWithLiquidityEvents> = {
         data: fetchedTokens.data || fetchedTokens.tokens || [],
         totalCount: fetchedTokens.totalCount,
@@ -67,29 +111,11 @@ const Home: React.FC = () => {
       setTokens(adjustedTokens);
     } catch (error) {
       console.error('Error fetching tokens:', error);
-      // Handle errors here (e.g., show an error message to the user)
+      setError('Failed to fetch tokens. Please try again later.');
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, sort, searchQuery]);
-
-  useEffect(() => {
-    fetchTokens();
-  }, [fetchTokens]);
-
-  useEffect(() => {
-    if (newTokens.length > 0 && sort === 'all') {
-      setTokens(prevTokens => {
-        if (!prevTokens) return null;
-        const updatedTokens = [...newTokens, ...prevTokens.data].slice(0, TOKENS_PER_PAGE);
-        return {
-          ...prevTokens,
-          data: updatedTokens,
-          totalCount: prevTokens.totalCount + newTokens.length
-        };
-      });
-    }
-  }, [newTokens, sort]);
+  };
 
   const filteredTokens = useMemo(() => {
     if (!tokens || !tokens.data) return [];
@@ -99,20 +125,61 @@ const Home: React.FC = () => {
     );
   }, [tokens, searchQuery]);
 
-  const handleSearch = useCallback((query: string) => {
+  const handleSearch = (query: string) => {
+    console.log('Search query updated:', query);
     setSearchQuery(query);
     setCurrentPage(1);
-  }, []);
+  };
 
-  const handleSort = useCallback((option: SortOption) => {
+  const handleSort = (option: SortOption) => {
+    console.log('Sort option changed:', option);
     setSort(option);
     setCurrentPage(1);
-    setSearchQuery('');
-  }, []);
+    setSearchQuery(''); // Clear search query when sorting
+  };
 
-  const handlePageChange = useCallback((page: number) => {
+  const handlePageChange = (page: number) => {
+    console.log('Page changed:', page);
     setCurrentPage(page);
-  }, []);
+  };
+
+  const toggleNewTokens = () => {
+    setShowNewTokens(prev => {
+      // console.log('Toggling new tokens. Current state:', prev);
+      if (prev) {
+        // Turning off
+        setTokens(oldTokens => {
+          if (!oldTokens) return null;
+          const updatedTokens = {
+            ...oldTokens,
+            data: oldTokens.data.filter(token => !displayedNewTokens.includes(token)),
+            totalCount: oldTokens.totalCount - displayedNewTokens.length
+          };
+          // console.log('Updated tokens after turning off:', updatedTokens);
+          return updatedTokens;
+        });
+        setNewTokensBuffer(displayedNewTokens);
+        setDisplayedNewTokens([]);
+      } else {
+        // Turning on
+        setTokens(oldTokens => {
+          if (!oldTokens) return null;
+          const updatedTokens = {
+            ...oldTokens,
+            data: [...newTokensBuffer, ...oldTokens.data],
+            totalCount: oldTokens.totalCount + newTokensBuffer.length
+          };
+          // console.log('Updated tokens after turning on:', updatedTokens);
+          return updatedTokens;
+        });
+        setDisplayedNewTokens(newTokensBuffer);
+        setNewTokensBuffer([]);
+      }
+      return !prev;
+    });
+  };
+
+  // console.log('Rendering component. isLoading:', isLoading, 'tokens:', tokens, 'filteredTokens:', filteredTokens);
 
   return (
     <Layout>
@@ -125,9 +192,25 @@ const Home: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 mb-6">Explore Tokens</h1>
         <SearchFilter onSearch={handleSearch} />
-        <SortOptions onSort={handleSort} currentSort={sort} />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
+          <SortOptions onSort={handleSort} currentSort={sort} />
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={showNewTokens}
+              onCheckedChange={toggleNewTokens}
+              aria-label="Toggle new tokens"
+              className="data-[state=checked]:bg-blue-500"
+            />
+            <span className="text-sm text-gray-400">Show new tokens</span>
+            {newTokensBuffer.length > 0 && !showNewTokens && (
+              <span className="text-xs text-blue-400">({newTokensBuffer.length} new)</span>
+            )}
+          </div>
+        </div>
         {isLoading ? (
           <div className="text-center text-white text-xl mt-10">Loading...</div>
+        ) : error ? (
+          <div className="text-center text-red-500 text-xl mt-10">{error}</div>
         ) : sort === 'bomper' ? (
           <div className="text-center text-white text-xl mt-10">NOTHING HERE FOR YOU</div>
         ) : noRecentTokens ? (

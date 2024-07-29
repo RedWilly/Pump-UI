@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAccount } from 'wagmi';
 import { useRouter } from 'next/router';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/Layout';
 import { getTransactionsByAddress, getAllTokenAddresses } from '@/utils/api';
 import { Transaction, PaginatedResponse } from '@/interface/types';
 import { formatTimestamp, formatAddressV2, formatAmount, useERC20Balance } from '@/utils/blockchainUtils';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
-import SEO from '@/components/SEO';
+import SEO from '@/components/seo/SEO';
 
 interface TransactionResponse extends Omit<PaginatedResponse<Transaction>, 'data'> {
   transactions: Transaction[];
