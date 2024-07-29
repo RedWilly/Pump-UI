@@ -19,7 +19,7 @@ const HowItWorksPopup: React.FC = () => {
     { icon: CurrencyDollarIcon, text: "Buy on the bonding curve" },
     { icon: ArrowTrendingUpIcon, text: "Sell anytime for profits/losses" },
     { icon: BanknotesIcon, text: "Curve reaches 2500 BONE" },
-    { icon: FireIcon, text: "BONE deposited in Uniswap & burned" },
+    { icon: FireIcon, text: "BONE deposited in Chewyswap & burned" },
   ];
 
   return (
