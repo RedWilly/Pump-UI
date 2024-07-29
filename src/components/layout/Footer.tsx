@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
             <Link href="/faq" className="text-xs text-gray-400 hover:text-white transition-colors">
               FAQ
             </Link>
-            <a href="https://twitter.com/BondleXYZ" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-400 hover:text-white transition-colors">
+            <a href="https://x.com/rink3y" target="_blank" rel="noopener noreferrer" className="text-xs text-gray-400 hover:text-white transition-colors">
               Twitter
             </a>
           </nav>
