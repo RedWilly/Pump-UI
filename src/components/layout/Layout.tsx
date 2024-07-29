@@ -1,7 +1,7 @@
 import React from 'react'
 import Navbar from './Navbar'
 import Footer from './Footer'
-import LiveNotifications from './LiveNotifications'
+import LiveNotifications from '../notifications/LiveNotifications'
 
 interface LayoutProps {
   children: React.ReactNode

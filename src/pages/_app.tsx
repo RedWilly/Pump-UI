@@ -7,7 +7,7 @@ import { getDefaultConfig, RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { WebSocketProvider } from '@/components/WebSocketProvider';
+import { WebSocketProvider } from '@/components/providers/WebSocketProvider';
 
 
 

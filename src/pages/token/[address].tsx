@@ -17,8 +17,8 @@ import {
   ChevronRightIcon,
   Info
 } from 'lucide-react';
-import Layout from '@/components/Layout';
-import TradingViewChart from '@/components/TradingViewChart';
+import Layout from '@/components/layout/Layout';
+import TradingViewChart from '@/components/charts/TradingViewChart';
 import {
   useCurrentTokenPrice,
   useTokenLiquidity,
@@ -37,8 +37,8 @@ import { parseUnits, formatUnits } from 'viem';
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
 import { useDebounce } from 'use-debounce';
 import { toast } from 'react-toastify';
-import ShareButton from '@/components/ShareButton';
-import SEO from '@/components/SEO';
+import ShareButton from '@/components/ui/ShareButton';
+import SEO from '@/components/seo/SEO';
 import { TokenWithTransactions } from '@/interface/types';
 // import OGPreview from '@/components/OGPreview'
 

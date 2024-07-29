@@ -1,43 +1,74 @@
 import React from 'react';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/Layout';
+import { CubeTransparentIcon, ChartBarIcon, CurrencyDollarIcon, ArrowPathIcon, BeakerIcon } from '@heroicons/react/24/outline';
 
 const AboutPage: React.FC = () => {
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-blue-400 mb-6">About Pump Fun</h1>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <h1 className="text-3xl md:text-4xl font-bold text-blue-400 mb-8 text-center">About Bondle</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <section className="card">
-            <h2 className="text-2xl font-semibold text-blue-400 mb-4">What is Pump Fun?</h2>
-            <p className="text-gray-300">
-              Pump Fun is a cutting-edge decentralized platform for creating and trading tokens using bonding curves. 
-              Our platform empowers anyone to launch their own token with a unique bonding curve, revolutionizing 
-              project funding and community building in the crypto space.
-            </p>
-          </section>
-          
-          <section className="card">
-            <h2 className="text-2xl font-semibold text-blue-400 mb-4">How It Works</h2>
-            <ol className="list-decimal list-inside space-y-2 text-gray-300">
-              <li><span className="font-bold text-blue-400">Token Creation:</span> Users create tokens by setting name, symbol, and description.</li>
-              <li><span className="font-bold text-blue-400">Bonding Curve:</span> Each token&apos;s price is determined by its unique curve.</li>
-              <li><span className="font-bold text-blue-400">Buying Tokens:</span> Users buy tokens with BONE, price based on the curve.</li>
-              <li><span className="font-bold text-blue-400">Selling Tokens:</span> Users can sell back anytime, also priced by the curve.</li>
-              <li><span className="font-bold text-blue-400">Liquidity Pool:</span> Each token has its own pool that grows and shrinks with trades.</li>
-            </ol>
-          </section>
+        <div className="mb-12">
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 md:p-8">
+            <h2 className="text-2xl font-semibold text-blue-400 mb-4">What is Bondle?</h2>
+            <div className="text-gray-300 leading-relaxed space-y-4">
+              <p>
+                Bondle is a revolutionary decentralized platform that empowers individuals to create and trade tokens using innovative bonding curve technology.
+              </p>
+              <p className="hidden sm:block">
+                Our mission is to democratize token creation and provide a dynamic, fair trading environment for the crypto community.
+              </p>
+              <p className="sm:hidden">
+                Our mission is to democratize token creation for the crypto community.
+              </p>
+              <p className="sm:hidden">
+                We provide a dynamic and fair trading environment using bonding curve technology.
+              </p>
+            </div>
+          </div>
         </div>
         
-        <section className="card mt-6">
-          <h2 className="text-2xl font-semibold text-blue-400 mb-4">Benefits of Bonding Curves</h2>
-          <ul className="list-disc list-inside space-y-2 text-gray-300">
-            <li><span className="font-bold text-blue-400">Continuous Liquidity:</span> Tokens can always be bought or sold</li>
-            <li><span className="font-bold text-blue-400">Price Discovery:</span> Market determines price based on supply and demand</li>
-            <li><span className="font-bold text-blue-400">Incentivized Participation:</span> Early supporters benefit from price appreciation</li>
-            <li><span className="font-bold text-blue-400">Customizable:</span> Different curve shapes for various token economics</li>
-          </ul>
-        </section>
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold text-blue-400 mb-6 text-center">How It Works</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: CubeTransparentIcon, title: "Token Creation", description: "Users easily create tokens by setting a name, symbol, and description." },
+              { icon: ChartBarIcon, title: "Bonding Curve", description: "Each token's price is determined by its unique bonding curve." },
+              { icon: CurrencyDollarIcon, title: "Trading", description: "Users can buy and sell tokens, with prices dynamically adjusted by the curve." },
+              { icon: ArrowPathIcon, title: "Liquidity Pool", description: "Each token has its own liquidity pool that grows and shrinks with trades." },
+              { icon: BeakerIcon, title: "Customization", description: "Various curve shapes allow for different token economics." },
+            ].map((item, index) => (
+              <div key={index} className="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center text-center">
+                <item.icon className="h-12 w-12 text-blue-400 mb-4" />
+                <h3 className="text-xl font-semibold text-blue-400 mb-2">{item.title}</h3>
+                <p className="text-gray-300">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div>
+          <h2 className="text-2xl font-semibold text-blue-400 mb-6 text-center">Benefits of Bonding Curves</h2>
+          <div className="bg-gray-800 rounded-lg shadow-lg p-6 md:p-8">
+            <ul className="space-y-4 text-gray-300">
+              {[
+                { title: "Continuous Liquidity", description: "Tokens can always be bought or sold, ensuring a fluid market." },
+                { title: "Algorithmic Price Discovery", description: "Market price is determined automatically based on supply and demand." },
+                { title: "Incentivized Participation", description: "Early supporters benefit from potential price appreciation as demand grows." },
+                { title: "Flexible Token Economics", description: "Different curve shapes allow for various economic models to suit project needs." },
+              ].map((item, index) => (
+                <li key={index} className="flex items-start">
+                  <svg className="h-6 w-6 text-blue-400 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <div>
+                    <span className="font-semibold text-blue-400">{item.title}:</span> {item.description}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </Layout>
   );

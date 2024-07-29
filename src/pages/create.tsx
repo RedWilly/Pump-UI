@@ -2,8 +2,8 @@ import React, { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
-import Layout from '@/components/Layout';
-import SEO from '@/components/SEO';
+import Layout from '@/components/layout/Layout';
+import SEO from '@/components/seo/SEO';
 import { useCreateToken } from '@/utils/blockchainUtils';
 import { updateToken } from '@/utils/api';
 import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
@@ -166,14 +166,14 @@ const CreateToken: React.FC = () => {
         description="Launch a coin that is instantly tradable without having to seed liquidity. - fair launch"
         image="/seo/create.jpg"
       />
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-blue-400 mb-6 text-center">Create New Token</h1>
         
         {/* Info button with tooltip */}
         <div className="relative mb-6 flex justify-center">
           <button
             type="button"
-            className="text-gray-400 hover:text-blue-400 transition-colors duration-200 flex items-center bg-gray-800 px-3 py-2 rounded-md shadow-md"
+            className="text-gray-400 hover:text-blue-400 transition-colors duration-200 flex items-center bg-gray-800 px-3 py-2 rounded-full shadow-md"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
           >
@@ -190,9 +190,9 @@ const CreateToken: React.FC = () => {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8 bg-gray-800 p-6 rounded-lg shadow-xl">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl">
           {/* Token Name and Symbol inputs */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="tokenName" className="block text-sm font-medium text-gray-300 mb-1">
                 Token Name
@@ -244,17 +244,17 @@ const CreateToken: React.FC = () => {
               Token Image
             </label>
             <div 
-              className="mt-1 flex justify-center items-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md hover:border-blue-500 transition duration-150 ease-in-out"
+              className="mt-1 flex justify-center items-center px-4 py-4 border-2 border-gray-600 border-dashed rounded-md hover:border-blue-500 transition duration-150 ease-in-out"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
               <div className="space-y-1 text-center">
                 <div className="flex flex-col items-center">
-                  <CloudArrowUpIcon className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                  <div className="flex text-sm text-gray-400 flex-wrap justify-center">
+                  <CloudArrowUpIcon className="mx-auto h-10 w-10 text-gray-400 mb-2" />
+                  <div className="flex flex-col sm:flex-row text-sm text-gray-400 items-center">
                     <label
                       htmlFor="tokenImage"
-                      className="relative cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 transition duration-150 ease-in-out px-3 py-2 mb-2 sm:mb-0 sm:mr-2"
+                      className="cursor-pointer bg-gray-700 rounded-md font-medium text-blue-400 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 transition duration-150 ease-in-out px-3 py-2 mb-2 sm:mb-0 sm:mr-2"
                     >
                       <span>Upload a file</span>
                       <input
@@ -268,7 +268,7 @@ const CreateToken: React.FC = () => {
                         ref={fileInputRef}
                       />
                     </label>
-                    <p className="mt-2 sm:mt-0">or drag and drop</p>
+                    <p>or drag and drop</p>
                   </div>
                   <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF up to 1MB</p>
                 </div>
@@ -284,9 +284,8 @@ const CreateToken: React.FC = () => {
                 <img
                   src={tokenImageUrl}
                   alt="Token preview"
-                  className="h-32 w-32 object-cover rounded-md mx-auto"
+                  className="h-24 w-24 object-cover rounded-full mx-auto border-2 border-blue-500"
                 />
-                {/* <p className="text-xs text-gray-400 mt-2 break-all max-w-xs mx-auto">IPFS: {tokenImageUrl}</p> */}
               </div>
             </div>
           )}
@@ -296,7 +295,7 @@ const CreateToken: React.FC = () => {
             <button
               type="button"
               onClick={toggleSocialSection}
-              className="w-full flex justify-between items-center p-4 bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-200"
+              className="w-full flex justify-between items-center p-3 bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-200"
             >
               <span className="font-medium">Social Media Links (Optional)</span>
               {isSocialExpanded ? (
@@ -306,7 +305,7 @@ const CreateToken: React.FC = () => {
               )}
             </button>
             {isSocialExpanded && (
-              <div className="p-4 bg-gray-800 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="p-4 bg-gray-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { id: 'website', label: 'Website', value: website, setter: setWebsite },
                   { id: 'telegram', label: 'Telegram', value: telegram, setter: setTelegram },
@@ -324,7 +323,6 @@ const CreateToken: React.FC = () => {
                       value={item.value}
                       onChange={(e) => item.setter(e.target.value)}
                       className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                      placeholder={`Enter ${item.label.toLowerCase()} URL`}
                     />
                   </div>
                 ))}
@@ -337,7 +335,7 @@ const CreateToken: React.FC = () => {
             <button
               type="submit"
               disabled={isButtonDisabled}
-              className={`w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white transition duration-150 ease-in-out ${
+              className={`w-full py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-medium text-white transition duration-150 ease-in-out ${
                 isButtonDisabled
                   ? 'bg-gray-600 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'

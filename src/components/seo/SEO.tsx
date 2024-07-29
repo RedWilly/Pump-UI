@@ -15,20 +15,14 @@ interface SEOProps {
 
 const SEO: React.FC<SEOProps> = ({ title, description, image, token }) => {
   const router = useRouter();
-  const domain = process.env.NEXT_PUBLIC_DOMAIN || 'https://bondle.xyz'; // Replace with your actual domain
+  const domain = process.env.NEXT_PUBLIC_DOMAIN || 'https://bondle.xyz';
 
   const seo = {
-    title: title || 'Bondle - Explore and Trade Tokens',
-    description: description || 'Explore, create, and trade tokens on the Bondle platform',
-    image: image || `${domain}/default-og-image.jpg`,
+    title: token ? `${token.name} (${token.symbol}) - Bondle` : title || 'Bondle - Explore and Trade Tokens',
+    description: token?.description || description || 'Explore, create, and trade tokens on the Bondle platform',
+    image: token?.logo || image || `${domain}/default-og-image.jpg`,
     url: `${domain}${router.asPath}`,
   };
-
-  if (token) {
-    seo.title = `${token.name} (${token.symbol}) - Bondle`;
-    seo.description = token.description || 'View token details on Bondle';
-    seo.image = token.logo || seo.image;
-  }
 
   return (
     <Head>

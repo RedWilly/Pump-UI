@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { CurrencyDollarIcon, UserIcon, ClockIcon, TagIcon } from '@heroicons/react/24/outline';
 import { Token, TokenWithLiquidityEvents } from '@/interface/types';
-import { useTokenLiquidity, formatAmount, formatTimestamp, formatAddressV2 } from '@/utils/blockchainUtils';
+import { useTokenLiquidity, formatAmount, formatTimestamp, formatAmountV2 } from '@/utils/blockchainUtils';
 
 interface TokenCardProps {
   token: Token | TokenWithLiquidityEvents;
@@ -53,11 +53,11 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
           </div>
           <div className="flex items-center justify-between text-white">
             <span>{token.symbol}</span>
-            <span>{formatAmount(liquidityEvent.tokenAmount)}</span>
+            <span>{formatAmountV2(liquidityEvent.tokenAmount)}</span>
           </div>
           <div className="flex items-center justify-between text-white">
             <span>BONE</span>
-            <span>{formatAmount(liquidityEvent.ethAmount)}</span>
+            <span>{formatAmountV2(liquidityEvent.ethAmount)}</span>
           </div>
           <div className="flex items-center justify-between text-gray-400">
             <span>Listed</span>
@@ -112,7 +112,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
                   height={16}
                   className="inline-block align-middle mr-1"
                 />
-                {formatAmount(currentLiquidity)}
+                {formatAmountV2(currentLiquidity)}
               </span>
             </div>
             <div className="flex items-center text-gray-400">
