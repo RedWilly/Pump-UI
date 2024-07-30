@@ -187,6 +187,94 @@ export function useCreateToken() {
   return { createToken, isLoading: isLoading || isSuccess === false };
 }
 
+
+// export function useCreateToken() {
+//   const { writeContractAsync } = useWriteContract();
+//   const { data: transactionReceipt, isLoading, isSuccess, isError, error } = useWaitForTransactionReceipt();
+//   const publicClient = usePublicClient();
+
+//   const createToken = async (name: string, symbol: string, initialPurchaseAmount: bigint) => {
+//     if (!publicClient) {
+//       throw new Error('Public client is not available');
+//     }
+
+//     try {
+//       console.log('Initiating token creation transaction...');
+//       const totalValue = CREATION_FEE + initialPurchaseAmount;
+//       const hash = await writeContractAsync({
+//         address: BONDING_CURVE_MANAGER_ADDRESS,
+//         abi: BondingCurveManagerABI,
+//         functionName: 'create',
+//         args: [name, symbol],
+//         value: totalValue,
+//       });
+//       console.log('Token creation transaction sent. Hash:', hash);
+
+//       console.log('Waiting for transaction confirmation...');
+//       let receipt: TransactionReceipt | null = null;
+//       let attempts = 0;
+//       const maxAttempts = 30; // a maximum of 30 * 2 seconds
+
+//       while (!receipt && attempts < maxAttempts) {
+//         if (isSuccess && transactionReceipt) {
+//           receipt = transactionReceipt;
+//           break;
+//         }
+
+//         if (isError) {
+//           console.error('Transaction failed:', error?.message);
+//           throw new Error('Transaction failed: ' + error?.message);
+//         }
+
+//         // Manual check for transaction receipt
+//         try {
+//           receipt = await publicClient.getTransactionReceipt({ hash });
+//           if (receipt) break;
+//         } catch (e) {
+//           console.log('Error fetching receipt, will retry:', e);
+//         }
+
+//         await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for 3 seconds
+//         attempts++;
+//         console.log(`Still waiting for confirmation... Attempt ${attempts}/${maxAttempts}`);
+//       }
+
+//       if (!receipt) {
+//         console.error('Transaction confirmation timeout');
+//         throw new Error('Transaction confirmation timeout');
+//       }
+
+//       console.log('Transaction confirmed. Receipt:', receipt);
+
+//       const tokenCreatedLog = receipt.logs.find(log => 
+//         log.address.toLowerCase() === BONDING_CURVE_MANAGER_ADDRESS.toLowerCase()
+//       ) as Log | undefined;
+
+//       if (tokenCreatedLog) {
+//         console.log('TokenCreated event found in logs');
+//         const decodedLog = decodeEventLog({
+//           abi: BondingCurveManagerABI,
+//           data: tokenCreatedLog.data,
+//           topics: tokenCreatedLog.topics,
+//         }) as unknown as { eventName: string; args: { tokenAddress: `0x${string}`; creator: `0x${string}`; name: string; symbol: string } };
+
+//         if (decodedLog.eventName === 'TokenCreated' && decodedLog.args) {
+//           console.log('Token created successfully. Address:', decodedLog.args.tokenAddress);
+//           return decodedLog.args.tokenAddress;
+//         }
+//       }
+
+//       console.error('TokenCreated event not found in transaction logs');
+//       throw new Error('TokenCreated event not found in transaction logs');
+//     } catch (error) {
+//       console.error('Error in createToken function:', error);
+//       throw error;
+//     }
+//   };
+
+//   return { createToken, isLoading: isLoading || isSuccess === false };
+// }
+
 export function useBuyTokens() {
   const { writeContractAsync, data, error, isPending } = useWriteContract();
 

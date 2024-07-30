@@ -297,7 +297,7 @@ const CreateToken: React.FC = () => {
               onClick={toggleSocialSection}
               className="w-full flex justify-between items-center p-3 bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-200"
             >
-              <span className="font-medium">Social Media Links (Optional)</span>
+              <span className="font-small">Social Links (Optional)</span>
               {isSocialExpanded ? (
                 <ChevronUpIcon className="h-5 w-5" />
               ) : (
