@@ -7,8 +7,52 @@ import SEO from '@/components/seo/SEO';
 import { useCreateToken } from '@/utils/blockchainUtils';
 import { updateToken } from '@/utils/api';
 import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { parseUnits } from 'viem';
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const CREATION_FEE = parseUnits('1', 18); // 1 BONE
+
+interface PurchaseConfirmationPopupProps {
+  onConfirm: (amount: bigint) => void;
+  onCancel: () => void;
+}
+
+const PurchaseConfirmationPopup: React.FC<PurchaseConfirmationPopupProps> = ({ onConfirm, onCancel }) => {
+
+  const [purchaseAmount, setPurchaseAmount] = useState('');
+
+  const handleConfirm = () => {
+    const amount = parseFloat(purchaseAmount);
+    if (isNaN(amount) || amount < 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    onConfirm(parseUnits(purchaseAmount, 18));
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full">
+        <h2 className="text-xl font-bold text-blue-400 mb-4">Confirm Initial Purchase</h2>
+        <p className="text-gray-300 mb-4">How many BONE would you like to use for the initial token purchase?</p>
+        <input
+          type="number"
+          value={purchaseAmount}
+          onChange={(e) => setPurchaseAmount(e.target.value)}
+          className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white mb-4"
+          placeholder="Enter amount of BONE"
+        />
+        <p className="text-gray-300 mb-4">
+          Total cost: {(parseFloat(purchaseAmount) + 1).toFixed(2)} BONE (including 1 BONE creation fee)
+        </p>
+        <div className="flex justify-end space-x-4">
+          <button onClick={onCancel} className="px-4 py-2 bg-gray-600 text-white rounded-md">Cancel</button>
+          <button onClick={handleConfirm} className="px-4 py-2 bg-blue-500 text-white rounded-md">Confirm</button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const CreateToken: React.FC = () => {
   const router = useRouter();
@@ -26,6 +70,7 @@ const CreateToken: React.FC = () => {
   const [creationStep, setCreationStep] = useState<'idle' | 'uploading' | 'creating' | 'updating' | 'completed' | 'error'>('idle');
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showPurchasePopup, setShowPurchasePopup] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { createToken, isLoading: isBlockchainLoading } = useCreateToken();
@@ -104,13 +149,17 @@ const CreateToken: React.FC = () => {
       toast.error('Please upload an image before creating the token.');
       return;
     }
+    setShowPurchasePopup(true);
+  }, [tokenImageUrl]);
 
+  const handlePurchaseConfirm = useCallback(async (purchaseAmount: bigint) => {
+    setShowPurchasePopup(false);
     setCreationStep('creating');
     let tokenAddress: string | null = null;
 
     try {
       console.log('Creating token on blockchain...');
-      tokenAddress = await createToken(tokenName, tokenSymbol);
+      tokenAddress = await createToken(tokenName, tokenSymbol, purchaseAmount);
       console.log('Token created on blockchain:', tokenAddress);
       
       setCreationStep('updating');
@@ -119,16 +168,20 @@ const CreateToken: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 4000));
       
       console.log('Updating token in backend...');
-      await updateToken(tokenAddress, {
-        logo: tokenImageUrl,
-        description: tokenDescription,
-        website,
-        telegram,
-        discord,
-        twitter,
-        youtube
-      });
-      console.log('Token updated in backend');
+      if (tokenAddress && tokenImageUrl) {
+        await updateToken(tokenAddress, {
+          logo: tokenImageUrl,
+          description: tokenDescription,
+          website,
+          telegram,
+          discord,
+          twitter,
+          youtube
+        });
+        console.log('Token updated in backend');
+      } else {
+        throw new Error('Token address or image URL is missing');
+      }
       
       setCreationStep('completed');
       toast.success('Token created and updated successfully!');
@@ -272,7 +325,7 @@ const CreateToken: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF up to 1MB</p>
                 </div>
-              </div>
+                </div>
             </div>
             {isUploading && <p className="text-sm text-gray-400 mt-2">Uploading image to IPFS...</p>}
           </div>
@@ -297,7 +350,7 @@ const CreateToken: React.FC = () => {
               onClick={toggleSocialSection}
               className="w-full flex justify-between items-center p-3 bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-200"
             >
-              <span className="font-small">Social Links (Optional)</span>
+              <span className="font-medium">Social Media Links (Optional)</span>
               {isSocialExpanded ? (
                 <ChevronUpIcon className="h-5 w-5" />
               ) : (
@@ -323,6 +376,7 @@ const CreateToken: React.FC = () => {
                       value={item.value}
                       onChange={(e) => item.setter(e.target.value)}
                       className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                      placeholder={`Enter ${item.label.toLowerCase()} URL`}
                     />
                   </div>
                 ))}
@@ -345,6 +399,13 @@ const CreateToken: React.FC = () => {
             </button>
           </div>
         </form>
+
+        {showPurchasePopup && (
+          <PurchaseConfirmationPopup
+            onConfirm={handlePurchaseConfirm}
+            onCancel={() => setShowPurchasePopup(false)}
+          />
+        )}
       </div>
     </Layout>
   );
