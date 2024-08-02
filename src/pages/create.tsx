@@ -7,8 +7,13 @@ import SEO from '@/components/seo/SEO';
 import { useCreateToken } from '@/utils/blockchainUtils';
 import { updateToken } from '@/utils/api';
 import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
+import { parseUnits } from 'viem';
+import PurchaseConfirmationPopup from '@/components/notifications/PurchaseConfirmationPopup';
+
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const CREATION_FEE = parseUnits('1', 18); // 1 BONE
+
 
 const CreateToken: React.FC = () => {
   const router = useRouter();
@@ -26,9 +31,10 @@ const CreateToken: React.FC = () => {
   const [creationStep, setCreationStep] = useState<'idle' | 'uploading' | 'creating' | 'updating' | 'completed' | 'error'>('idle');
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showPurchasePopup, setShowPurchasePopup] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { createToken, isLoading: isBlockchainLoading } = useCreateToken();
+  const { createToken, isLoading: isBlockchainLoading, UserRejectedRequestError } = useCreateToken();
 
   const uploadToIPFS = useCallback(async (file: File) => {
     if (file.size > MAX_FILE_SIZE) {
@@ -104,13 +110,17 @@ const CreateToken: React.FC = () => {
       toast.error('Please upload an image before creating the token.');
       return;
     }
+    setShowPurchasePopup(true);
+  }, [tokenImageUrl]);
 
+  const handlePurchaseConfirm = useCallback(async (purchaseAmount: bigint) => {
+    setShowPurchasePopup(false);
     setCreationStep('creating');
     let tokenAddress: string | null = null;
 
     try {
       console.log('Creating token on blockchain...');
-      tokenAddress = await createToken(tokenName, tokenSymbol);
+      tokenAddress = await createToken(tokenName, tokenSymbol, purchaseAmount);
       console.log('Token created on blockchain:', tokenAddress);
       
       setCreationStep('updating');
@@ -119,28 +129,45 @@ const CreateToken: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 4000));
       
       console.log('Updating token in backend...');
-      await updateToken(tokenAddress, {
-        logo: tokenImageUrl,
-        description: tokenDescription,
-        website,
-        telegram,
-        discord,
-        twitter,
-        youtube
-      });
-      console.log('Token updated in backend');
+      if (tokenAddress && tokenImageUrl) {
+        await updateToken(tokenAddress, {
+          logo: tokenImageUrl,
+          description: tokenDescription,
+          website,
+          telegram,
+          discord,
+          twitter,
+          youtube
+        });
+        console.log('Token updated in backend');
+      } else {
+        throw new Error('Token address or image URL is missing');
+      }
       
       setCreationStep('completed');
       toast.success('Token created and updated successfully!');
       router.push(`/token/${tokenAddress}`);
     } catch (error) {
       console.error('Error in token creation/update process:', error);
-      if (tokenAddress) {
-        toast.error('Token created on blockchain but failed to update in backend. Please try updating later in your portfolio.');
+      
+      // Reset creation step to allow resubmission
+      setCreationStep('idle');
+
+      if (error instanceof Error) {
+        if (error instanceof UserRejectedRequestError) {
+          // MetaMask rejection or similar
+          toast.error('Transaction was cancelled. Please try again.');
+        } else if (!tokenAddress) {
+          // Error occurred before token creation on blockchain
+          toast.error('Failed to create token on blockchain. Please try again.');
+        } else {
+          // Token created on blockchain but backend update failed
+          toast.error('Token created on blockchain but failed to update in backend. Please try updating later in your portfolio.');
+        }
       } else {
-        toast.error('Failed to create token. Please try again.');
+        // Fallback error message
+        toast.error('An unexpected error occurred. Please try again.');
       }
-      setCreationStep('error');
     }
   }, [tokenName, tokenSymbol, tokenImageUrl, tokenDescription, website, telegram, discord, twitter, youtube, createToken, router]);
 
@@ -272,7 +299,7 @@ const CreateToken: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF up to 1MB</p>
                 </div>
-              </div>
+                </div>
             </div>
             {isUploading && <p className="text-sm text-gray-400 mt-2">Uploading image to IPFS...</p>}
           </div>
@@ -297,7 +324,7 @@ const CreateToken: React.FC = () => {
               onClick={toggleSocialSection}
               className="w-full flex justify-between items-center p-3 bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-200"
             >
-              <span className="font-small">Social Links (Optional)</span>
+              <span className="font-medium">Social Media Links (Optional)</span>
               {isSocialExpanded ? (
                 <ChevronUpIcon className="h-5 w-5" />
               ) : (
@@ -323,6 +350,7 @@ const CreateToken: React.FC = () => {
                       value={item.value}
                       onChange={(e) => item.setter(e.target.value)}
                       className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                      placeholder={`Enter ${item.label.toLowerCase()} URL`}
                     />
                   </div>
                 ))}
@@ -345,6 +373,14 @@ const CreateToken: React.FC = () => {
             </button>
           </div>
         </form>
+
+        {showPurchasePopup && (
+        <PurchaseConfirmationPopup
+          onConfirm={handlePurchaseConfirm}
+          onCancel={() => setShowPurchasePopup(false)}
+          tokenSymbol={tokenSymbol}
+        />
+      )}
       </div>
     </Layout>
   );
