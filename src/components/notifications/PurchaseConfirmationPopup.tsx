@@ -28,7 +28,7 @@ const PurchaseConfirmationPopup: React.FC<PurchaseConfirmationPopupProps> = ({ o
         </button>
         <h2 className="text-sm font-bold text-blue-400 mb-2">How many {tokenSymbol} do you want to buy?</h2>
         <p className="text-[10px] sm:text-xs text-gray-400 mb-3 italic leading-tight">
-          Tip: It's optional, but buying a small amount helps protect your coin from snipers
+          Tip: It&apos;s optional, but buying a small amount helps protect your coin from snipers
         </p>
         <input
           type="number"
