@@ -9,6 +9,7 @@ import { Token, TokenWithLiquidityEvents, PaginatedResponse } from '@/interface/
 import SEO from '@/components/seo/SEO';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import { Switch } from '@/components/ui/switch';
+import Spinner from '@/components/ui/Spinner';
 
 const TOKENS_PER_PAGE = 10;
 
@@ -19,6 +20,7 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [noRecentTokens, setNoRecentTokens] = useState(false);
+  const [noLiquidityTokens, setNoLiquidityTokens] = useState(false);
   const [showNewTokens, setShowNewTokens] = useState(false);
   const [newTokensBuffer, setNewTokensBuffer] = useState<Token[]>([]);
   const [displayedNewTokens, setDisplayedNewTokens] = useState<Token[]>([]);
@@ -36,7 +38,7 @@ const Home: React.FC = () => {
       if (showNewTokens) {
         setTokens(prevTokens => {
           if (!prevTokens) return null;
-          const newUniqueTokens = newTokens.filter(newToken => 
+          const newUniqueTokens = newTokens.filter(newToken =>
             !prevTokens.data.some(existingToken => existingToken.id === newToken.id) &&
             !displayedNewTokens.some(displayedToken => displayedToken.id === newToken.id)
           );
@@ -50,7 +52,7 @@ const Home: React.FC = () => {
         });
       } else {
         setNewTokensBuffer(prev => {
-          const uniqueNewTokens = newTokens.filter(newToken => 
+          const uniqueNewTokens = newTokens.filter(newToken =>
             !prev.some(bufferToken => bufferToken.id === newToken.id)
           );
           // console.log('New tokens added to buffer:', uniqueNewTokens);
@@ -63,6 +65,7 @@ const Home: React.FC = () => {
   const fetchTokens = async () => {
     setIsLoading(true);
     setNoRecentTokens(false);
+    setNoLiquidityTokens(false);
     setError(null);
     let fetchedTokens;
 
@@ -83,7 +86,16 @@ const Home: React.FC = () => {
             }
             break;
           case 'ended':
-            fetchedTokens = await getTokensWithLiquidity(currentPage, TOKENS_PER_PAGE);
+            try {
+              fetchedTokens = await getTokensWithLiquidity(currentPage, TOKENS_PER_PAGE);
+            } catch (liquidityError) {
+              if (liquidityError instanceof Error && 'response' in liquidityError && (liquidityError.response as any).status === 404) {
+                setNoLiquidityTokens(true);
+                fetchedTokens = { data: [], totalCount: 0, currentPage: 1, totalPages: 1 };
+              } else {
+                throw liquidityError;
+              }
+            }
             break;
           case 'bomper':
             fetchedTokens = {
@@ -119,7 +131,7 @@ const Home: React.FC = () => {
 
   const filteredTokens = useMemo(() => {
     if (!tokens || !tokens.data) return [];
-    return tokens.data.filter(token => 
+    return tokens.data.filter(token =>
       token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       token.symbol.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -183,7 +195,7 @@ const Home: React.FC = () => {
 
   return (
     <Layout>
-      <SEO 
+      <SEO
         title="Create and Trade Memecoins Easily on Bondle."
         description="The ultimate platform for launching and trading memecoins on Shibarium. Create your own tokens effortlessly and engage in fair, dynamic trading."
         image="seo/home.jpg"
@@ -208,13 +220,17 @@ const Home: React.FC = () => {
           </div>
         </div>
         {isLoading ? (
-          <div className="text-center text-white text-xl mt-10">Loading...</div>
+          <div className="flex justify-center items-center mt-10">
+            <Spinner size="medium" color="blue-400" />
+          </div>
         ) : error ? (
           <div className="text-center text-red-500 text-xl mt-10">{error}</div>
         ) : sort === 'bomper' ? (
           <div className="text-center text-white text-xl mt-10">NOTHING HERE FOR YOU</div>
         ) : noRecentTokens ? (
           <div className="text-center text-white text-xl mt-10">No tokens created in the last hour. Check back soon.</div>
+        ) : noLiquidityTokens ? (
+          <div className="text-center text-white text-xl mt-10">No tokens Listed Yet.</div>
         ) : filteredTokens.length > 0 ? (
           <TokenList
             tokens={filteredTokens}

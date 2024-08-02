@@ -41,6 +41,8 @@ import { toast } from 'react-toastify';
 import ShareButton from '@/components/ui/ShareButton';
 import SEO from '@/components/seo/SEO';
 import { TokenWithTransactions } from '@/interface/types';
+import Spinner from '@/components/ui/Spinner';
+
 // import OGPreview from '@/components/OGPreview'
 
 
@@ -301,7 +303,9 @@ interface TokenDetailProps {
   if (!tokenInfo) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-8 text-white">Loading...</div>
+        <div className="flex justify-center items-center min-h-screen">
+          <Spinner size="large" color="blue-400" />
+        </div>
       </Layout>
     );
   }
