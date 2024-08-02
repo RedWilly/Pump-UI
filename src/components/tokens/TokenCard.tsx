@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { CurrencyDollarIcon, UserIcon, ClockIcon, TagIcon } from '@heroicons/react/24/outline';
 import { Token, TokenWithLiquidityEvents } from '@/interface/types';
 import { useTokenLiquidity, formatAmount, formatTimestamp, formatAmountV2 } from '@/utils/blockchainUtils';
+import Spinner from '@/components/ui/Spinner';
+
 
 interface TokenCardProps {
   token: Token | TokenWithLiquidityEvents;
@@ -13,6 +15,7 @@ interface TokenCardProps {
 }
 
 const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [currentLiquidity, setCurrentLiquidity] = useState<string>('0');
   const tokenAddress = token.address as `0x${string}`;
   const { data: liquidityData } = useTokenLiquidity(tokenAddress);
@@ -27,6 +30,10 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
 
   const isTokenWithLiquidity = (token: Token | TokenWithLiquidityEvents): token is TokenWithLiquidityEvents => {
     return 'liquidityEvents' in token && token.liquidityEvents.length > 0;
+  };
+
+  const handleClick = () => {
+    setIsLoading(true);
   };
 
   if (isEnded && isTokenWithLiquidity(token)) {
@@ -85,8 +92,13 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
   const creatorAddressLink = `https://shibariumscan.io/address/${token.creatorAddress}`;
 
   return (
-    <Link href={`/token/${token.address}`}>
-      <div className="w-full bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer">
+    <Link href={`/token/${token.address}`} onClick={handleClick}>
+      <div className="w-full bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer relative">
+      {isLoading && (
+          <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
+            <Spinner size="medium" color="blue-400" />
+          </div>
+        )}
         <div className="h-40 sm:h-48 overflow-hidden">
           <img src={token.logo} alt={token.name} className="w-full h-full object-cover" />
         </div>
