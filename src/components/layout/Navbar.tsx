@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { shortenAddress } from '@/utils/blockchainUtils';
 
 const CustomConnectButton = () => {
   return (
@@ -39,7 +40,7 @@ const CustomConnectButton = () => {
 
               if (chain.unsupported) {
                 return (
-                  <button onClick={openChainModal} className="btn btn-secondary text-xs px-2 py-1">
+                  <button onClick={openChainModal} className="btn btn-secondary text-[10px] sm:text-xs px-2 py-1">
                     Wrong network
                   </button>
                 )
@@ -76,7 +77,7 @@ const CustomConnectButton = () => {
                   </button>
 
                   <button onClick={openAccountModal} className="btn btn-primary text-[10px] sm:text-xs px-2 py-1">
-                    <span>{account.displayName.slice(0, 4)}...{account.displayName.slice(-4)}</span>
+                  {shortenAddress(account.address)}
                     {account.displayBalance
                       ? <span className="hidden sm:inline ml-1">({account.displayBalance})</span>
                       : ''}
@@ -120,11 +121,11 @@ const Navbar: React.FC = () => {
               <span>Bondle.</span>
             </Link>
           </div>
-          <div className="hidden md:flex items-center space-x-4">
-            <Link href="/create" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm">
+          <div className="hidden md:flex items-center space-x-3">
+            <Link href="/create" className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs">
               Create Token
             </Link>
-            <Link href="/dashboard" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm">
+            <Link href="/dashboard" className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs">
               Dashboard
             </Link>
             <CustomConnectButton />
