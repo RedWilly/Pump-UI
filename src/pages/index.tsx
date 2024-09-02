@@ -202,18 +202,18 @@ const Home: React.FC = () => {
       />
       <HowItWorksPopup />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-400 mb-6">Explore Tokens</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-blue-400 mb-6">Explore Tokens</h1>
         <SearchFilter onSearch={handleSearch} />
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
           <SortOptions onSort={handleSort} currentSort={sort} />
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1">
             <Switch
               checked={showNewTokens}
               onCheckedChange={toggleNewTokens}
               aria-label="Toggle new tokens"
               className="data-[state=checked]:bg-blue-500"
             />
-            <span className="text-sm text-gray-400">Show new tokens</span>
+            <span className="text-xs text-gray-400">Show new tokens</span>
             {newTokensBuffer.length > 0 && !showNewTokens && (
               <span className="text-xs text-blue-400">({newTokensBuffer.length} new)</span>
             )}
@@ -221,16 +221,16 @@ const Home: React.FC = () => {
         </div>
         {isLoading ? (
           <div className="flex justify-center items-center mt-10">
-            <Spinner size="medium" color="blue-400" />
+            <Spinner size="medium" />
           </div>
         ) : error ? (
           <div className="text-center text-red-500 text-xl mt-10">{error}</div>
         ) : sort === 'bomper' ? (
-          <div className="text-center text-white text-xl mt-10">NOTHING HERE FOR YOU</div>
+          <div className="text-center text-white text-xs mt-10">NOTHING HERE FOR YOU</div>
         ) : noRecentTokens ? (
-          <div className="text-center text-white text-xl mt-10">No tokens created in the last hour. Check back soon.</div>
+          <div className="text-center text-white text-xs mt-10">No tokens created in the last hour. Check back soon.</div>
         ) : noLiquidityTokens ? (
-          <div className="text-center text-white text-xl mt-10">No tokens Listed Yet.</div>
+          <div className="text-center text-white text-xs mt-10">No tokens Listed Yet.</div>
         ) : filteredTokens.length > 0 ? (
           <TokenList
             tokens={filteredTokens}
@@ -240,7 +240,7 @@ const Home: React.FC = () => {
             isEnded={sort === 'ended'}
           />
         ) : (
-          <div className="text-center text-white text-xl mt-10">No tokens found matching your criteria.</div>
+          <div className="text-center text-white text-xs mt-10">No tokens found matching your criteria.</div>
         )}
       </div>
     </Layout>

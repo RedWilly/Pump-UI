@@ -71,7 +71,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, currentPage, totalPages, 
             <button
               key={index}
               onClick={() => typeof page === 'number' && onPageChange(page)}
-              className={`px-3 py-1 rounded-md text-sm ${
+              className={`px-3 py-1 rounded-md text-xs ${
                 currentPage === page
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-800 text-gray-400 hover:bg-gray-700'

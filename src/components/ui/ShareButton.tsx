@@ -83,7 +83,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ tokenInfo, isOpen, onClose }) =
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-gray-800 rounded-lg p-4 sm:p-6 w-full max-w-xs sm:max-w-sm md:max-w-md">
         <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h3 className="text-lg sm:text-xl font-bold text-white">Share {tokenInfo.name} on</h3>
+          <h3 className="text-xs sm:text-sm font-bold text-white">Share {tokenInfo.name} on</h3>
           <button 
             onClick={onClose} 
             className="text-gray-400 hover:text-white transition-colors"

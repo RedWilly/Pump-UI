@@ -157,6 +157,47 @@ export async function getTransactionsByAddress(
   }
 }
 
+// POST /chats: Add a new chat message with optional reply_to
+export async function addChatMessage(
+  user: string, 
+  token: string, 
+  message: string, 
+  replyTo?: number
+): Promise<{ id: number }> {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/chats`, {
+      user,
+      token,
+      message,
+      reply_to: replyTo  // Optional: ID of the message being replied to
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error adding chat message:', error);
+    throw new Error('Failed to add chat message');
+  }
+}
+
+// GET /chats: Get chat messages for a specific token
+export async function getChatMessages(token: string): Promise<Array<{
+  id: number;
+  user: string;
+  token: string;
+  message: string;
+  reply_to: number | null;
+  timestamp: string;
+}>> {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/chats`, {
+      params: { token }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching chat messages:', error);
+    throw new Error('Failed to fetch chat messages');
+  }
+}
+
 //get all token address
 export async function getAllTokenAddresses(): Promise<Array<{address: string, symbol: string}>> {
   try {

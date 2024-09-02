@@ -9,19 +9,19 @@ interface SortOptionsProps {
 
 const sortOptionMapping: { [key: string]: SortOption } = {
   'All': 'all',
-  'Recent Created 1hrs': 'recentCreated',
+  'Creation Time': 'recentCreated',
   'Ended': 'ended',
   'Bomper': 'bomper'
 };
 
 const SortOptions: React.FC<SortOptionsProps> = ({ onSort, currentSort }) => {
   return (
-    <div className="mb-6 flex flex-wrap gap-2">
+    <div className="mb-5 flex flex-wrap gap-2 justify-center max-w-lg mx-auto">
       {Object.keys(sortOptionMapping).map((option) => (
         <button
           key={option}
           onClick={() => onSort(sortOptionMapping[option])}
-          className={`px-3 py-1 text-xs sm:text-sm rounded-full transition-colors duration-200 ${
+          className={`px-3 py-1 text-[10px] sm:text-xs rounded-full transition-colors duration-200 ${
             currentSort === sortOptionMapping[option]
               ? 'bg-blue-500 text-white neon-border'
               : 'bg-gray-700 text-gray-300 hover:bg-gray-600'

@@ -303,6 +303,10 @@ export function formatAddressV2(address: string): string {
   return `${lastSix}`;
 }
 
+export function shortenAddress(address: string): string {
+  return address.slice(2, 8);
+}
+
 export function getExplorerUrl(txHash: string): string {
   return `https://shibariumscan.io/tx/${txHash}`;
 }
