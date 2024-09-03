@@ -73,4 +73,4 @@ CHAINSAFE_BUCKET_ID=your_chainsafe_bucket_id
 
 ### 🚀 Looking to build a platform like Pump.fun?
 
-I've made the UI open-source, but the backend and smart contract are closed-source. If you're interested in creating a full-fledged Pump.fun-like platform, let's collaborate! Contact me for more details.
+I've made the UI open-source, but the backend and smart contract are closed-source. If you're interested in creating a full-fledged Pump.fun-like platform, let's collaborate! [Contact me on Telegram](https://t.me/rink3y) (RedWilly) for more details.
