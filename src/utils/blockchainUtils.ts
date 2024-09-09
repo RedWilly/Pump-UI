@@ -257,6 +257,30 @@ export function useApproveTokens() {
   return { approveTokens, data, error, isPending };
 }
 
+export const formatAmountV3 = (amount: string, decimals: number = 18) => {
+  const formattedAmount = parseFloat(formatUnits(BigInt(amount), decimals));
+  
+  const format = (value: number, maxDecimals: number) => {
+    const rounded = value.toFixed(maxDecimals);
+    const withoutTrailingZeros = parseFloat(rounded).toString();
+    return withoutTrailingZeros;
+  };
+
+  if (formattedAmount >= 1e12) {
+    return `${format(formattedAmount / 1e12, 2)}T`;
+  } else if (formattedAmount >= 1e9) {
+    return `${format(formattedAmount / 1e9, 2)}B`;
+  } else if (formattedAmount >= 1e6) {
+    return `${format(formattedAmount / 1e6, 2)}M`;
+  } else if (formattedAmount >= 1e3) {
+    return `${format(formattedAmount / 1e3, 2)}k`;
+  } else if (formattedAmount >= 1) {
+    return format(formattedAmount, 2);
+  } else {
+    const decimals = Math.min(6, Math.max(2, 3 - Math.floor(Math.log10(formattedAmount))));
+    return format(formattedAmount, decimals);
+  }
+};
 
 export function formatTimestamp(timestamp: string): string {
   const now = new Date();

@@ -337,14 +337,14 @@ interface TokenDetailProps {
       {/* Price and Liquidity Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
         <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-sm sm:text-base font-semibold mb-2 text-blue-300">Current Price</h2>
-          <p className="text-xs sm:text-sm text-blue-400">
+          <h2 className="text-xs sm:text-sm font-semibold mb-2 text-blue-300">Current Price</h2>
+          <p className="text-[10px] sm:text-xs text-blue-400">
             {currentPrice ? formatAmount(currentPrice.toString()) : 'Loading...'} BONE
           </p>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-sm sm:text-base font-semibold mb-2 text-blue-300">Current Liquidity</h2>
-          <p className="text-xs sm:text-sm text-blue-400 mb-2">
+          <h2 className="text-xs sm:text-sm font-semibold mb-2 text-blue-300">Current Liquidity</h2>
+          <p className="text-[10px] sm:text-xs text-blue-400 mb-2">
             {liquidityData && liquidityData[2] ? `${formatAmountV2(liquidityData[2].toString())} BONE` : '0 BONE'}
           </p>
           {liquidityData && liquidityData[2] && (
