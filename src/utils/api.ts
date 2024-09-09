@@ -144,7 +144,7 @@ export async function updateToken(
 export async function getTransactionsByAddress(
   address: string, 
   page: number = 1, 
-  pageSize: number = 20
+  pageSize: number = 10
 ): Promise<TransactionResponse> {
   try {
     const response = await axios.get(`${API_BASE_URL}/api/transactions/address/${address}`, {
@@ -209,6 +209,23 @@ export async function getAllTokenAddresses(): Promise<Array<{address: string, sy
   }
 }
 
+export async function getTokensByCreator(
+  creatorAddress: string,
+  page: number = 1,
+  pageSize: number = 20
+): Promise<PaginatedResponse<Token>> {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/tokens/creator/${creatorAddress}`, {
+      params: { page, pageSize }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching tokens by creator:', error);
+    throw new Error('Failed to fetch tokens by creator');
+  }
+}
+
+
 //blockexplorer Get token Holders
 export async function getTokenHolders(tokenAddress: string): Promise<TokenHolder[]> {
   try {
@@ -226,3 +243,4 @@ export async function getTokenHolders(tokenAddress: string): Promise<TokenHolder
     throw new Error('Failed to fetch token holders');
   }
 }
+

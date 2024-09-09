@@ -1,7 +1,7 @@
 import React from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, ExternalLinkIcon } from 'lucide-react';
 import { TokenHolder } from '@/interface/types';
-import { formatAmount } from '@/utils/blockchainUtils';
+import { formatAmountV3, shortenAddress } from '@/utils/blockchainUtils';
 
 interface TokenHoldersProps {
   tokenHolders: TokenHolder[];
@@ -58,11 +58,11 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
                       rel="noopener noreferrer"
                       className="text-blue-400 hover:underline"
                     >
-                      {holder.address.slice(0, 6)}...{holder.address.slice(-4)} <ExternalLinkIcon size={14} className="inline ml-1" />
+                      {shortenAddress(holder.address)} <ExternalLinkIcon size={14} className="inline ml-1" />
                     </a>
                   )}
                 </td>
-                <td className="p-2 text-blue-400">{formatAmount(holder.balance)}</td>
+                <td className="p-2 text-blue-400">{formatAmountV3(holder.balance)}</td>
               </tr>
             ))}
           </tbody>
@@ -70,25 +70,56 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
       </div>
       {tokenHolders.length === 0 && <p className="text-gray-400 text-center mt-4">No token holder data available</p>}
 
-      {/* Pagination for token holders */}
+      {/* Updated Pagination for token holders */}
       {tokenHolders.length > 0 && (
-        <div className="flex justify-center mt-4">
+        <div className="flex items-center justify-center mt-4 space-x-2">
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-3 py-1 bg-gray-700 text-gray-300 rounded-l hover:bg-gray-600 disabled:opacity-50"
+            className="p-1 rounded-md bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
-            <ChevronLeftIcon size={20} />
+            <ChevronLeftIcon size={16} />
           </button>
-          <span className="px-4 py-1 bg-gray-800 text-gray-300">
-            {currentPage} of {totalPages}
-          </span>
+          <div className="flex items-center space-x-1">
+            {[...Array(totalPages)].map((_, index) => {
+              const page = index + 1;
+              if (
+                page === 1 ||
+                page === totalPages ||
+                (page >= currentPage - 1 && page <= currentPage + 1)
+              ) {
+                return (
+                  <button
+                    key={page}
+                    onClick={() => onPageChange(page)}
+                    className={`px-2 py-1 text-xs rounded-md transition-colors duration-200 ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              } else if (
+                page === currentPage - 2 ||
+                page === currentPage + 2
+              ) {
+                return (
+                  <span key={page} className="text-gray-500 text-xs">
+                    ...
+                  </span>
+                );
+              }
+              return null;
+            })}
+          </div>
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 bg-gray-700 text-gray-300 rounded-r hover:bg-gray-600 disabled:opacity-50"
+            className="p-1 rounded-md bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
           >
-            <ChevronRightIcon size={20} />
+            <ChevronRightIcon size={16} />
           </button>
         </div>
       )}

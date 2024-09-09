@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CopyIcon, ExternalLinkIcon, MessageCircleIcon, GlobeIcon, TwitterIcon, YoutubeIcon, Info } from 'lucide-react';
+import { ExternalLinkIcon, MessageCircleIcon, GlobeIcon, TwitterIcon, YoutubeIcon, Info } from 'lucide-react';
 import { TokenWithTransactions } from '@/interface/types';
 import { formatTimestamp, shortenAddress, formatAddressV2 } from '@/utils/blockchainUtils';
 import { toast } from 'react-toastify';
@@ -11,97 +11,47 @@ interface TokenInfoProps {
 const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo }) => {
   const [showTokenInfo, setShowTokenInfo] = useState(false);
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success('Copied');
-  };
-
   return (
-    <div className="bg-gray-800 p-4 sm:p-6 rounded-lg mb-8">
-      <div className="flex justify-between items-center cursor-pointer" onClick={() => setShowTokenInfo(!showTokenInfo)}>
-        <h2 className="text-sm sm:text-base font-semibold text-blue-300">Token Information</h2>
-        <Info size={20} className={`${showTokenInfo ? 'transform rotate-180' : ''}`} />
+    <div className="bg-gray-800 p-2 sm:p-3 rounded-lg mb-4 shadow-lg text-[10px] sm:text-xs">
+      <div 
+        className="flex justify-between items-center cursor-pointer transition-colors duration-200 hover:bg-gray-700 p-1.5 rounded-md" 
+        onClick={() => setShowTokenInfo(!showTokenInfo)}
+      >
+        <h2 className="text-xs sm:text-sm font-semibold text-blue-300">Token Information</h2>
+        <Info size={16} className={`transition-transform duration-200 ${showTokenInfo ? 'transform rotate-180' : ''}`} />
       </div>
       {showTokenInfo && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm mt-4">
-          <div>
-            <p>
-              <span className="text-gray-300">Symbol:</span> <span className="text-blue-400">{tokenInfo?.symbol ?? 'Loading...'}</span>
-            </p>
-            <p>
-              <span className="text-gray-300">Contract Address:</span>
-              <span className="text-blue-400">
-                {tokenInfo?.address ? formatAddressV2(tokenInfo.address) : 'Loading...'}
-              </span>
-              {tokenInfo?.address && (
-                <>
-                  <button onClick={() => copyToClipboard(tokenInfo.address)} className="ml-2 text-gray-400 hover:text-blue-400">
-                    <CopyIcon size={14} />
-                  </button>
-                  <a
-                    href={`https://shibariumscan.io/address/${tokenInfo.address}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-2 text-gray-400 hover:text-blue-400"
-                  >
-                    <ExternalLinkIcon size={14} />
-                  </a>
-                </>
-              )}
-            </p>
-            <p>
-              <span className="text-gray-300">Creator:</span>
-              {tokenInfo?.creatorAddress ? (
-                <a
-                  href={`https://shibariumscan.io/address/${tokenInfo.creatorAddress}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="ml-2 text-blue-400 hover:underline"
-                >
-                  {tokenInfo?.creatorAddress ? shortenAddress(tokenInfo.creatorAddress) : 'Loading...'}
-                  <ExternalLinkIcon size={14} className="ml-1" />
-                </a>
-              ) : (
-                <span className="text-blue-400">Loading...</span>
-              )}
-            </p>
-            <p>
-              <span className="text-gray-300">Creation Date:</span>{' '}
-              <span className="text-blue-400">{tokenInfo?.createdAt ? formatTimestamp(tokenInfo.createdAt) : 'Loading...'}</span>
-            </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-2 bg-gray-750 p-2 rounded-md">
+          <div className="space-y-2">
+            <InfoItem label="Symbol" value={tokenInfo?.symbol} />
+            <InfoItem 
+              label="Contract" 
+              value={tokenInfo?.address ? formatAddressV2(tokenInfo.address) : 'Loading...'}
+              link={`https://shibariumscan.io/address/${tokenInfo?.address}`}
+            />
+            <InfoItem 
+              label="Deployer's Wallet" 
+              value={tokenInfo?.creatorAddress ? shortenAddress(tokenInfo.creatorAddress) : 'Loading...'}
+              link={`https://shibariumscan.io/address/${tokenInfo?.creatorAddress}`}
+            />
+            <InfoItem 
+              label="Created" 
+              value={tokenInfo?.createdAt ? formatTimestamp(tokenInfo.createdAt) : 'Loading...'}
+            />
           </div>
-          <div>
-            <p>
-              <span className="text-gray-300">Description:</span> <span className="text-blue-400">{tokenInfo?.description ?? 'Loading...'}</span>
-            </p>
-            <div className="mt-4">
-              <span className="text-gray-300">Socials:</span>
-              <div className="flex space-x-4 mt-2">
-                {tokenInfo?.telegram && (
-                  <a href={tokenInfo.telegram} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                    <MessageCircleIcon size={16} />
-                  </a>
-                )}
-                {tokenInfo?.website && (
-                  <a href={tokenInfo.website} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                    <GlobeIcon size={16} />
-                  </a>
-                )}
-                {tokenInfo?.twitter && (
-                  <a href={tokenInfo.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                    <TwitterIcon size={16} />
-                  </a>
-                )}
-                {tokenInfo?.discord && (
-                  <a href={tokenInfo.discord} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                    <MessageCircleIcon size={16} />
-                  </a>
-                )}
-                {tokenInfo?.youtube && (
-                  <a href={tokenInfo.youtube} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400">
-                    <YoutubeIcon size={16} />
-                  </a>
-                )}
+          <div className="space-y-2">
+            <div className="flex flex-col">
+              <span className="text-gray-400 font-medium mb-1">Description:</span>
+              <span className="text-blue-400 break-words">{tokenInfo?.description || 'Loading...'}</span>
+            </div>
+            <div className="mt-2">
+              <span className="text-gray-400 font-medium">Socials:</span>
+              <div className="flex space-x-2 mt-1">
+                <SocialLink href={tokenInfo?.telegram} icon={<MessageCircleIcon size={12} />} />
+                <SocialLink href={tokenInfo?.website} icon={<GlobeIcon size={12} />} />
+                <SocialLink href={tokenInfo?.twitter} icon={<TwitterIcon size={12} />} />
+                <SocialLink href={tokenInfo?.discord} icon={<MessageCircleIcon size={12} />} />
+                <SocialLink href={tokenInfo?.youtube} icon={<YoutubeIcon size={12} />} />
               </div>
             </div>
           </div>
@@ -110,5 +60,28 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo }) => {
     </div>
   );
 };
+
+const InfoItem: React.FC<{ label: string; value?: string; link?: string }> = ({ label, value, link }) => (
+  <div className="flex flex-col sm:flex-row sm:items-start">
+    <span className="text-gray-400 font-medium sm:w-32 shrink-0">{label}:</span>
+    <span className="text-blue-400 break-words sm:ml-2">
+      {link ? (
+        <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+          {value} <ExternalLinkIcon size={10} className="inline ml-0.5" />
+        </a>
+      ) : (
+        value
+      )}
+    </span>
+  </div>
+);
+
+const SocialLink: React.FC<{ href?: string; icon: React.ReactNode }> = ({ href, icon }) => (
+  href ? (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors duration-200">
+      {icon}
+    </a>
+  ) : null
+);
 
 export default TokenInfo;
