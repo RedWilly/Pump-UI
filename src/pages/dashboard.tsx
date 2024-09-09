@@ -232,7 +232,7 @@ const UserDashboard: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-300 text-center text-sm sm:text-base">Don't own any tokens yet</p>
+                <p className="text-gray-300 text-center text-sm sm:text-base">Don&apos;t own any tokens yet</p>
               )}
             </div>
           )}
