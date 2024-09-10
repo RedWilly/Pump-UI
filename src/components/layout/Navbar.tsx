@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
-import { shortenAddress } from '@/utils/blockchainUtils';
+import { shortenAddress } from '@/utils/blockchainUtils'
+import { useAccount } from 'wagmi'
 
 const CustomConnectButton = () => {
   return (
@@ -94,6 +95,16 @@ const CustomConnectButton = () => {
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
+  const { address } = useAccount()
+  const [showPopup, setShowPopup] = useState(false)
+
+  const handleProfileClick = (e: React.MouseEvent) => {
+    if (!address) {
+      e.preventDefault()
+      setShowPopup(true)
+      setTimeout(() => setShowPopup(false), 3000) // Hide popup after 3 seconds
+    }
+  }
 
   return (
     <nav className="bg-gray-800 shadow-lg sticky top-0 z-50">
@@ -125,8 +136,12 @@ const Navbar: React.FC = () => {
             <Link href="/create" className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs">
               Create Token
             </Link>
-            <Link href="/dashboard" className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs">
-              Dashboard
+            <Link 
+              href={address ? `/profile/${address}` : '#'} 
+              className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs"
+              onClick={handleProfileClick}
+            >
+              Profile
             </Link>
             <CustomConnectButton />
           </div>
@@ -150,13 +165,22 @@ const Navbar: React.FC = () => {
             <Link href="/create" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
               Create Token
             </Link>
-            <Link href="/dashboard" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              Dashboard
+            <Link 
+              href={address ? `/profile/${address}` : '#'}
+              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+              onClick={handleProfileClick}
+            >
+              Profile
             </Link>
             <div className="mt-4 px-3">
               <CustomConnectButton />
             </div>
           </div>
+        </div>
+      )}
+      {showPopup && (
+        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg">
+          Please connect wallet first
         </div>
       )}
     </nav>
