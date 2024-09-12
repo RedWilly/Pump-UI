@@ -62,7 +62,7 @@ The application follows a component-based architecture, with reusable UI compone
 Create a `.env.local` for local run, but for production create `.env` file in the root directory with the following variables:
 
 ```
-NEXT_PUBLIC_API_BASE_URL=backend-url
+NEXT_PUBLIC_API_BASE_URL=https://backend-url
 NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS="contract-address"
 NEXT_PUBLIC_WS_BASE_URL=https://backend-url
 CHAINSAFE_API_KEY=your_chainsafe_api_key
