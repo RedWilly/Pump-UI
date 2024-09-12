@@ -29,7 +29,7 @@ const TokenBalanceItem: React.FC<TokenBalanceItemProps> = ({ tokenAddress, symbo
 
   const handleAddressClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    window.open(`https://shibariumscan.io/address/${tokenAddress}`, '_blank');
+    window.open(`https://etherscan.io/address/${tokenAddress}`, '_blank');
   };
 
   return (
@@ -306,7 +306,7 @@ const ProfilePage: React.FC = () => {
                 <thead className="bg-gray-900">
                   <tr>
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
-                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Token</th>
+                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">Token</th>
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">Amount</th>
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">ETH</th>
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Date</th>
@@ -327,7 +327,7 @@ const ProfilePage: React.FC = () => {
                         <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300 hidden sm:table-cell">{formatTimestamp(tx.timestamp)}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300 hidden sm:table-cell">
                           <a
-                            href={`https://shibariumscan.io/tx/${tx.txHash}`}
+                            href={`https://etherscan.io/tx/${tx.txHash}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center text-blue-400 hover:underline"

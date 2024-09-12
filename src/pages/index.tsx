@@ -189,7 +189,7 @@ const Home: React.FC = () => {
     <Layout>
       <SEO
         title="Create and Trade Memecoins Easily on DEGFUN."
-        description="The ultimate platform for launching and trading memecoins on Shibarium. Create your own tokens effortlessly and engage in fair, dynamic trading."
+        description="The ultimate platform for launching and trading memecoins on Ethereum Mainnet. Create your own tokens effortlessly and engage in fair, dynamic trading."
         image="seo/home.jpg"
       />
       <HowItWorksPopup />
