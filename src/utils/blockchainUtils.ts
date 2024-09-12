@@ -3,10 +3,9 @@ import { formatUnits, parseUnits, maxUint256, decodeEventLog, Log, TransactionRe
 import { useReadContract, useWriteContract, useBalance, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
 import BondingCurveManagerABI from '@/abi/BondingCurveManager.json';
 import ERC20ABI from '@/abi/ERC20.json';
-import { updateToken } from '@/utils/api';
 
 const BONDING_CURVE_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
-const CREATION_FEE = parseUnits('1', 18);
+const CREATION_FEE = parseUnits('0.01', 18);
 
 export function useCurrentTokenPrice(tokenAddress: `0x${string}`) {
   const { data, refetch } = useReadContract({
@@ -332,5 +331,5 @@ export function shortenAddress(address: string): string {
 }
 
 export function getExplorerUrl(txHash: string): string {
-  return `https://shibariumscan.io/tx/${txHash}`;
+  return `https://eth.blockscout.com/tx/${txHash}`;
 }

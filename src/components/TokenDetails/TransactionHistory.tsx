@@ -32,7 +32,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             <tr className="bg-gray-700">
               <th className="p-2 text-left text-gray-300">Maker</th>
               <th className="p-2 text-left text-gray-300">Type</th>
-              <th className="p-2 text-left text-gray-300">BONE</th>
+              <th className="p-2 text-left text-gray-300">ETH</th>
               <th className="p-2 text-left text-gray-300">{tokenSymbol}</th>
               <th className="p-2 text-left text-gray-300">Date</th>
               <th className="p-2 text-left text-gray-300">Tx</th>
@@ -51,7 +51,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                   <td className="p-2 text-blue-400">{formatAmountV3(tx.tokenAmount)}</td>
                   <td className="p-2 text-blue-400 hidden sm:table-cell">{formatTimestamp(tx.timestamp)}</td>
                   <td className="p-2 text-blue-400 hidden sm:table-cell">
-                    <a href={`https://shibariumscan.io/tx/${tx.txHash}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    <a href={`https://etherscan.io/tx/${tx.txHash}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
                       {tx.txHash.slice(-8)}
                     </a>
                   </td>
@@ -66,7 +66,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                         <p>Maker: {shortenAddress(tx.senderAddress)}</p>
                         <p>Date: {formatTimestamp(tx.timestamp)}</p>
                         <a 
-                          href={`https://shibariumscan.io/tx/${tx.txHash}`} 
+                          href={`https://etherscan.io/tx/${tx.txHash}`} 
                           target="_blank" 
                           rel="noopener noreferrer" 
                           className="flex items-center text-blue-400 hover:underline"

@@ -5,7 +5,7 @@ import Layout from '@/components/layout/Layout';
 import { getTransactionsByAddress, getAllTokenAddresses, getTokensByCreator } from '@/utils/api';
 import { Transaction, PaginatedResponse, Token } from '@/interface/types';
 import { formatTimestamp, formatAddressV2, formatAmountV3, useERC20Balance } from '@/utils/blockchainUtils';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
+import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon, ExternalLinkIcon } from 'lucide-react';
 import SEO from '@/components/seo/SEO';
 import Spinner from '@/components/ui/Spinner';
 
@@ -147,6 +147,7 @@ const ProfilePage: React.FC = () => {
   const [createdTokens, setCreatedTokens] = useState<Token[]>([]);
   const [createdTokensPage, setCreatedTokensPage] = useState(1);
   const [createdTokensTotalPages, setCreatedTokensTotalPages] = useState(1);
+  const [expandedTx, setExpandedTx] = useState<string | null>(null);
 
   const addressToUse = (profileAddress as string) || connectedAddress || '';
 
@@ -215,15 +216,19 @@ const ProfilePage: React.FC = () => {
     setCreatedTokensPage(newPage);
   };
 
+  const toggleTxExpand = (txId: string) => {
+    setExpandedTx(expandedTx === txId ? null : txId);
+  };
+
   return (
     <Layout>
       <SEO 
-        title={`${addressToUse ? `Profile: ${formatAddressV2(addressToUse)}` : 'Your Profile'} - Bondle`}
+        title={`${addressToUse ? `Profile: ${formatAddressV2(addressToUse)}` : 'Your Profile'} - DEGFun`}
         description={`View token holdings and transactions for ${addressToUse ? formatAddressV2(addressToUse) : 'your account'}.`}
         image="seo/profile.jpg"
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-xl sm:text-2xl font-bold text-blue-400 mb-6 neon-text">
+        <h1 className="text-xl sm:text-2xl font-bold text-blue-400 mb-6">
           {addressToUse === connectedAddress ? 'Your Profile' : `Profile: ${formatAddressV2(addressToUse)}`}
         </h1>
         
@@ -301,21 +306,61 @@ const ProfilePage: React.FC = () => {
                 <thead className="bg-gray-900">
                   <tr>
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
-                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">Token</th>
+                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Token</th>
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">Amount</th>
-                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">Bone</th>
-                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">Date</th>
+                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider">ETH</th>
+                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Date</th>
+                    <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-300 uppercase tracking-wider hidden sm:table-cell">Tx</th>
                   </tr>
                 </thead>
                 <tbody className="bg-gray-800 divide-y divide-gray-700">
                   {transactions.map((tx) => (
-                    <tr key={tx.id} className="hover:bg-gray-700 transition-colors duration-150">
-                      <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{tx.type}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{getTokenSymbol(tx.recipientAddress)}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{formatAmountV3(tx.tokenAmount)}</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{formatAmountV3(tx.ethAmount)} BONE</td>
-                      <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{formatTimestamp(tx.timestamp)}</td>
-                    </tr>
+                    <React.Fragment key={tx.id}>
+                      <tr 
+                        className="hover:bg-gray-700 transition-colors duration-150 cursor-pointer sm:cursor-default"
+                        onClick={() => toggleTxExpand(tx.id)}
+                      >
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{tx.type}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300 hidden sm:table-cell">{getTokenSymbol(tx.recipientAddress)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{formatAmountV3(tx.tokenAmount)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{formatAmountV3(tx.ethAmount)} ETH</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300 hidden sm:table-cell">{formatTimestamp(tx.timestamp)}</td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300 hidden sm:table-cell">
+                          <a
+                            href={`https://shibariumscan.io/tx/${tx.txHash}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center text-blue-400 hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {tx.txHash.slice(-8)}
+                            <ExternalLinkIcon size={12} className="ml-1" />
+                          </a>
+                        </td>
+                        <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300 sm:hidden">
+                          <ChevronDownIcon size={16} className={`transition-transform ${expandedTx === tx.id ? 'rotate-180' : ''}`} />
+                        </td>
+                      </tr>
+                      {expandedTx === tx.id && (
+                        <tr className="bg-gray-750 sm:hidden">
+                          <td colSpan={4}>
+                            <div className="px-4 py-2 space-y-2">
+                              <p className="text-[10px] text-gray-300">Token: {getTokenSymbol(tx.recipientAddress)}</p>
+                              <p className="text-[10px] text-gray-300">Date: {formatTimestamp(tx.timestamp)}</p>
+                              <a
+                                href={`https://etherscan.io/tx/${tx.txHash}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center text-[10px] text-blue-400 hover:underline"
+                              >
+                                View TX
+                                <ExternalLinkIcon size={12} className="ml-1" />
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>

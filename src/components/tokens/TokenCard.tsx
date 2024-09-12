@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { CurrencyDollarIcon, UserIcon, ClockIcon, TagIcon } from '@heroicons/react/24/outline';
 import { Token, TokenWithLiquidityEvents } from '@/interface/types';
-import { useTokenLiquidity, formatAmount, formatTimestamp, formatAmountV2 } from '@/utils/blockchainUtils';
+import { useTokenLiquidity, formatTimestamp, formatAmountV2 } from '@/utils/blockchainUtils';
 import Spinner from '@/components/ui/Spinner';
 
 
@@ -38,7 +38,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
 
   if (isEnded && isTokenWithLiquidity(token)) {
     const liquidityEvent = token.liquidityEvents[0];
-    const uniswapLink = `https://chewyswap.dog/swap/?outputCurrency=${token.address}&chain=shibarium`;
+    const uniswapLink = `https://app.uniswap.org/swap?outputCurrency=${token.address}&chain=ethereum`;
 
     return (
       <div className="w-full max-w-sm p-4 bg-gray-800 rounded-lg shadow-xl">
@@ -50,7 +50,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
             <h3 className="text-lg font-semibold text-white">{token.name}</h3>
             <div className="flex items-center gap-1 text-sm text-gray-400">
               <TagIcon className="h-4 w-4" />
-              <span>Listed on Chewswap</span>
+              <span>Listed on Uniswap</span>
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
             <span>{formatAmountV2(liquidityEvent.tokenAmount)}</span>
           </div>
           <div className="flex items-center justify-between text-white">
-            <span>BONE</span>
+            <span>ETH</span>
             <span>{formatAmountV2(liquidityEvent.ethAmount)}</span>
           </div>
           <div className="flex items-center justify-between text-gray-400">
@@ -89,7 +89,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
     );
   }
 
-  const creatorAddressLink = `https://shibariumscan.io/address/${token.creatorAddress}`;
+  const creatorAddressLink = `/profile/${token.creatorAddress}`;
 
   return (
     <Link href={`/token/${token.address}`} onClick={handleClick}>
@@ -108,7 +108,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
               <img src={token.logo} alt={token.name} className="w-full h-full object-cover" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-semibold text-blue-400">{token.name}</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-blue-400">{token.name}</h3>
               <p className="text-[10px] sm:text-xs text-gray-400">{token.symbol}</p>
             </div>
           </div>
@@ -118,8 +118,8 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
               <span className="flex items-center">
                 Liquidity:{'\u00A0'}
                 <Image
-                  src="/logo/wbone.png"
-                  alt="BONE"
+                  src="/logo/ethereum.png"
+                  alt="ETH"
                   width={16}
                   height={16}
                   className="inline-block align-middle mr-1"
@@ -135,7 +135,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
                   className="text-blue-500 hover:underline cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
-                    window.open(creatorAddressLink, '_blank', 'noopener,noreferrer');
+                    window.location.href = creatorAddressLink;
                   }}
                 >
                   {token.creatorAddress ? `${token.creatorAddress.slice(-6)}` : 'Unknown'}

@@ -4,6 +4,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { shortenAddress } from '@/utils/blockchainUtils'
 import { useAccount } from 'wagmi'
+import Image from 'next/image'
 
 const CustomConnectButton = () => {
   return (
@@ -78,7 +79,7 @@ const CustomConnectButton = () => {
                   </button>
 
                   <button onClick={openAccountModal} className="btn btn-primary text-[10px] sm:text-xs px-2 py-1">
-                  {shortenAddress(account.address)}
+                    {shortenAddress(account.address)}
                     {account.displayBalance
                       ? <span className="hidden sm:inline ml-1">({account.displayBalance})</span>
                       : ''}
@@ -107,38 +108,38 @@ const Navbar: React.FC = () => {
   }
 
   return (
-    <nav className="bg-gray-800 shadow-lg sticky top-0 z-50">
+    <nav className="bg-[#000000] shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center text-xl font-bold text-blue-400">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-white mr-2"
-                style={{ transform: 'rotate(-60deg)' }}
-              >
-                <circle cx="19" cy="5" r="2"/>
-                <circle cx="5" cy="19" r="2"/>
-                <path d="M5 17A12 12 0 0 1 17 5"/>
-              </svg>
-              <span>Bondle.</span>
+              <div className="flex items-center">
+                <Image
+                  src="/logo/icon.png"
+                  alt="Logo"
+                  width={80}
+                  height={80}
+                  className="-mr-4"
+                />
+                <span className="hidden lg:inline text-white font-bold text-sm lg:text-base">
+                  Degentralized Funancial
+                </span>
+                <span className="hidden md:inline lg:hidden text-white font-bold text-xs sm:text-sm">
+                  Degentralized
+                </span>
+                <span className="md:hidden text-white font-bold text-xs sm:text-sm">
+                  DEGFun
+                </span>
+              </div>
             </Link>
           </div>
           <div className="hidden md:flex items-center space-x-3">
-            <Link href="/create" className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs">
+            <Link href="/create" className="text-xs md:text-sm text-white hover:text-blue-400 px-2 py-1 rounded-md font-semibold">
               Create Token
             </Link>
-            <Link 
-              href={address ? `/profile/${address}` : '#'} 
-              className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs"
+            <Link
+              href={address ? `/profile/${address}` : '#'}
+              className="text-xs md:text-sm text-white hover:text-blue-400 px-2 py-1 rounded-md font-semibold"
               onClick={handleProfileClick}
             >
               Profile
@@ -162,12 +163,12 @@ const Navbar: React.FC = () => {
       {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/create" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+            <Link href="/create" className="text-white hover:text-blue-400 block px-3 py-2 rounded-md text-base font-semibold">
               Create Token
             </Link>
-            <Link 
+            <Link
               href={address ? `/profile/${address}` : '#'}
-              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
+              className="text-white hover:text-blue-400 block px-3 py-2 rounded-md text-base font-semibold"
               onClick={handleProfileClick}
             >
               Profile

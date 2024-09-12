@@ -15,16 +15,16 @@ interface SEOProps {
 
 const SEO: React.FC<SEOProps> = ({ title, description, image, token }) => {
   const router = useRouter();
-  const domain = process.env.NEXT_PUBLIC_DOMAIN || 'https://bondle.xyz';
+  const domain = process.env.NEXT_PUBLIC_DOMAIN || 'https://degentralized.fun';
 
   const seo = {
-    title: token ? `${token.name} (${token.symbol}) - Bondle` : title || 'Bondle - Explore and Trade Tokens',
-    description: token?.description || description || 'Explore, create, and trade tokens on the Bondle platform',
-    image: token?.logo || image || `${domain}/default-og-image.jpg`,
+    title: token ? `${token.name} (${token.symbol}) - DEGFUN` : title || 'DEGFUN - Explore and Trade Tokens',
+    description: token?.description || description || 'Explore, create, and trade tokens on the DEGFUN platform',
+    image: token?.logo || image || `${domain}/seo/home.jpg`,
     url: `${domain}${router.asPath}`,
   };
 
-  return (
+  return ( 
     <Head>
       <title>{seo.title}</title>
       <meta name="description" content={seo.description} />

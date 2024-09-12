@@ -6,14 +6,14 @@ const AboutPage: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-xl sm:text-1xl md:text-2xl font-bold text-blue-400 mb-8 text-center">About Bondle</h1>
+        <h1 className="text-xl sm:text-1xl md:text-2xl font-bold text-blue-400 mb-8 text-center">About DEGFun</h1>
         
         <div className="mb-12">
           <div className="bg-gray-800 rounded-lg shadow-lg p-6 md:p-8">
-            <h2 className="text-base sm:text-lg font-semibold text-blue-400 mb-4">What is Bondle?</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-blue-400 mb-4">What is DEGFun?</h2>
             <div className="text-gray-300 text-xs sm:text-sm leading-relaxed space-y-4">
               <p>
-                Bondle is a revolutionary decentralized platform that empowers individuals to create and trade tokens using innovative bonding curve technology.
+                DEGFun is a revolutionary decentralized platform that empowers individuals to create and trade tokens using innovative bonding curve technology.
               </p>
               <p className="hidden sm:block">
                 Our mission is to democratize token creation and provide a dynamic, fair trading environment for the crypto community.

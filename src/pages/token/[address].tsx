@@ -61,7 +61,7 @@ interface TokenDetailProps {
   const [transactions, setTransactions] = useState<any[]>([]);
   const [transactionPage, setTransactionPage] = useState(1);
   const [totalTransactionPages, setTotalTransactionPages] = useState(1);
-  const [fromToken, setFromToken] = useState({ symbol: 'BONE', amount: '' });
+  const [fromToken, setFromToken] = useState({ symbol: 'ETH', amount: '' });
   const [toToken, setToToken] = useState({ symbol: '', amount: '' });
   const [isSwapped, setIsSwapped] = useState(false);
   const [isCalculating, setIsCalculating] = useState(false);
@@ -73,7 +73,7 @@ interface TokenDetailProps {
   const [isTransacting, setIsTransacting] = useState(false);
   const [transactionHash, setTransactionHash] = useState<`0x${string}` | undefined>();
 
-  const [selectedTab, setSelectedTab] = useState('trades');
+  // const [selectedTab, setSelectedTab] = useState('trades');
 
 
   //holders
@@ -130,6 +130,7 @@ interface TokenDetailProps {
             close: parseFloat(item.tokenPriceUSD),
           };
         });
+        console.log(formattedData);
         setChartData(formattedData);
       }
     } catch (error) {
@@ -236,11 +237,11 @@ interface TokenDetailProps {
   const handleSwap = useCallback(() => {
     setIsSwapped((prev) => !prev);
     setFromToken((prev) => ({
-      symbol: prev.symbol === 'BONE' ? tokenInfo.symbol : 'BONE',
+      symbol: prev.symbol === 'ETH' ? tokenInfo.symbol : 'ETH',
       amount: '',
     }));
     setToToken((prev) => ({
-      symbol: prev.symbol === 'BONE' ? tokenInfo.symbol : 'BONE',
+      symbol: prev.symbol === 'ETH' ? tokenInfo.symbol : 'ETH',
       amount: '',
     }));
   }, [tokenInfo]);
@@ -307,7 +308,7 @@ interface TokenDetailProps {
 
   const calculateProgress = (currentLiquidity: bigint): number => {
     const liquidityInEth = parseFloat(formatUnits(currentLiquidity, 18));
-    const target = 2500; 
+    const target = 5; // liquidity in eth target ( 5 eth)
     const progress = (liquidityInEth / target) * 100;
     return Math.min(progress, 100);
   };
@@ -323,7 +324,7 @@ interface TokenDetailProps {
           logo: tokenInfo.logo
         }}
       />
-      <div className="w-full min-h-screen bg-gray-900 text-white overflow-x-hidden">
+      <div className="w-full min-h-screen bg-[#000000] text-white overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header Section */}
           <div className="flex flex-col sm:flex-row items-center mb-6 gap-4">
@@ -339,13 +340,13 @@ interface TokenDetailProps {
         <div className="bg-gray-800 p-4 rounded-lg">
           <h2 className="text-xs sm:text-sm font-semibold mb-2 text-blue-300">Current Price</h2>
           <p className="text-[10px] sm:text-xs text-blue-400">
-            {currentPrice ? formatAmount(currentPrice.toString()) : 'Loading...'} BONE
+            {currentPrice ? formatAmount(currentPrice.toString()) : 'Loading...'} ETH
           </p>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg">
           <h2 className="text-xs sm:text-sm font-semibold mb-2 text-blue-300">Current Liquidity</h2>
           <p className="text-[10px] sm:text-xs text-blue-400 mb-2">
-            {liquidityData && liquidityData[2] ? `${formatAmountV2(liquidityData[2].toString())} BONE` : '0 BONE'}
+            {liquidityData && liquidityData[2] ? `${formatAmountV2(liquidityData[2].toString())} ETH` : '0 ETH'}
           </p>
           {liquidityData && liquidityData[2] && (
             <>

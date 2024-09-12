@@ -9,7 +9,8 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+    // <div className="flex flex-col min-h-screen bg-gray-900 text-white">
+    <div className="flex flex-col min-h-screen bg-[#000000] text-white">
       <div className="sticky top-0 z-50">
         <LiveNotifications />
         <Navbar />

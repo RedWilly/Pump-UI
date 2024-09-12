@@ -42,7 +42,7 @@ const PurchaseConfirmationPopup: React.FC<PurchaseConfirmationPopupProps> = ({ o
           <button onClick={handleConfirm} className="px-3 py-1.5 bg-blue-500 text-white rounded-md text-xs sm:text-sm">Confirm</button>
         </div>
         <p className="text-[8px] sm:text-xs text-gray-400 text-center">
-          Cost to deploy: ~1 BONE
+          Cost to deploy: ~0.01 ETH
         </p>
       </div>
     </div>

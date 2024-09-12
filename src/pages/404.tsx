@@ -8,7 +8,7 @@ const Custom404: React.FC = () => {
     return (
       <Layout>
         <SEO 
-          title="404 - Not Found | bondle"
+          title="404 - Not Found | DEGFUN"
           description="The page you're looking for doesn&apos;t exist or is still indexing."
         />
         <div className="flex flex-col items-center justify-start px-4 text-center pt-20 sm:pt-32 pb-10">

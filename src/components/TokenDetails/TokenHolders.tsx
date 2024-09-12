@@ -44,7 +44,7 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
                 <td className="p-2">
                   {holder.address === creatorAddress ? (
                     <a
-                      href={`https://www.shibariumscan.io/address/${holder.address}`}
+                      href={`https://etherscan.io/address/${holder.address}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-400 hover:underline"
@@ -53,7 +53,7 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
                     </a>
                   ) : (
                     <a
-                      href={`https://www.shibariumscan.io/address/${holder.address}`}
+                      href={`https://etherscan.io/address/${holder.address}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-400 hover:underline"

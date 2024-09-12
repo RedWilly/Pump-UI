@@ -229,7 +229,7 @@ export async function getTokensByCreator(
 //blockexplorer Get token Holders
 export async function getTokenHolders(tokenAddress: string): Promise<TokenHolder[]> {
   try {
-    const response = await axios.get(`https://www.shibariumscan.io/api/v2/tokens/${tokenAddress}/holders`);
+    const response = await axios.get(`https://eth.blockscout.com/api/v2/tokens/${tokenAddress}/holders`);
     const data = response.data;
 
     return data.items.map((item: any) => {

@@ -12,8 +12,6 @@ import PurchaseConfirmationPopup from '@/components/notifications/PurchaseConfir
 
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
-const CREATION_FEE = parseUnits('1', 18); // 1 BONE
-
 
 const CreateToken: React.FC = () => {
   const router = useRouter();
@@ -189,7 +187,7 @@ const CreateToken: React.FC = () => {
   return (
     <Layout>
       <SEO 
-        title="Create Your Own Token - Bondle"
+        title="Create Your Own Token - DEGFUN"
         description="Launch a coin that is instantly tradable without having to seed liquidity. - fair launch"
         image="/seo/create.jpg"
       />
@@ -208,16 +206,16 @@ const CreateToken: React.FC = () => {
             <span className="text-[10px] sm:text-xs">Deployment Cost Info</span>
           </button>
           {showTooltip && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 top-12 bg-gray-800 text-white p-4 rounded-md shadow-lg z-10 w-64 border border-gray-700">
+            <div className="absolute left-1/2 transform -translate-x-1/2 top-12 bg-[#000000] text-white p-4 rounded-md shadow-lg z-10 w-64 border border-gray-700">
               <p className="text-[8px] sm:text-xs">
-                Cost to deploy: 1 BONE
+                Cost to deploy: 1 ETH
                 This serves as an initial boost to the bonding curve.
               </p>
             </div>
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-[#000000] p-4 sm:p-6 rounded-lg shadow-xl">
           {/* Token Name and Symbol inputs */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

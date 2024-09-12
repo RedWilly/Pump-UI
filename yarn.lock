@@ -6695,10 +6695,10 @@ lighthouse-logger@^1.0.0:
     debug "^2.6.9"
     marky "^1.2.2"
 
-lightweight-charts@^4.1.7:
-  version "4.1.7"
-  resolved "https://registry.npmjs.org/lightweight-charts/-/lightweight-charts-4.1.7.tgz"
-  integrity sha512-/np9mQ8GXThrvJvxx4iSTZl/PvIhqG0bVQe7V+N0SO9E7e25VLglHf5M6eQFGDmwcOWNTLztH2fF0PmZ/sVq9g==
+lightweight-charts@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.npmjs.org/lightweight-charts/-/lightweight-charts-4.2.0.tgz"
+  integrity sha512-TRC61cI6bEKBEHcpqawL0KP8Rwos9b2OcdyeQ4Ri7Zybf8NvrRYmNcJV+2a2rMo7VZp1NhVWURuNEskjc+wm4A==
   dependencies:
     fancy-canvas "2.1.0"
 
@@ -7209,6 +7209,11 @@ modern-ahocorasick@^1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/modern-ahocorasick/-/modern-ahocorasick-1.0.1.tgz"
   integrity sha512-yoe+JbhTClckZ67b2itRtistFKf8yPYelHLc7e5xAwtNAXxM6wJTUx2C7QeVSJFDzKT7bCIFyBVybPMKvmB9AA==
+
+moment@^2.29.4:
+  version "2.29.4"
+  resolved "https://registry.npmjs.org/moment/-/moment-2.29.4.tgz"
+  integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
 motion@10.16.2:
   version "10.16.2"

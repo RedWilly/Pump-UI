@@ -23,13 +23,13 @@ const LiveNotifications: React.FC = () => {
     switch (data.type) {
       case 'buy':
         return {
-          message: `${addressEnd} Bought ${formatAmountV2(data.data.ethAmount)} BONE of ${data.data.symbol}`,
+          message: `${addressEnd} Bought ${formatAmountV2(data.data.ethAmount)} ETH of ${data.data.symbol}`,
           type: 'buy',
           logo: data.data.logo
         };
       case 'sell':
         return {
-          message: `${addressEnd} Sold ${formatAmountV2(data.data.ethAmount)} BONE of ${data.data.symbol}`,
+          message: `${addressEnd} Sold ${formatAmountV2(data.data.ethAmount)} ETH of ${data.data.symbol}`,
           type: 'sell',
           logo: data.data.logo
         };

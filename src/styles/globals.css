@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Serif:wght@400;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -19,7 +19,7 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
-  font-family: 'Press Start 2P', cursive;
+  font-family: 'Roboto Serif', serif;
 }
 
 @layer base {

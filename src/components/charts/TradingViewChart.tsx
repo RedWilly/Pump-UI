@@ -1,79 +1,115 @@
 import React, { useEffect, useRef } from 'react';
-import { createChart, ColorType, UTCTimestamp, IChartApi, ISeriesApi, CandlestickData } from 'lightweight-charts';
+import { createChart, CrosshairMode, IChartApi, Time } from 'lightweight-charts';
 
-interface ChartProps {
-  data: { time: number; open: number; high: number; low: number; close: number }[];
+interface ChartDataPoint {
+  time: number;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
 }
 
-const TradingViewChart: React.FC<ChartProps> = ({ data }) => {
+interface PriceChartProps {
+  data: ChartDataPoint[];
+}
+
+const PriceChart: React.FC<PriceChartProps> = ({ data }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<IChartApi | null>(null);
-  const candlestickSeriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
 
   useEffect(() => {
-    if (chartContainerRef.current && data.length > 0) {
-      const chart = createChart(chartContainerRef.current, {
+    if (chartContainerRef.current && data.length >= 2) {
+      const chart: IChartApi = createChart(chartContainerRef.current, {
         width: chartContainerRef.current.clientWidth,
         height: 500,
         layout: {
-          background: { type: ColorType.Solid, color: '#131722' },
-          textColor: '#d1d4dc',
+          background: { color: '#1f2937' },
+          textColor: '#d1d5db',
         },
         grid: {
-          vertLines: { color: '#242732' },
-          horzLines: { color: '#242732' },
-        },
-        crosshair: {
-          mode: 0,
+          vertLines: { color: 'rgba(255, 255, 255, 0.1)' },
+          horzLines: { color: 'rgba(255, 255, 255, 0.1)' },
         },
         rightPriceScale: {
-          borderColor: '#485c7b',
+          borderColor: 'rgba(255, 255, 255, 0.2)',
+          visible: true,
+          borderVisible: true,
+          alignLabels: true,
+          scaleMargins: {
+            top: 0.1,
+            bottom: 0.1,
+          },
+          autoScale: false,
         },
         timeScale: {
-          borderColor: '#485c7b',
+          borderColor: 'rgba(255, 255, 255, 0.2)',
           timeVisible: true,
           secondsVisible: false,
         },
+        crosshair: {
+          mode: CrosshairMode.Normal,
+        },
+        watermark: {
+          color: 'rgba(255, 255, 255, 0.1)',
+          visible: true,
+          text: 'Degentralized Funancial',
+          fontSize: 28,
+          horzAlign: 'center',
+          vertAlign: 'center',
+        },
       });
 
-      const candlestickSeries = chart.addCandlestickSeries({
+      const candleSeries = chart.addCandlestickSeries({
         upColor: '#26a69a',
         downColor: '#ef5350',
         borderVisible: false,
         wickUpColor: '#26a69a',
-        wickDownColor: '#ef5350',
+        wickDownColor: '#ef5350'
       });
 
-      const sortedData = data
-        .sort((a, b) => a.time - b.time)
-        .map(item => ({
-          time: item.time as UTCTimestamp,
-          open: item.open,
-          high: item.high,
-          low: item.low,
-          close: item.close,
-        }));
+      const enhancedChartData = enhanceSmallCandles(data);
+      candleSeries.setData(enhancedChartData.map(item => ({
+        time: item.time as Time,
+        open: item.open,
+        high: item.high,
+        low: item.low,
+        close: item.close
+      })));
 
-      candlestickSeries.setData(sortedData);
-
-      chart.timeScale().fitContent();
-
-      chart.applyOptions({
-        localization: {
-          priceFormatter: (price: number) => {
-            return price.toFixed(9);
-          },
+      candleSeries.applyOptions({
+        priceFormat: {
+          type: 'custom',
+          formatter: formatPrice,
+          minMove: 1e-9,
         },
       });
 
+      const prices = enhancedChartData.flatMap(item => [item.open, item.high, item.low, item.close]);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+
+      const zoomFactor = 0.8;
+      const priceRange = maxPrice - minPrice;
+      const zoomedMinPrice = Math.max(0, minPrice - priceRange * (1 - zoomFactor) / 2);
+      const zoomedMaxPrice = maxPrice + priceRange * (1 - zoomFactor) / 2;
+
+      chart.priceScale('right').applyOptions({
+        autoScale: false,
+        scaleMargins: {
+          top: 0.1,
+          bottom: 0.1,
+        },
+      });
+
+      chart.timeScale().setVisibleRange({
+        from: enhancedChartData[0].time as Time,
+        to: enhancedChartData[enhancedChartData.length - 1].time as Time,
+      });
+
       const handleResize = () => {
-        chart.applyOptions({ width: chartContainerRef.current!.clientWidth });
+        chart.applyOptions({ width: chartContainerRef.current?.clientWidth || 500 });
       };
 
       window.addEventListener('resize', handleResize);
-
-      chartRef.current = chart;
-      candlestickSeriesRef.current = candlestickSeries;
 
       return () => {
         window.removeEventListener('resize', handleResize);
@@ -82,17 +118,40 @@ const TradingViewChart: React.FC<ChartProps> = ({ data }) => {
     }
   }, [data]);
 
-  return (
-    <div className="relative">
-      <div ref={chartContainerRef} />
-      <div className="absolute top-4 left-4 text-white text-sm">
-        <div>O: {data[data.length - 1]?.open.toFixed(9)}</div>
-        <div>H: {data[data.length - 1]?.high.toFixed(9)}</div>
-        <div>L: {data[data.length - 1]?.low.toFixed(9)}</div>
-        <div>C: {data[data.length - 1]?.close.toFixed(9)}</div>
+  if (data.length < 2) {
+    return (
+      <div className="w-full h-[500px] bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+        <p className="text-white text-lg">Not enough data to display chart</p>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <div ref={chartContainerRef} className="w-full h-[500px] bg-gray-800 rounded-lg overflow-hidden" />
   );
 };
 
-export default TradingViewChart;
+function enhanceSmallCandles(data: ChartDataPoint[]): ChartDataPoint[] {
+  const minCandleSize = 1e-9;
+  return data.map(item => {
+    const bodySize = Math.abs(item.open - item.close);
+    if (bodySize < minCandleSize) {
+      const midPoint = (item.open + item.close) / 2;
+      const adjustment = minCandleSize / 2;
+      return {
+        ...item,
+        open: midPoint - adjustment,
+        close: midPoint + adjustment,
+        high: Math.max(item.high, midPoint + adjustment),
+        low: Math.min(item.low, midPoint - adjustment)
+      };
+    }
+    return item;
+  });
+}
+
+function formatPrice(price: number) {
+  return price.toFixed(9);
+}
+
+export default PriceChart;

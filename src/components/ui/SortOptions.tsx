@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type SortOption = 'all' | 'recentCreated' | 'ended' | 'bomper';
+export type SortOption = 'all' | 'recentCreated' | 'ended';
 
 interface SortOptionsProps {
   onSort: (option: SortOption) => void;
@@ -11,7 +11,7 @@ const sortOptionMapping: { [key: string]: SortOption } = {
   'All': 'all',
   'Creation Time': 'recentCreated',
   'Ended': 'ended',
-  'Bomper': 'bomper'
+  // 'Bomper': 'bomper'
 };
 
 const SortOptions: React.FC<SortOptionsProps> = ({ onSort, currentSort }) => {
