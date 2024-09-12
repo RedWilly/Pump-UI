@@ -10,8 +10,6 @@ Pump Fun UI is a Next.js-based web application for interacting with the Pump Fun
   - [Running the Application](#running-the-application)
 - [Architecture Overview](#architecture-overview)
 - [Environment Variables](#environment-variables)
-- [Available Scripts](#available-scripts)
-- [Dependencies](#dependencies)
 
 
 ## Getting Started
@@ -61,7 +59,7 @@ The application follows a component-based architecture, with reusable UI compone
 
 ## Environment Variables
 
-Create a `.env.local` file in the root directory with the following variables:
+Create a `.env.local` for local run, but for production create `.env` file in the root directory with the following variables:
 
 ```
 NEXT_PUBLIC_API_BASE_URL=backend-url
@@ -70,7 +68,3 @@ NEXT_PUBLIC_WS_BASE_URL=https://backend-url
 CHAINSAFE_API_KEY=your_chainsafe_api_key
 CHAINSAFE_BUCKET_ID=your_chainsafe_bucket_id
 ```
-
-### 🚀 Looking to build a platform like Pump.fun?
-
-I've made the UI open-source, but the backend and smart contract are closed-source. If you're interested in creating a full-fledged Pump.fun-like platform, let's collaborate! [Contact me on Telegram](https://t.me/rink3y) (RedWilly) for more details.
