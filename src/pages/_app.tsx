@@ -10,11 +10,23 @@ import 'react-toastify/dist/ReactToastify.css';
 import { WebSocketProvider } from '@/components/providers/WebSocketProvider';
 
 
+const customMainnet = {
+  ...mainnet,
+  rpcUrls: {
+    default: {
+      http: ['https://eth.llamarpc.com'],
+    },
+    public: {
+      http: ['https://eth.llamarpc.com'],
+    },
+  },
+};
+
 
 const config = getDefaultConfig({
   appName: "DEGFun",
   projectId: "YOUR_PROJECT_ID", // TODO: add project id - optional
-  chains: [mainnet],
+  chains: [customMainnet],
   ssr: true,
 });
 
