@@ -14,10 +14,10 @@ const customMainnet = {
   ...mainnet,
   rpcUrls: {
     default: {
-      http: ['https://eth.llamarpc.com'],
+      http: ['https://eth-mainnet.public.blastapi.io'],
     },
     public: {
-      http: ['https://eth.llamarpc.com'],
+      http: ['https://eth-mainnet.public.blastapi.io'],
     },
   },
 };

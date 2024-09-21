@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
@@ -9,6 +9,7 @@ import { updateToken } from '@/utils/api';
 import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { parseUnits } from 'viem';
 import PurchaseConfirmationPopup from '@/components/notifications/PurchaseConfirmationPopup';
+import Modal from '@/components/notifications/modal';
 
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
@@ -30,6 +31,7 @@ const CreateToken: React.FC = () => {
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showPurchasePopup, setShowPurchasePopup] = useState(false);
+  const [showPreventNavigationModal, setShowPreventNavigationModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { createToken, isLoading: isBlockchainLoading, UserRejectedRequestError } = useCreateToken();
@@ -183,6 +185,29 @@ const CreateToken: React.FC = () => {
   const isButtonDisabled = creationStep !== 'idle' || !tokenName || !tokenSymbol || !tokenImageUrl;
 
   const toggleSocialSection = () => setIsSocialExpanded(!isSocialExpanded);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (creationStep === 'creating' || creationStep === 'updating') {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [creationStep]);
+
+  useEffect(() => {
+    if (creationStep === 'creating' || creationStep === 'updating') {
+      setShowPreventNavigationModal(true);
+    } else {
+      setShowPreventNavigationModal(false);
+    }
+  }, [creationStep]);
 
   return (
     <Layout>
@@ -379,6 +404,22 @@ const CreateToken: React.FC = () => {
           onCancel={() => setShowPurchasePopup(false)}
           tokenSymbol={tokenSymbol}
         />
+      )}
+
+      {showPreventNavigationModal && (
+        <Modal
+          isOpen={showPreventNavigationModal}
+          onClose={() => {}} // Empty function to prevent closing
+        >
+          <div className="p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Please Wait</h3>
+            <p className="text-sm text-gray-500">
+              Your token is being {creationStep === 'creating' ? 'created' : 'updated'}. This
+              process may take a few moments. Please do not navigate away or close the browser
+              until the process is complete.
+            </p>
+          </div>
+        </Modal>
       )}
       </div>
     </Layout>

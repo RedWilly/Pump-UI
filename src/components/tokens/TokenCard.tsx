@@ -82,7 +82,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
             rel="noopener noreferrer"
             className="px-4 py-2 text-sm font-medium bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 text-center whitespace-nowrap"
           >
-            Buy on Chewyswap
+            Buy on Uniswap
           </a>
         </div>
       </div>
