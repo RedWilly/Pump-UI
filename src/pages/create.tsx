@@ -9,7 +9,7 @@ import { updateToken } from '@/utils/api';
 import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { parseUnits } from 'viem';
 import PurchaseConfirmationPopup from '@/components/notifications/PurchaseConfirmationPopup';
-import Modal from '@/components/notifications/modal';
+import Modal from '@/components/notifications/Modal';
 
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
