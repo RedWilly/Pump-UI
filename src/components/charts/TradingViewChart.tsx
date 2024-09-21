@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { formatAmountV3 } from '@/utils/blockchainUtils';
 import Spinner from '@/components/ui/Spinner';
 
+// TODO: add different chart types (bars, line, area, etc)
+
 interface ChartDataPoint {
   time: number;
   open: number;
