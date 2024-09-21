@@ -6,20 +6,14 @@ import Layout from '@/components/layout/Layout';
 import SEO from '@/components/seo/SEO';
 import { useCreateToken } from '@/utils/blockchainUtils';
 import { updateToken } from '@/utils/api';
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  CloudArrowUpIcon,
-  InformationCircleIcon,
-} from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { parseUnits } from 'viem';
 import PurchaseConfirmationPopup from '@/components/notifications/PurchaseConfirmationPopup';
-import Modal from '@/components/notifications/Modal';
+import Modal from '@/components/notifications/modal';
 
-// ... (rest of your imports)
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
-const CREATION_FEE = parseUnits('1', 18); // 1 BONE
+
 
 const CreateToken: React.FC = () => {
   const router = useRouter();
@@ -34,246 +28,184 @@ const CreateToken: React.FC = () => {
   const [twitter, setTwitter] = useState('');
   const [youtube, setYoutube] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [creationStep, setCreationStep] = useState<
-    'idle' | 'uploading' | 'creating' | 'updating' | 'completed' | 'error'
-  >('idle');
+  const [creationStep, setCreationStep] = useState<'idle' | 'uploading' | 'creating' | 'updating' | 'completed' | 'error'>('idle');
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showPurchasePopup, setShowPurchasePopup] = useState(false);
+  const [showPreventNavigationModal, setShowPreventNavigationModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const {
-    createToken,
-    isLoading: isBlockchainLoading,
-    UserRejectedRequestError,
-  } = useCreateToken();
+  const { createToken, isLoading: isBlockchainLoading, UserRejectedRequestError } = useCreateToken();
 
-  // Prevent user from leaving the page during critical operations
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = ''; // This is necessary for Chrome to trigger the dialog
-    };
-
-    if (creationStep === 'creating' || creationStep === 'updating') {
-      window.addEventListener('beforeunload', handleBeforeUnload);
-    } else {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+  const uploadToIPFS = useCallback(async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('File size exceeds 1MB limit. Please choose a smaller file.');
+      return null;
     }
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [creationStep]);
+    setIsUploading(true);
+    setCreationStep('uploading');
+    const formData = new FormData();
+    formData.append('file', file);
 
-  // Handle internal navigation (Next.js route changes)
-  useEffect(() => {
-    const handleRouteChangeStart = (url: string) => {
-      if (creationStep === 'creating' || creationStep === 'updating') {
-        if (!confirm('A token creation is in progress. Are you sure you want to leave?')) {
-          // Prevent navigation
-          router.events.emit('routeChangeError');
-          throw 'Route change aborted.';
-        }
+    try {
+      console.log('Uploading image to IPFS...');
+      const response = await axios.post('/api/upload-to-ipfs', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.url) {
+        console.log('Image uploaded successfully:', response.data.url);
+        setTokenImageUrl(response.data.url);
+        toast.success('Image uploaded to IPFS successfully!');
+        return response.data.url;
+      } else {
+        throw new Error('No URL returned from server');
       }
-    };
-
-    router.events.on('routeChangeStart', handleRouteChangeStart);
-
-    return () => {
-      router.events.off('routeChangeStart', handleRouteChangeStart);
-    };
-  }, [creationStep, router]);
-
-  const uploadToIPFS = useCallback(
-    async (file: File) => {
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error('File size exceeds 1MB limit. Please choose a smaller file.');
-        return null;
+    } catch (error) {
+      console.error('Error uploading to IPFS:', error);
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(`Failed to upload image: ${error.response.data.error || error.message}`);
+      } else {
+        toast.error('Failed to upload image. Please try again.');
       }
+      return null;
+    } finally {
+      setIsUploading(false);
+      setCreationStep('idle');
+    }
+  }, []);
 
-      setIsUploading(true);
-      setCreationStep('uploading');
-      const formData = new FormData();
-      formData.append('file', file);
+  const handleFileUpload = useCallback(async (file: File) => {
+    setTokenImage(file);
+    const newImageUrl = await uploadToIPFS(file);
+    if (newImageUrl) {
+      setTokenImageUrl(newImageUrl);
+    }
+  }, [uploadToIPFS]);
 
-      try {
-        console.log('Uploading image to IPFS...');
-        const response = await axios.post('/api/upload-to-ipfs', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-
-        if (response.data.url) {
-          console.log('Image uploaded successfully:', response.data.url);
-          setTokenImageUrl(response.data.url);
-          toast.success('Image uploaded to IPFS successfully!');
-          return response.data.url;
-        } else {
-          throw new Error('No URL returned from server');
-        }
-      } catch (error) {
-        console.error('Error uploading to IPFS:', error);
-        if (axios.isAxiosError(error) && error.response) {
-          toast.error(`Failed to upload image: ${error.response.data.error || error.message}`);
-        } else {
-          toast.error('Failed to upload image. Please try again.');
-        }
-        return null;
-      } finally {
-        setIsUploading(false);
-        setCreationStep('idle');
-      }
-    },
-    []
-  );
-
-  const handleFileUpload = useCallback(
-    async (file: File) => {
-      setTokenImage(file);
-      const newImageUrl = await uploadToIPFS(file);
-      if (newImageUrl) {
-        setTokenImageUrl(newImageUrl);
-      }
-    },
-    [uploadToIPFS]
-  );
-
-  const handleImageChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files[0]) {
-        handleFileUpload(e.target.files[0]);
-      }
-    },
-    [handleFileUpload]
-  );
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFileUpload(e.target.files[0]);
+    }
+  }, [handleFileUpload]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
   }, []);
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        handleFileUpload(e.dataTransfer.files[0]);
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileUpload(e.dataTransfer.files[0]);
+    }
+  }, [handleFileUpload]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tokenImageUrl) {
+      toast.error('Please upload an image before creating the token.');
+      return;
+    }
+    setShowPurchasePopup(true);
+  }, [tokenImageUrl]);
+
+  const handlePurchaseConfirm = useCallback(async (purchaseAmount: bigint) => {
+    setShowPurchasePopup(false);
+    setCreationStep('creating');
+    let tokenAddress: string | null = null;
+
+    try {
+      console.log('Creating token on blockchain...');
+      tokenAddress = await createToken(tokenName, tokenSymbol, purchaseAmount);
+      console.log('Token created on blockchain:', tokenAddress);
+
+      setCreationStep('updating');
+
+      // Add a 4-second delay before updating the server - gives the backend time to catch event and process
+      await new Promise(resolve => setTimeout(resolve, 4000));
+
+      console.log('Updating token in backend...');
+      if (tokenAddress && tokenImageUrl) {
+        await updateToken(tokenAddress, {
+          logo: tokenImageUrl,
+          description: tokenDescription,
+          website,
+          telegram,
+          discord,
+          twitter,
+          youtube
+        });
+        console.log('Token updated in backend');
+      } else {
+        throw new Error('Token address or image URL is missing');
       }
-    },
-    [handleFileUpload]
-  );
 
-  const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!tokenImageUrl) {
-        toast.error('Please upload an image before creating the token.');
-        return;
-      }
-      setShowPurchasePopup(true);
-    },
-    [tokenImageUrl]
-  );
+      setCreationStep('completed');
+      toast.success('Token created and updated successfully!');
+      router.push(`/token/${tokenAddress}`);
+    } catch (error) {
+      console.error('Error in token creation/update process:', error);
 
-  const handlePurchaseConfirm = useCallback(
-    async (purchaseAmount: bigint) => {
-      setShowPurchasePopup(false);
-      setCreationStep('creating');
-      let tokenAddress: string | null = null;
+      // Reset creation step to allow resubmission
+      setCreationStep('idle');
 
-      try {
-        console.log('Creating token on blockchain...');
-        tokenAddress = await createToken(tokenName, tokenSymbol, purchaseAmount);
-        console.log('Token created on blockchain:', tokenAddress);
-
-        setCreationStep('updating');
-
-        // Add a 4-second delay before updating the server - gives the backend time to catch event and process
-        await new Promise((resolve) => setTimeout(resolve, 4000));
-
-        console.log('Updating token in backend...');
-        if (tokenAddress && tokenImageUrl) {
-          await updateToken(tokenAddress, {
-            logo: tokenImageUrl,
-            description: tokenDescription,
-            website,
-            telegram,
-            discord,
-            twitter,
-            youtube,
-          });
-          console.log('Token updated in backend');
+      if (error instanceof Error) {
+        if (error instanceof UserRejectedRequestError) {
+          // MetaMask rejection or similar
+          toast.error('Transaction was cancelled. Please try again.');
+        } else if (!tokenAddress) {
+          // Error occurred before token creation on blockchain
+          toast.error('Failed to create token on blockchain. Please try again.');
         } else {
-          throw new Error('Token address or image URL is missing');
+          // Token created on blockchain but backend update failed
+          toast.error('Token created on blockchain but failed to update in backend. Please try updating later in your portfolio.');
         }
-
-        setCreationStep('completed');
-        toast.success('Token created and updated successfully!');
-        router.push(`/token/${tokenAddress}`);
-      } catch (error) {
-        console.error('Error in token creation/update process:', error);
-
-        // Reset creation step to allow resubmission
-        setCreationStep('idle');
-
-        if (error instanceof Error) {
-          if (error instanceof UserRejectedRequestError) {
-            // MetaMask rejection or similar
-            toast.error('Transaction was cancelled. Please try again.');
-          } else if (!tokenAddress) {
-            // Error occurred before token creation on blockchain
-            toast.error('Failed to create token on blockchain. Please try again.');
-          } else {
-            // Token created on blockchain but backend update failed
-            toast.error(
-              'Token created on blockchain but failed to update in backend. Please try updating later in your portfolio.'
-            );
-          }
-        } else {
-          // Fallback error message
-          toast.error('An unexpected error occurred. Please try again.');
-        }
+      } else {
+        // Fallback error message
+        toast.error('An unexpected error occurred. Please try again.');
       }
-    },
-    [
-      tokenName,
-      tokenSymbol,
-      tokenImageUrl,
-      tokenDescription,
-      website,
-      telegram,
-      discord,
-      twitter,
-      youtube,
-      createToken,
-      router,
-    ]
-  );
+    }
+  }, [tokenName, tokenSymbol, tokenImageUrl, tokenDescription, website, telegram, discord, twitter, youtube, createToken, router]);
 
   const getButtonText = useCallback(() => {
     switch (creationStep) {
-      case 'uploading':
-        return 'Uploading image...';
-      case 'creating':
-        return isBlockchainLoading
-          ? 'Waiting for blockchain confirmation...'
-          : 'Creating token on blockchain...';
-      case 'updating':
-        return 'Updating token in backend...';
-      case 'completed':
-        return 'Token created successfully!';
-      case 'error':
-        return 'Error occurred. Visit Portfolio to Update TokenInfo';
-      default:
-        return 'Create Token';
+      case 'uploading': return 'Uploading image...';
+      case 'creating': return isBlockchainLoading ? 'Waiting for blockchain confirmation...' : 'Creating token on blockchain...';
+      case 'updating': return 'Updating token in backend...';
+      case 'completed': return 'Token created successfully!';
+      case 'error': return 'Error occurred. Visit Portfolio to Update TokenInfo';
+      default: return 'Create Token';
     }
   }, [creationStep, isBlockchainLoading]);
 
   const isButtonDisabled = creationStep !== 'idle' || !tokenName || !tokenSymbol || !tokenImageUrl;
 
   const toggleSocialSection = () => setIsSocialExpanded(!isSocialExpanded);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (creationStep === 'creating' || creationStep === 'updating') {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [creationStep]);
+  useEffect(() => {
+    if (creationStep === 'creating' || creationStep === 'updating') {
+      setShowPreventNavigationModal(true);
+    } else {
+      setShowPreventNavigationModal(false);
+    }
+  }, [creationStep]);
 
   return (
     <Layout>
@@ -283,9 +215,7 @@ const CreateToken: React.FC = () => {
         image="/seo/create.jpg"
       />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-xl sm:text-1xl md:text-2xl font-bold text-blue-400 mb-6 text-center">
-          Create New Token
-        </h1>
+        <h1 className="text-xl sm:text-1xl md:text-2xl font-bold text-blue-400 mb-6 text-center">Create New Token</h1>
 
         {/* Info button with tooltip */}
         <div className="relative mb-6 flex justify-center">
@@ -308,17 +238,11 @@ const CreateToken: React.FC = () => {
           )}
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl"
-        >
+        <form onSubmit={handleSubmit} className="space-y-6 bg-gray-800 p-4 sm:p-6 rounded-lg shadow-xl">
           {/* Token Name and Symbol inputs */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label
-                htmlFor="tokenName"
-                className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1"
-              >
+              <label htmlFor="tokenName" className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1">
                 Token Name
               </label>
               <input
@@ -328,14 +252,11 @@ const CreateToken: React.FC = () => {
                 onChange={(e) => setTokenName(e.target.value)}
                 required
                 className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                // placeholder="Enter token name"
+              // placeholder="Enter token name"
               />
             </div>
             <div>
-              <label
-                htmlFor="tokenSymbol"
-                className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1"
-              >
+              <label htmlFor="tokenSymbol" className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1">
                 Token Symbol
               </label>
               <input
@@ -345,17 +266,14 @@ const CreateToken: React.FC = () => {
                 onChange={(e) => setTokenSymbol(e.target.value)}
                 required
                 className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                // placeholder="Enter token symbol"
+              // placeholder="Enter token symbol"
               />
             </div>
           </div>
 
           {/* Token Description textarea */}
           <div>
-            <label
-              htmlFor="tokenDescription"
-              className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1"
-            >
+            <label htmlFor="tokenDescription" className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1">
               Token Description
             </label>
             <textarea
@@ -364,16 +282,13 @@ const CreateToken: React.FC = () => {
               onChange={(e) => setTokenDescription(e.target.value)}
               rows={4}
               className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-              // placeholder="Describe your token"
+            // placeholder="Describe your token"
             />
           </div>
 
           {/* Token Image upload */}
           <div>
-            <label
-              htmlFor="tokenImage"
-              className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-2"
-            >
+            <label htmlFor="tokenImage" className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-2">
               Token Image
             </label>
             <div
@@ -447,10 +362,7 @@ const CreateToken: React.FC = () => {
                   { id: 'youtube', label: 'YouTube', value: youtube, setter: setYoutube },
                 ].map((item) => (
                   <div key={item.id}>
-                    <label
-                      htmlFor={item.id}
-                      className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1"
-                    >
+                    <label htmlFor={item.id} className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1">
                       {item.label}
                     </label>
                     <input
@@ -473,11 +385,10 @@ const CreateToken: React.FC = () => {
             <button
               type="submit"
               disabled={isButtonDisabled}
-              className={`w-full py-3 px-4 border border-transparent rounded-full shadow-sm text-xs sm:text-sm font-medium text-white transition duration-150 ease-in-out ${
-                isButtonDisabled
+              className={`w-full py-3 px-4 border border-transparent rounded-full shadow-sm text-xs sm:text-sm font-medium text-white transition duration-150 ease-in-out ${isButtonDisabled
                   ? 'bg-gray-600 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-              }`}
+                }`}
             >
               {getButtonText()}
             </button>
@@ -492,19 +403,18 @@ const CreateToken: React.FC = () => {
           />
         )}
 
-        {/* Modal to warn the user not to leave the page */}
-        {(creationStep === 'creating' || creationStep === 'updating') && (
-          <Modal>
-            <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
-              <h2 className="text-sm sm:text-base font-bold text-white mb-4">Please Do Not Leave the Page</h2>
-              <p className="text-gray-300 mb-4 text-[10px] sm:text-xs">
+        {showPreventNavigationModal && (
+          <Modal
+            isOpen={showPreventNavigationModal}
+            onClose={() => { }} // Empty function to prevent closing
+          >
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Please Wait</h3>
+              <p className="text-sm text-gray-500">
                 Your token is being {creationStep === 'creating' ? 'created' : 'updated'}. This
                 process may take a few moments. Please do not navigate away or close the browser
                 until the process is complete.
               </p>
-              <div className="flex justify-center">
-                <div className="loader"></div> {/* todo - will add a loading indicator here */}
-              </div>
             </div>
           </Modal>
         )}

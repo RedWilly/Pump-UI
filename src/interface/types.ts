@@ -38,6 +38,7 @@ export interface LiquidityEvent {
 
   // Add this new interface to your types file
 export interface TokenWithTransactions extends Token {
+  id: string;
   youtube: string | undefined;
   discord: string | undefined;
   twitter: any;

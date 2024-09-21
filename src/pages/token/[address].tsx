@@ -21,7 +21,7 @@ import {
   useApproveTokens,
   formatAmountV2,
 } from '@/utils/blockchainUtils';
-import { getTokenInfoAndTransactions, getTokenUSDPriceHistory, getTokenHolders } from '@/utils/api';
+import { getTokenInfoAndTransactions, getTokenUSDPriceHistory, getTokenHolders, getTokenLiquidityEvents } from '@/utils/api';
 import { formatTimestamp, formatAmount } from '@/utils/blockchainUtils';
 import { parseUnits, formatUnits } from 'viem';
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
@@ -102,6 +102,9 @@ interface TokenDetailProps {
   const { sellTokens } = useSellTokens();
   const { approveTokens } = useApproveTokens();
 
+  const [liquidityEvents, setLiquidityEvents] = useState<any>(null);
+
+
   const fetchTokenData = useCallback(
     async (page: number) => {
       try {
@@ -165,8 +168,16 @@ interface TokenDetailProps {
       refetchCurrentPrice();
       refetchLiquidity();
       fetchTokenHolders();
+
+      // Fetch liquidity events
+      try {
+        const events = await getTokenLiquidityEvents(tokenInfo.id);
+        setLiquidityEvents(events);
+      } catch (error) {
+        console.error('Error fetching liquidity events:', error);
+      }
     }
-  }, [address, transactionPage, fetchTokenData, fetchHistoricalPriceData, refetchCurrentPrice, refetchLiquidity]);
+  }, [address, transactionPage, fetchTokenData, fetchHistoricalPriceData, refetchCurrentPrice, refetchLiquidity, tokenInfo.id]);
 
   useEffect(() => {
     fetchAllData();
@@ -373,14 +384,11 @@ interface TokenDetailProps {
           <div className="mb-8">
             <h2 className="text-sm sm:text-base font-semibold mb-4 text-blue-300">Price Chart (USD)</h2>
             <div className="bg-gray-800 p-2 sm:p-4 rounded-lg shadow">
-              {chartData.length > 0 ? (
-                <TradingViewChart data={chartData} />
-              ) : (
-                <div className="flex justify-center items-center h-48 sm:h-64 md:h-80 text-gray-400 text-xs sm:text-base">
-                  {chartError || 'Loading chart data...'}
-                  <Spinner size="medium" />
-                </div>
-              )}
+            <TradingViewChart 
+                data={chartData} 
+                liquidityEvents={liquidityEvents} 
+                tokenInfo={tokenInfo}
+              />
             </div>
           </div>
 

@@ -7,7 +7,7 @@ import { CurrencyDollarIcon, UserIcon, ClockIcon, TagIcon } from '@heroicons/rea
 import { Token, TokenWithLiquidityEvents } from '@/interface/types';
 import { useTokenLiquidity, formatAmount, formatTimestamp, formatAmountV2 } from '@/utils/blockchainUtils';
 import Spinner from '@/components/ui/Spinner';
-
+import { useRouter } from 'next/router';
 
 interface TokenCardProps {
   token: Token | TokenWithLiquidityEvents;
@@ -16,6 +16,7 @@ interface TokenCardProps {
 
 const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
   const [currentLiquidity, setCurrentLiquidity] = useState<string>('0');
   const tokenAddress = token.address as `0x${string}`;
   const { data: liquidityData } = useTokenLiquidity(tokenAddress);
@@ -36,12 +37,23 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
     setIsLoading(true);
   };
 
+  const handleViewCharts = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    router.push(`/token/${token.address}`);
+  };
+
   if (isEnded && isTokenWithLiquidity(token)) {
     const liquidityEvent = token.liquidityEvents[0];
     const uniswapLink = `https://chewyswap.dog/swap/?outputCurrency=${token.address}&chain=shibarium`;
 
     return (
-      <div className="w-full max-w-sm p-4 bg-gray-800 rounded-lg shadow-xl">
+      <div className="w-full max-w-sm p-4 bg-gray-800 rounded-lg shadow-xl relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10 rounded-lg">
+            <Spinner size="medium" />
+          </div>
+        )}
         <div className="flex items-center gap-4 mb-4">
           <div className="bg-gray-700 rounded-md flex items-center justify-center w-16 h-16">
             <img src={token.logo} alt={`${token.name} Logo`} width={64} height={64} className="object-cover rounded-md" />
@@ -75,14 +87,21 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
             <span>{formatAmount(currentLiquidity)}</span> */}
           </div>
         </div>
-        <div className="flex justify-center">
+        <div className="grid grid-cols-2 gap-2">
           <a
             href={uniswapLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 text-sm font-medium bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 text-center whitespace-nowrap"
+            className="px-2 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-medium bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-200 text-center whitespace-nowrap"
           >
-            Buy on Chewyswap
+            Chewyswap
+          </a>
+          <a
+            href={`/token/${token.address}`}
+            onClick={handleViewCharts}
+            className="px-2 py-1 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-medium bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors duration-200 text-center whitespace-nowrap"
+          >
+            View Charts
           </a>
         </div>
       </div>
