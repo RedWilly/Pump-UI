@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { toast } from 'react-hot-toast';
 import axios from 'axios';
@@ -9,10 +9,10 @@ import { updateToken } from '@/utils/api';
 import { ChevronDownIcon, ChevronUpIcon, CloudArrowUpIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { parseUnits } from 'viem';
 import PurchaseConfirmationPopup from '@/components/notifications/PurchaseConfirmationPopup';
+import Modal from '@/components/notifications/modal';
 
 
 const MAX_FILE_SIZE = 1024 * 1024; // 1MB
-const CREATION_FEE = parseUnits('1', 18); // 1 BONE
 
 
 const CreateToken: React.FC = () => {
@@ -32,6 +32,7 @@ const CreateToken: React.FC = () => {
   const [isSocialExpanded, setIsSocialExpanded] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [showPurchasePopup, setShowPurchasePopup] = useState(false);
+  const [showPreventNavigationModal, setShowPreventNavigationModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { createToken, isLoading: isBlockchainLoading, UserRejectedRequestError } = useCreateToken();
@@ -122,12 +123,12 @@ const CreateToken: React.FC = () => {
       console.log('Creating token on blockchain...');
       tokenAddress = await createToken(tokenName, tokenSymbol, purchaseAmount);
       console.log('Token created on blockchain:', tokenAddress);
-      
+
       setCreationStep('updating');
 
       // Add a 4-second delay before updating the server - gives the backend time to catch event and process
       await new Promise(resolve => setTimeout(resolve, 4000));
-      
+
       console.log('Updating token in backend...');
       if (tokenAddress && tokenImageUrl) {
         await updateToken(tokenAddress, {
@@ -143,13 +144,13 @@ const CreateToken: React.FC = () => {
       } else {
         throw new Error('Token address or image URL is missing');
       }
-      
+
       setCreationStep('completed');
       toast.success('Token created and updated successfully!');
       router.push(`/token/${tokenAddress}`);
     } catch (error) {
       console.error('Error in token creation/update process:', error);
-      
+
       // Reset creation step to allow resubmission
       setCreationStep('idle');
 
@@ -186,16 +187,36 @@ const CreateToken: React.FC = () => {
 
   const toggleSocialSection = () => setIsSocialExpanded(!isSocialExpanded);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (creationStep === 'creating' || creationStep === 'updating') {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [creationStep]);
+  useEffect(() => {
+    if (creationStep === 'creating' || creationStep === 'updating') {
+      setShowPreventNavigationModal(true);
+    } else {
+      setShowPreventNavigationModal(false);
+    }
+  }, [creationStep]);
+
   return (
     <Layout>
-      <SEO 
+      <SEO
         title="Create Your Own Token - Bondle"
         description="Launch a coin that is instantly tradable without having to seed liquidity. - fair launch"
         image="/seo/create.jpg"
       />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-xl sm:text-1xl md:text-2xl font-bold text-blue-400 mb-6 text-center">Create New Token</h1>
-        
+
         {/* Info button with tooltip */}
         <div className="relative mb-6 flex justify-center">
           <button
@@ -231,7 +252,7 @@ const CreateToken: React.FC = () => {
                 onChange={(e) => setTokenName(e.target.value)}
                 required
                 className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                // placeholder="Enter token name"
+              // placeholder="Enter token name"
               />
             </div>
             <div>
@@ -245,11 +266,11 @@ const CreateToken: React.FC = () => {
                 onChange={(e) => setTokenSymbol(e.target.value)}
                 required
                 className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                // placeholder="Enter token symbol"
+              // placeholder="Enter token symbol"
               />
             </div>
           </div>
-          
+
           {/* Token Description textarea */}
           <div>
             <label htmlFor="tokenDescription" className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-1">
@@ -261,7 +282,7 @@ const CreateToken: React.FC = () => {
               onChange={(e) => setTokenDescription(e.target.value)}
               rows={4}
               className="w-full py-2 px-3 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-              // placeholder="Describe your token"
+            // placeholder="Describe your token"
             />
           </div>
 
@@ -270,7 +291,7 @@ const CreateToken: React.FC = () => {
             <label htmlFor="tokenImage" className="block text-[10px] sm:text-xs font-medium text-gray-300 mb-2">
               Token Image
             </label>
-            <div 
+            <div
               className="mt-1 flex justify-center items-center px-4 py-4 border-2 border-gray-600 border-dashed rounded-md hover:border-blue-500 transition duration-150 ease-in-out"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
@@ -299,7 +320,7 @@ const CreateToken: React.FC = () => {
                   </div>
                   <p className="text-xs text-gray-400 mt-2">PNG, JPG, GIF up to 1MB</p>
                 </div>
-                </div>
+              </div>
             </div>
             {isUploading && <p className="text-sm text-gray-400 mt-2">Uploading image to IPFS...</p>}
           </div>
@@ -316,7 +337,7 @@ const CreateToken: React.FC = () => {
               </div>
             </div>
           )}
-          
+
           {/* Collapsible Social Media Section */}
           <div className="border border-gray-600 rounded-md overflow-hidden">
             <button
@@ -364,11 +385,10 @@ const CreateToken: React.FC = () => {
             <button
               type="submit"
               disabled={isButtonDisabled}
-              className={`w-full py-3 px-4 border border-transparent rounded-full shadow-sm text-xs sm:text-sm font-medium text-white transition duration-150 ease-in-out ${
-                isButtonDisabled
+              className={`w-full py-3 px-4 border border-transparent rounded-full shadow-sm text-xs sm:text-sm font-medium text-white transition duration-150 ease-in-out ${isButtonDisabled
                   ? 'bg-gray-600 cursor-not-allowed'
                   : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-              }`}
+                }`}
             >
               {getButtonText()}
             </button>
@@ -376,12 +396,28 @@ const CreateToken: React.FC = () => {
         </form>
 
         {showPurchasePopup && (
-        <PurchaseConfirmationPopup
-          onConfirm={handlePurchaseConfirm}
-          onCancel={() => setShowPurchasePopup(false)}
-          tokenSymbol={tokenSymbol}
-        />
-      )}
+          <PurchaseConfirmationPopup
+            onConfirm={handlePurchaseConfirm}
+            onCancel={() => setShowPurchasePopup(false)}
+            tokenSymbol={tokenSymbol}
+          />
+        )}
+
+        {showPreventNavigationModal && (
+          <Modal
+            isOpen={showPreventNavigationModal}
+            onClose={() => { }} // Empty function to prevent closing
+          >
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Please Wait</h3>
+              <p className="text-sm text-gray-500">
+                Your token is being {creationStep === 'creating' ? 'created' : 'updated'}. This
+                process may take a few moments. Please do not navigate away or close the browser
+                until the process is complete.
+              </p>
+            </div>
+          </Modal>
+        )}
       </div>
     </Layout>
   );
