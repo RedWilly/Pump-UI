@@ -1,5 +1,3 @@
-// TokenList.tsx
-
 import React from 'react';
 import TokenCard from './TokenCard';
 import { Token, TokenWithLiquidityEvents } from '@/interface/types';

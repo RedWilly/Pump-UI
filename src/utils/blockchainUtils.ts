@@ -1,9 +1,8 @@
-//BlockchainUtils.ts
 import { formatUnits, parseUnits, maxUint256, decodeEventLog, Log, TransactionReceipt, UserRejectedRequestError } from 'viem';
 import { useReadContract, useWriteContract, useBalance, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
 import BondingCurveManagerABI from '@/abi/BondingCurveManager.json';
 import ERC20ABI from '@/abi/ERC20.json';
-import { updateToken } from '@/utils/api';
+import { useCallback } from 'react';
 
 const BONDING_CURVE_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
 const CREATION_FEE = parseUnits('1', 18);
@@ -56,25 +55,25 @@ export function useCalcSellReturn(tokenAddress: `0x${string}`, tokenAmount: bigi
   return { data: data as bigint | undefined, isLoading };
 }
 
-export function useUserBalance(address: `0x${string}`, tokenAddress?: `0x${string}`) {
-  const { data: ethBalance } = useBalance({
-    address,
+export function useUserBalance(userAddress: `0x${string}`, tokenAddress: `0x${string}`) {
+  const { data: ethBalance, refetch: refetchEthBalance } = useBalance({
+    address: userAddress,
   });
 
-  const { data: tokenBalance } = useReadContract(
-    tokenAddress
-      ? {
-          address: tokenAddress,
-          abi: ERC20ABI,
-          functionName: 'balanceOf',
-          args: [address],
-        }
-      : { address: undefined, abi: undefined, functionName: undefined }
-  );
+  const { data: tokenBalance, refetch: refetchTokenBalance } = useBalance({
+    address: userAddress,
+    token: tokenAddress,
+  });
+
+  const refetch = useCallback(() => {
+    refetchEthBalance();
+    refetchTokenBalance();
+  }, [refetchEthBalance, refetchTokenBalance]);
 
   return {
     ethBalance: ethBalance?.value,
-    tokenBalance: tokenBalance as bigint | undefined
+    tokenBalance: tokenBalance?.value,
+    refetch,
   };
 }
 

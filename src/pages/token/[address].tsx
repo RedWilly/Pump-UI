@@ -1,4 +1,3 @@
-//[address].tsx
 import { GetServerSideProps } from 'next';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/router';
@@ -95,7 +94,7 @@ interface TokenDetailProps {
   const { data: buyReturnData, isLoading: isBuyCalculating } = useCalcBuyReturn(address as `0x${string}`, parseUnits(debouncedFromAmount || '0', 18));
   const { data: sellReturnData, isLoading: isSellCalculating } = useCalcSellReturn(address as `0x${string}`, parseUnits(debouncedFromAmount || '0', 18));
 
-  const { ethBalance: fetchedEthBalance, tokenBalance: fetchedTokenBalance } = useUserBalance(userAddress as `0x${string}`, address as `0x${string}`);
+  const { ethBalance: fetchedEthBalance, tokenBalance: fetchedTokenBalance, refetch: refetchUserBalance } = useUserBalance(userAddress as `0x${string}`, address as `0x${string}`);
   const { data: tokenAllowance } = useTokenAllowance(address as `0x${string}`, userAddress as `0x${string}`, BONDING_CURVE_MANAGER_ADDRESS);
 
   const { buyTokens } = useBuyTokens();
@@ -153,12 +152,10 @@ interface TokenDetailProps {
     }
   };
 
-  // Get current holders
   const indexOfLastHolder = currentPage * holdersPerPage;
   const indexOfFirstHolder = indexOfLastHolder - holdersPerPage;
   const currentHolders = tokenHolders.slice(indexOfFirstHolder, indexOfLastHolder);
 
-  // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const fetchAllData = useCallback(async () => {
@@ -168,8 +165,9 @@ interface TokenDetailProps {
       refetchCurrentPrice();
       refetchLiquidity();
       fetchTokenHolders();
+      refetchUserBalance();
 
-      // Fetch liquidity events
+      
       try {
         const events = await getTokenLiquidityEvents(tokenInfo.id);
         setLiquidityEvents(events);
@@ -177,7 +175,7 @@ interface TokenDetailProps {
         console.error('Error fetching liquidity events:', error);
       }
     }
-  }, [address, transactionPage, fetchTokenData, fetchHistoricalPriceData, refetchCurrentPrice, refetchLiquidity, tokenInfo.id]);
+  }, [address, transactionPage, fetchTokenData, fetchHistoricalPriceData, refetchCurrentPrice, refetchLiquidity, tokenInfo.id, refetchUserBalance]);
 
   useEffect(() => {
     fetchAllData();
@@ -211,8 +209,10 @@ interface TokenDetailProps {
         toast.success('Tokens bought successfully');
       }
       fetchAllData();
+      setIsTransacting(false);
     } else if (transactionError) {
       toast.error('Transaction failed');
+      setIsTransacting(false);
     }
   }, [transactionReceipt, transactionError, isSwapped, isApproved, fetchAllData]);
 
@@ -512,7 +512,7 @@ interface TokenDetailProps {
   );
 };
 
-//simple server-side rendering  just to get token info for seo - nothing more 
+//simple server-side rendering  just to get token info for seo - nothing more - nothing else  
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { address } = context.params as { address: string };
 

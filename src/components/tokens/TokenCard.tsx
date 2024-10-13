@@ -1,5 +1,3 @@
-// TokenCard.tsx
-
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -20,14 +18,12 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
   const [currentLiquidity, setCurrentLiquidity] = useState<string>('0');
   const tokenAddress = token.address as `0x${string}`;
   const { data: liquidityData } = useTokenLiquidity(tokenAddress);
-  
 
   useEffect(() => {
     if (liquidityData && liquidityData[2]) {
       setCurrentLiquidity(liquidityData[2].toString());
     }
   }, [liquidityData]);
-
 
   const isTokenWithLiquidity = (token: Token | TokenWithLiquidityEvents): token is TokenWithLiquidityEvents => {
     return 'liquidityEvents' in token && token.liquidityEvents.length > 0;
@@ -41,6 +37,12 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
     e.preventDefault();
     setIsLoading(true);
     router.push(`/token/${token.address}`);
+  };
+
+  const handleProfileClick = (e: React.MouseEvent<HTMLSpanElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(`/profile/${token.creatorAddress}`);
   };
 
   if (isEnded && isTokenWithLiquidity(token)) {
@@ -108,12 +110,10 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
     );
   }
 
-  const creatorAddressLink = `https://shibariumscan.io/address/${token.creatorAddress}`;
-
   return (
-    <Link href={`/token/${token.address}`} onClick={handleClick}>
-      <div className="w-full bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer relative">
-      {isLoading && (
+    <Link href={`/token/${token.address}`} passHref>
+      <div onClick={handleClick} className="w-full bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer relative">
+        {isLoading && (
           <div className="absolute inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
             <Spinner size="medium" />
           </div>
@@ -152,10 +152,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded }) => {
                 Deployed by{' '}
                 <span
                   className="text-blue-500 hover:underline cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.open(creatorAddressLink, '_blank', 'noopener,noreferrer');
-                  }}
+                  onClick={handleProfileClick}
                 >
                   {token.creatorAddress ? `${token.creatorAddress.slice(-6)}` : 'Unknown'}
                 </span>

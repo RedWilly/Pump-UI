@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { ExternalLinkIcon, MessageCircleIcon, GlobeIcon, TwitterIcon, YoutubeIcon, Info } from 'lucide-react';
 import { TokenWithTransactions } from '@/interface/types';
 import { formatTimestamp, shortenAddress, formatAddressV2 } from '@/utils/blockchainUtils';
-import { toast } from 'react-toastify';
 
 interface TokenInfoProps {
   tokenInfo: TokenWithTransactions;
@@ -28,11 +28,13 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo }) => {
               label="Contract" 
               value={tokenInfo?.address ? formatAddressV2(tokenInfo.address) : 'Loading...'}
               link={`https://shibariumscan.io/address/${tokenInfo?.address}`}
+              isExternal={true}
             />
             <InfoItem 
               label="Deployer's Wallet" 
               value={tokenInfo?.creatorAddress ? shortenAddress(tokenInfo.creatorAddress) : 'Loading...'}
-              link={`https://shibariumscan.io/address/${tokenInfo?.creatorAddress}`}
+              link={`/profile/${tokenInfo?.creatorAddress}`}
+              isExternal={false}
             />
             <InfoItem 
               label="Created" 
@@ -61,14 +63,20 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo }) => {
   );
 };
 
-const InfoItem: React.FC<{ label: string; value?: string; link?: string }> = ({ label, value, link }) => (
+const InfoItem: React.FC<{ label: string; value?: string; link?: string; isExternal?: boolean }> = ({ label, value, link, isExternal }) => (
   <div className="flex flex-col sm:flex-row sm:items-start">
     <span className="text-gray-400 font-medium sm:w-32 shrink-0">{label}:</span>
     <span className="text-blue-400 break-words sm:ml-2">
       {link ? (
-        <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline">
-          {value} <ExternalLinkIcon size={10} className="inline ml-0.5" />
-        </a>
+        isExternal ? (
+          <a href={link} target="_blank" rel="noopener noreferrer" className="hover:underline">
+            {value} <ExternalLinkIcon size={10} className="inline ml-0.5" />
+          </a>
+        ) : (
+          <Link href={link} className="hover:underline">
+            {value}
+          </Link>
+        )
       ) : (
         value
       )}
