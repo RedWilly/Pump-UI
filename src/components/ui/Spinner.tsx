@@ -1,4 +1,3 @@
-// components/ui/Spinner.tsx (Improved)
 import React from 'react';
 
 interface SpinnerProps {
@@ -17,7 +16,7 @@ const Spinner: React.FC<SpinnerProps> = ({ size = 'medium' }) => {
       <div
         className={`animate-spin rounded-full border-t-2 border-b-2 border-blue-500 border-opacity-50 w-6 h-6 ${sizeClasses[size]}`}
         style={{
-          borderImage: 'linear-gradient(to right, #4F46E5, #818CF8) 1', // Animated gradient
+          borderImage: 'linear-gradient(to right, #4F46E5, #818CF8) 1',
         }}
       ></div>
     </div>

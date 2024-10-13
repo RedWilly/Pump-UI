@@ -12,7 +12,7 @@ import PurchaseConfirmationPopup from '@/components/notifications/PurchaseConfir
 import Modal from '@/components/notifications/Modal';
 
 
-const MAX_FILE_SIZE = 1024 * 1024; // 1MB
+const MAX_FILE_SIZE = 1024 * 1024; // 1MB image size limit
 
 
 const CreateToken: React.FC = () => {
