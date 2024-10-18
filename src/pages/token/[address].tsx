@@ -78,7 +78,7 @@ interface TokenDetailProps {
   //holders
   const [tokenHolders, setTokenHolders] = useState<Awaited<ReturnType<typeof getTokenHolders>>>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [holdersPerPage] = useState(20);
+  const [holdersPerPage] = useState(10);
 
   //confirm
   const { data: transactionReceipt, isError: transactionError, isLoading: isWaiting } = useWaitForTransactionReceipt({

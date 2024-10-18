@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { formatTimestamp, getRandomAvatarImage, shortenAddress } from '@/utils/chatUtils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TokenWithTransactions } from '@/interface/types';
+import SiweAuth from '@/components/auth/SiweAuth';
 
 interface ChatMessage {
   id: number;
@@ -27,6 +28,7 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [replyToId, setReplyToId] = useState<number | undefined>(undefined);
   const { address } = useAccount();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const userAvatars = useMemo(() => {
     const avatars: { [key: string]: string } = {};
@@ -39,10 +41,30 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
   }, [messages]);
 
   useEffect(() => {
+    checkAuth();
     fetchMessages();
-    const interval = setInterval(fetchMessages, 30000); // Refresh every 30 seconds
+    const interval = setInterval(fetchMessages, 30000);
     return () => clearInterval(interval);
   }, [tokenAddress]);
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch('/api/auth/user');
+      if (response.ok) {
+        setIsAuthenticated(true);
+        fetchMessages();
+      } else {
+        setIsAuthenticated(false);
+      }
+    } catch (error) {
+      setIsAuthenticated(false);
+    }
+  };
+
+  const handleAuthSuccess = () => {
+    setIsAuthenticated(true);
+    fetchMessages(); 
+  };
 
   const fetchMessages = async () => {
     try {
@@ -55,8 +77,8 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
   };
 
   const handlePostMessage = async () => {
-    if (!address) {
-      toast.error('Please connect your wallet to post a message');
+    if (!isAuthenticated) {
+      toast.error('Please sign in with Ethereum to post a message');
       return;
     }
 
@@ -66,7 +88,7 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
     }
 
     try {
-      await addChatMessage(address, tokenAddress, newMessage, replyToId);
+      await addChatMessage(address!, tokenAddress, newMessage, replyToId);
       setNewMessage('');
       setIsPopupOpen(false);
       setReplyToId(undefined);
@@ -130,67 +152,73 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
   return (
     <div className="bg-gray-800 p-3 sm:p-4 rounded-lg mb-6 shadow-lg">
       <h2 className="text-sm font-semibold mb-3 text-blue-300">Chats</h2>
-      {messages.length === 0 ? (
-        <p className="text-xs sm:text-sm text-gray-400">Nothing here for you</p>
+      {!isAuthenticated ? (
+        <SiweAuth onAuthSuccess={handleAuthSuccess} />
       ) : (
-        <div className="space-y-3 mb-3 max-h-80 sm:max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-          <AnimatePresence>
-            {messages.filter(msg => msg.reply_to === null).map(msg => renderMessage(msg))}
-          </AnimatePresence>
-        </div>
-      )}
-      <button
-        onClick={() => setIsPopupOpen(true)}
-        className="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm font-medium shadow-md"
-      >
-        Post a reply
-      </button>
-
-      <AnimatePresence>
-        {isPopupOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        <>
+          {messages.length === 0 ? (
+            <p className="text-xs sm:text-sm text-gray-400">No messages yet. Be the first to chat!</p>
+          ) : (
+            <div className="space-y-3 mb-3 max-h-80 sm:max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+              <AnimatePresence>
+                {messages.filter(msg => msg.reply_to === null).map(msg => renderMessage(msg))}
+              </AnimatePresence>
+            </div>
+          )}
+          <button
+            onClick={() => setIsPopupOpen(true)}
+            className="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm font-medium shadow-md"
           >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-gray-800 p-4 sm:p-6 rounded-lg w-full max-w-md shadow-xl"
-            >
-              <h3 className="text-sm sm:text-base font-semibold mb-3 text-blue-300">
-                {replyToId !== undefined ? 'Reply' : 'Post'}
-              </h3>
-              <textarea
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                className="w-full bg-gray-700 text-white p-2 sm:p-3 rounded-lg mb-3 text-sm resize-none focus:ring-2 focus:ring-blue-500 outline-none"
-                rows={4}
-                placeholder="Enter your message..."
-              />
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => {
-                    setIsPopupOpen(false);
-                    setReplyToId(undefined);
-                  }}
-                  className="bg-gray-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-700 transition-colors text-xs sm:text-sm font-medium"
+            Post a message
+          </button>
+
+          <AnimatePresence>
+            {isPopupOpen && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+              >
+                <motion.div
+                  initial={{ scale: 0.9, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.9, y: 20 }}
+                  className="bg-gray-800 p-4 sm:p-6 rounded-lg w-full max-w-md shadow-xl"
                 >
-                  Cancel
-                </button>
-                <button
-                  onClick={handlePostMessage}
-                  className="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm font-medium"
-                >
-                  Post
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                  <h3 className="text-sm sm:text-base font-semibold mb-3 text-blue-300">
+                    {replyToId !== undefined ? 'Reply' : 'Post'}
+                  </h3>
+                  <textarea
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    className="w-full bg-gray-700 text-white p-2 sm:p-3 rounded-lg mb-3 text-sm resize-none focus:ring-2 focus:ring-blue-500 outline-none"
+                    rows={4}
+                    placeholder="Enter your message..."
+                  />
+                  <div className="flex justify-end space-x-3">
+                    <button
+                      onClick={() => {
+                        setIsPopupOpen(false);
+                        setReplyToId(undefined);
+                      }}
+                      className="bg-gray-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-700 transition-colors text-xs sm:text-sm font-medium"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handlePostMessage}
+                      className="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm font-medium"
+                    >
+                      Post
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
     </div>
   );
 };
