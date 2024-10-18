@@ -5,6 +5,10 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'ipfs-chainsafe.dev',
+      },
+      {
+        protocol: 'https',
         hostname: '**',
       },
     ],
