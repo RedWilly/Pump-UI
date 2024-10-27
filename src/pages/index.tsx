@@ -11,7 +11,7 @@ import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import { Switch } from '@/components/ui/switch';
 import Spinner from '@/components/ui/Spinner';
 
-const TOKENS_PER_PAGE = 10;
+const TOKENS_PER_PAGE = 12;
 
 const Home: React.FC = () => {
   const [tokens, setTokens] = useState<PaginatedResponse<Token | TokenWithLiquidityEvents> | null>(null);
