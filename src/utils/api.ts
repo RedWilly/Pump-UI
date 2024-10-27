@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export async function getAllTokens(page: number = 1, pageSize: number = 20): Promise<PaginatedResponse<Token>> {
+export async function getAllTokens(page: number = 1, pageSize: number = 13): Promise<PaginatedResponse<Token>> {
   const response = await axios.get(`${API_BASE_URL}/api/tokens`, {
     params: { page, pageSize }
   });
