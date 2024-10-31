@@ -320,12 +320,12 @@ interface TokenDetailProps {
     );
   }
 
-  const calculateProgress = (currentLiquidity: bigint): number => {
-    const liquidityInEth = parseFloat(formatUnits(currentLiquidity, 18));
-    const target = 2500; 
-    const progress = (liquidityInEth / target) * 100;
-    return Math.min(progress, 100);
-  };
+  // const calculateProgress = (currentLiquidity: bigint): number => {
+  //   const liquidityInEth = parseFloat(formatUnits(currentLiquidity, 18));
+  //   const target = Number(process.env.NEXT_PUBLIC_DEX_TARGET);
+  //   const progress = (liquidityInEth / target) * 100;
+  //   return Math.min(progress, 100);
+  // };
 
   return (
     <Layout>
@@ -337,6 +337,7 @@ interface TokenDetailProps {
           tokenInfo={tokenInfo} 
           showHeader={true} 
           refreshTrigger={refreshCounter}
+          liquidityEvents={liquidityEvents}
         />
       </div>
 
@@ -476,6 +477,7 @@ interface TokenDetailProps {
                 tokenInfo={tokenInfo} 
                 showHeader={true} 
                 refreshTrigger={refreshCounter}
+                liquidityEvents={liquidityEvents}
               />
             </div>
 

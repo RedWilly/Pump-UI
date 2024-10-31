@@ -1,32 +1,46 @@
 import React, { useEffect } from 'react';
-import { ExternalLinkIcon } from 'lucide-react';
+import { ExternalLinkIcon, Copy } from 'lucide-react';
 import { TokenWithTransactions } from '@/interface/types';
 import { formatTimestamp, shortenAddress, formatAddressV2, formatAmount } from '@/utils/blockchainUtils';
 import { Globe, Twitter, Send as Telegram } from 'lucide-react';
 import { useTokenLiquidity, useCurrentTokenPrice } from '@/utils/blockchainUtils';
 import { formatUnits } from 'viem';
+import { toast } from 'react-toastify';
 
 interface TokenInfoProps {
   tokenInfo: TokenWithTransactions;
   showHeader?: boolean;
   refreshTrigger?: number;
+  liquidityEvents?: any;
 }
 
-const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, refreshTrigger = 0 }) => {
+const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, refreshTrigger = 0, liquidityEvents }) => {
   const tokenAddress = tokenInfo?.address as `0x${string}`;
-  const { data: liquidityData, refetch: refetchLiquidity } = useTokenLiquidity(tokenAddress);
+  const shouldFetchLiquidity = !liquidityEvents?.liquidityEvents?.length;
+  const { data: liquidityData, refetch: refetchLiquidity } = useTokenLiquidity(shouldFetchLiquidity ? tokenAddress : null);
   const { data: currentPrice, refetch: refetchPrice } = useCurrentTokenPrice(tokenAddress);
 
   useEffect(() => {
-    refetchLiquidity();
+    if (shouldFetchLiquidity) {
+      refetchLiquidity();
+    }
     refetchPrice();
-  }, [refreshTrigger, refetchLiquidity, refetchPrice]);
+  }, [refreshTrigger, refetchLiquidity, refetchPrice, shouldFetchLiquidity]);
+
+  const isCompleted = liquidityEvents?.liquidityEvents?.length > 0;
 
   const calculateProgress = (currentLiquidity: bigint): number => {
+    if (isCompleted) return 100;
+    
     const liquidityInEth = parseFloat(formatUnits(currentLiquidity, 18));
-    const target = 2500; 
+    const target = Number(process.env.NEXT_PUBLIC_DEX_TARGET);
     const progress = (liquidityInEth / target) * 100;
     return Math.min(progress, 100);
+  };
+
+  const truncateDescription = (description: string, maxLength: number = 100) => {
+    if (description.length <= maxLength) return description;
+    return `${description.slice(0, maxLength)}...`;
   };
 
   const TokenDetails = () => (
@@ -43,6 +57,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
           value={tokenInfo?.creatorAddress ? shortenAddress(tokenInfo.creatorAddress) : 'Loading...'}
           link={`/profile/${tokenInfo?.creatorAddress}`}
           isExternal={false}
+          copyValue={tokenInfo?.creatorAddress}
         />
       </div>
 
@@ -77,15 +92,15 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
           <div className="px-4">
             {/* Name and Symbol - Updated to be inline */}
             <div className="text-center mb-4">
-              <h1 className="text-2xl font-bold text-white inline-flex items-center justify-center gap-2">
+              <h1 className="text-2xl font-bold text-white inline">
                 {tokenInfo.name}
-                <span className="text-gray-400">${tokenInfo.symbol}</span>
+                <span className="text-gray-400 ml-2">${tokenInfo.symbol}</span>
               </h1>
             </div>
 
-            {/* Description */}
+            {/* Updated Description */}
             <p className="text-sm text-gray-400 text-center mb-4">
-              {tokenInfo.description}
+              {truncateDescription(tokenInfo.description)}
             </p>
 
             {/* Social Links */}
@@ -134,10 +149,15 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
             />
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-white">{tokenInfo.name}</h1>
-                <span className="text-gray-400">${tokenInfo.symbol}</span>
+                <h1 className="text-xl font-bold text-white inline">
+                  {tokenInfo.name}
+                  <span className="text-gray-400 ml-2">${tokenInfo.symbol}</span>
+                </h1>
               </div>
-              <p className="text-sm text-gray-400 mt-1">{tokenInfo.description}</p>
+              {/* Updated Description */}
+              <p className="text-sm text-gray-400 mt-1">
+                {truncateDescription(tokenInfo.description)}
+              </p>
               
               {/* Social Links */}
               <div className="flex gap-3 mt-4">
@@ -168,15 +188,22 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
         <div className="bg-[#1a1a1a] p-4 rounded-lg">
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-400">Progress to DEX</span>
-            <span className="text-white">
-              {liquidityData && liquidityData[2] ? 
-                `${calculateProgress(liquidityData[2]).toFixed(1)}%` : '0%'}
+            <span className={isCompleted ? "text-[#CCFF00]" : "text-white"}>
+              {isCompleted 
+                ? 'Completed' 
+                : liquidityData && liquidityData[2] 
+                  ? `${calculateProgress(liquidityData[2]).toFixed(1)}%` 
+                  : '0%'}
             </span>
           </div>
           <div className="w-full bg-[#333333] rounded-full h-2.5">
             <div
               className="bg-[#CCFF00] h-2.5 rounded-full transition-all duration-500"
-              style={{ width: `${liquidityData ? calculateProgress(liquidityData[2]) : 0}%` }}
+              style={{ 
+                width: isCompleted 
+                  ? '100%' 
+                  : `${liquidityData ? calculateProgress(liquidityData[2]) : 0}%` 
+              }}
             />
           </div>
         </div>
@@ -196,34 +223,49 @@ const InfoItem: React.FC<{
   value?: string; 
   link?: string; 
   isExternal?: boolean;
-}> = ({ label, value, link, isExternal }) => (
+  copyValue?: string;
+}> = ({ label, value, link, isExternal, copyValue }) => (
   <div className="bg-[#1a1a1a] p-3 rounded-lg">
     <div className="text-xs text-gray-400 mb-1">{label}</div>
-    <div className="text-sm text-white">
+    <div className="text-sm text-white flex items-center gap-2">
       {link ? (
-        isExternal ? (
+        <div className="flex items-center gap-2 flex-grow">
           <a 
             href={link} 
-            target="_blank" 
-            rel="noopener noreferrer" 
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
             className="hover:text-[#CCFF00] transition-colors flex items-center gap-1"
           >
             {value}
-            <ExternalLinkIcon size={12} />
+            {isExternal && <ExternalLinkIcon size={12} />}
           </a>
-        ) : (
-          <a 
-            href={link} 
-            className="hover:text-[#CCFF00] transition-colors"
-          >
-            {value}
-          </a>
-        )
+          {copyValue && (
+            <button
+              onClick={() => copyToClipboard(copyValue)}
+              className="text-gray-400 hover:text-[#CCFF00] transition-colors"
+            >
+              <Copy size={12} />
+            </button>
+          )}
+        </div>
       ) : (
         value
       )}
     </div>
   </div>
 );
+
+const copyToClipboard = (text: string) => {
+  navigator.clipboard.writeText(text).then(() => {
+    toast.success('Address copied to clipboard!', {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  });
+};
 
 export default TokenInfo;

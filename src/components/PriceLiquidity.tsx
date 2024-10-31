@@ -12,7 +12,7 @@ const PriceLiquidity: React.FC<PriceLiquidityProps> = ({ address }) => {
 
   const calculateProgress = (currentLiquidity: bigint): number => {
     const liquidityInEth = parseFloat(formatAmountV2(currentLiquidity.toString()));
-    const target = 2500; 
+    const target = Number(process.env.NEXT_PUBLIC_DEX_TARGET);
     const progress = (liquidityInEth / target) * 100;
     return Math.min(progress, 100);
   };

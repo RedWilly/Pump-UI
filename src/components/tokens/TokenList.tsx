@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TokenCard from './TokenCard';
 import { Token, TokenWithLiquidityEvents } from '@/interface/types';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/router';
+import LoadingBar from '@/components/ui/LoadingBar';
 
 interface TokenListProps {
   tokens: (Token | TokenWithLiquidityEvents)[];
@@ -12,13 +14,33 @@ interface TokenListProps {
 }
 
 const TokenList: React.FC<TokenListProps> = ({ tokens, currentPage, totalPages, onPageChange, isEnded }) => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleTokenClick = async (tokenAddress: string) => {
+    setIsLoading(true);
+    await router.push(`/token/${tokenAddress}`);
+    setIsLoading(false);
+  };
+
   return (
-    <div>
+    <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
         {tokens.map((token) => (
-          <TokenCard key={token.id} token={token} isEnded={isEnded} />
+          <TokenCard 
+            key={token.id} 
+            token={token} 
+            isEnded={isEnded} 
+            onTokenClick={handleTokenClick}
+          />
         ))}
       </div>
+      
+      {isLoading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <LoadingBar size="large" />
+        </div>
+      )}
       
       {totalPages > 1 && (
         <div className="flex justify-center items-center space-x-2 mt-8">
@@ -55,7 +77,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, currentPage, totalPages, 
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

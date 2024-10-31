@@ -14,6 +14,13 @@ export async function getAllTokens(page: number = 1, pageSize: number = 13): Pro
   return response.data;
 }
 
+export async function getAllTokensTrends(page: number = 1, pageSize: number = 13): Promise<PaginatedResponse<Token>> {
+  const response = await axios.get(`${API_BASE_URL}/api/tokens/trending`, {
+    params: { page, pageSize }
+  });
+  return response.data;
+}
+
 
 export async function getRecentTokens(page: number = 1, pageSize: number = 20, hours: number = 1): Promise<PaginatedResponse<Token> | null> {
   try {

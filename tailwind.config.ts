@@ -15,10 +15,16 @@ const config: Config = {
       },
       animation: {
         crawl: 'crawl 20s linear infinite',
+        'loading-bar': 'loading-bar 1.5s ease-in-out infinite',
       },
       keyframes: {
         crawl: {
           '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+        'loading-bar': {
+          '0%': { transform: 'translateX(-100%)' },
+          '50%': { transform: 'translateX(100%)' },
           '100%': { transform: 'translateX(-100%)' },
         },
       },

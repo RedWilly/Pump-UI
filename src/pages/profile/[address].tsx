@@ -7,7 +7,7 @@ import { Transaction, PaginatedResponse, Token } from '@/interface/types';
 import { formatTimestamp, formatAddressV2, formatAmountV3, useERC20Balance } from '@/utils/blockchainUtils';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import SEO from '@/components/seo/SEO';
-import Spinner from '@/components/ui/Spinner';
+import LoadingBar from '@/components/ui/LoadingBar';
 
 interface TransactionResponse extends Omit<PaginatedResponse<Transaction>, 'data'> {
     transactions: Transaction[];
@@ -256,8 +256,8 @@ const ProfilePage: React.FC = () => {
           {activeTab === 'created' && (
             <div>
               {isLoading ? (
-                <div className="flex justify-center">
-                  <Spinner size="medium" />
+                <div className="flex justify-center py-8">
+                  <LoadingBar size="medium" />
                 </div>
               ) : createdTokens.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -296,8 +296,8 @@ const ProfilePage: React.FC = () => {
         <div>
           <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Recent Transactions</h2>
           {isLoading ? (
-            <div className="flex justify-center">
-              <Spinner size="medium" />
+            <div className="flex justify-center py-8">
+              <LoadingBar size="medium" />
             </div>
           ) : transactions && transactions.length > 0 ? (
             <div className="overflow-x-auto bg-[#222222] rounded-lg">
@@ -339,7 +339,7 @@ const ProfilePage: React.FC = () => {
       </div>
       {isTokenLoading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <Spinner size="large" />
+          <LoadingBar size="large" />
         </div>
       )}
     </Layout>

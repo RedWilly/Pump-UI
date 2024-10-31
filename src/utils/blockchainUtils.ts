@@ -25,7 +25,7 @@ export function useTotalSupply(tokenAddress: `0x${string}`) {
   });
 }
 
-export function useTokenLiquidity(tokenAddress: `0x${string}`) {
+export function useTokenLiquidity(tokenAddress: `0x${string}` | null) {
   const { data, refetch } = useReadContract({
     address: BONDING_CURVE_MANAGER_ADDRESS,
     abi: BondingCurveManagerABI,

@@ -23,6 +23,7 @@ export interface LiquidityEvent {
     discord: string;
     twitter: string;
     telegram: string;
+    latestTransactionTimestamp: string;
     _count: {
       liquidityEvents: number;
     };

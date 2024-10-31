@@ -4,7 +4,7 @@ import TokenList from '@/components/tokens/TokenList';
 import SearchFilter from '@/components/ui/SearchFilter';
 import HowItWorksPopup from '@/components/notifications/HowItWorksPopup';
 import SortOptions, { SortOption } from '@/components/ui/SortOptions';
-import { getAllTokens, getTokensWithLiquidity, getRecentTokens, searchTokens } from '@/utils/api';
+import { getAllTokensTrends, getTokensWithLiquidity, getRecentTokens, searchTokens } from '@/utils/api';
 import { Token, TokenWithLiquidityEvents, PaginatedResponse } from '@/interface/types';
 import SEO from '@/components/seo/SEO';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
@@ -31,7 +31,7 @@ const Home: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    console.log('Effect triggered. Current sort:', sort, 'Current page:', currentPage);
+    console.log('Effect triggered. Current sort:', sort, 'Current page:', currentPage, 'Search:', searchQuery);
     fetchTokens();
   }, [currentPage, sort, searchQuery]);
 
@@ -73,13 +73,12 @@ const Home: React.FC = () => {
     let fetchedTokens;
 
     try {
-      // console.log('Fetching tokens...');
-      if (searchQuery) {
+      if (searchQuery.trim()) {
         fetchedTokens = await searchTokens(searchQuery, currentPage, TOKENS_PER_PAGE);
       } else {
         switch (sort) {
           case 'trending':
-            fetchedTokens = await getAllTokens(currentPage, TOKENS_PER_PAGE);
+            fetchedTokens = await getAllTokensTrends(currentPage, TOKENS_PER_PAGE);
             break;
           case 'new':
             fetchedTokens = await getRecentTokens(currentPage, TOKENS_PER_PAGE, 1);
@@ -101,11 +100,9 @@ const Home: React.FC = () => {
             }
             break;
           default:
-            fetchedTokens = await getAllTokens(currentPage, TOKENS_PER_PAGE);
+            fetchedTokens = await getAllTokensTrends(currentPage, TOKENS_PER_PAGE);
         }
       }
-
-      // console.log('Fetched tokens:', fetchedTokens);
 
       const adjustedTokens: PaginatedResponse<Token | TokenWithLiquidityEvents> = {
         data: fetchedTokens.data || fetchedTokens.tokens || [],
@@ -134,15 +131,22 @@ const Home: React.FC = () => {
 
   const handleSearch = (query: string) => {
     console.log('Search query updated:', query);
-    setSearchQuery(query);
-    setCurrentPage(1);
+    if (query !== searchQuery) {
+      setSearchQuery(query);
+      if (query.trim()) {
+        setCurrentPage(1);
+      }
+      if (!query.trim()) {
+        fetchTokens();
+      }
+    }
   };
 
   const handleSort = (option: SortOption) => {
     console.log('Sort option changed:', option);
     setSort(option);
     setCurrentPage(1);
-    setSearchQuery(''); // Clear search query when sorting
+    setSearchQuery('');
   };
 
   const handlePageChange = (page: number) => {
