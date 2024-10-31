@@ -286,10 +286,59 @@ export function formatTimestamp(timestamp: string): string {
   const date = new Date(timestamp);
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-  if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  return `${Math.floor(diffInSeconds / 86400)} days ago`;
+  const seconds = diffInSeconds % 60;
+  const minutes = Math.floor((diffInSeconds / 60) % 60);
+  const hours = Math.floor((diffInSeconds / 3600) % 24);
+  const days = Math.floor((diffInSeconds / 86400) % 30);
+  const months = Math.floor((diffInSeconds / (86400 * 30)) % 12);
+  const years = Math.floor(diffInSeconds / (86400 * 365));
+
+  let result = '';
+  let unitCount = 0;
+
+  if (years > 0 && unitCount < 2) {
+    result += `${years}yr `;
+    unitCount++;
+  }
+  if (months > 0 && unitCount < 2) {
+    result += `${months}mo `;
+    unitCount++;
+  }
+  if (days > 0 && unitCount < 2) {
+    result += `${days}d `;
+    unitCount++;
+  }
+  if (hours > 0 && unitCount < 2) {
+    result += `${hours}h `;
+    unitCount++;
+  }
+  if (minutes > 0 && unitCount < 2) {
+    result += `${minutes}m `;
+    unitCount++;
+  }
+  if (seconds > 0 && unitCount === 0) {
+    result += `${seconds}s `;
+  }
+
+  return result.trim() + ' ago';
+}
+
+export function formatTimestampV1(timestamp: string): string {
+  const now = new Date();
+  const date = new Date(timestamp);
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return `${diffInSeconds}s`;
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}hr`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 30) return `${diffInDays}d`;
+  const diffInMonths = Math.floor(diffInDays / 30);
+  if (diffInMonths < 12) return `${diffInMonths}mo`;
+  const diffInYears = Math.floor(diffInMonths / 12);
+  return `${diffInYears}yr`;
 }
 
 export const formatAmount = (amount: string, decimals: number = 18) => {

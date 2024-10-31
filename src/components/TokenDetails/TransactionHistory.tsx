@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon, ExternalLinkIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, ExternalLinkIcon, ChevronDownIcon } from 'lucide-react';
 import { formatTimestamp, formatAmountV3, shortenAddress } from '@/utils/blockchainUtils';
 import { Transaction } from '@/interface/types';
 
@@ -8,7 +8,7 @@ interface TransactionHistoryProps {
   transactionPage: number;
   totalTransactionPages: number;
   tokenSymbol: string;
-  handlePageChange: (newPage: number) => void;
+  handlePageChange: (page: number) => void;
 }
 
 const TransactionHistory: React.FC<TransactionHistoryProps> = ({
@@ -20,120 +20,154 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 }) => {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
-  const toggleRow = (id: string) => {
-    setExpandedRow(expandedRow === id ? null : id);
-  };
+  // Desktop view table
+  const DesktopTable = () => (
+    <table className="w-full text-left hidden md:table">
+      <thead>
+        <tr className="bg-[#1a1a1a]">
+          <th className="px-4 py-2 text-sm text-gray-400">Maker</th>
+          <th className="px-4 py-2 text-sm text-gray-400">Type</th>
+          <th className="px-4 py-2 text-sm text-gray-400">BONE</th>
+          <th className="px-4 py-2 text-sm text-gray-400">{tokenSymbol}</th>
+          <th className="px-4 py-2 text-sm text-gray-400">Date</th>
+          <th className="px-4 py-2 text-sm text-gray-400">Tx</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactions.map((tx) => (
+          <tr key={tx.id} className="border-b border-[#2a2a2a]">
+            <td className="px-4 py-2">
+              <a 
+                href={`https://shibariumscan.io/address/${tx.senderAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#CCFF00] text-sm transition-colors"
+              >
+                {shortenAddress(tx.senderAddress)}
+              </a>
+            </td>
+            <td className="px-4 py-2 text-sm text-gray-400">{tx.type}</td>
+            <td className="px-4 py-2 text-sm text-gray-400">{formatAmountV3(tx.ethAmount)}</td>
+            <td className="px-4 py-2 text-sm text-gray-400">{formatAmountV3(tx.tokenAmount)}</td>
+            <td className="px-4 py-2 text-sm text-gray-400">{formatTimestamp(tx.timestamp)}</td>
+            <td className="px-4 py-2">
+              <a
+                href={`https://shibariumscan.io/tx/${tx.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#CCFF00] text-sm transition-colors"
+              >
+                {tx.txHash.slice(0, 8)}
+              </a>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+  // Mobile view table
+  const MobileTable = () => (
+    <div className="md:hidden">
+      {transactions.map((tx) => (
+        <div key={tx.id} className="mb-2">
+          <div 
+            className="bg-[#1a1a1a] p-3 rounded-lg cursor-pointer"
+            onClick={() => setExpandedRow(expandedRow === tx.id ? null : tx.id)}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm text-gray-400">{tx.type}</span>
+                  <ChevronDownIcon 
+                    size={16} 
+                    className={`text-gray-400 transition-transform ${
+                      expandedRow === tx.id ? 'transform rotate-180' : ''
+                    }`}
+                  />
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">{formatAmountV3(tx.ethAmount)} BONE</span>
+                  <span className="text-gray-400">{formatAmountV3(tx.tokenAmount)} {tokenSymbol}</span>
+                </div>
+              </div>
+            </div>
+
+            {expandedRow === tx.id && (
+              <div className="mt-3 pt-3 border-t border-[#2a2a2a] space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Maker:</span>
+                  <a 
+                    href={`https://shibariumscan.io/address/${tx.senderAddress}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-[#CCFF00]"
+                  >
+                    {shortenAddress(tx.senderAddress)}
+                  </a>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Date:</span>
+                  <span className="text-gray-400">{formatTimestamp(tx.timestamp)}</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Transaction:</span>
+                  <a
+                    href={`https://shibariumscan.io/tx/${tx.txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-[#CCFF00] flex items-center gap-1"
+                  >
+                    View <ExternalLinkIcon size={12} />
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
-    <div className="mb-8">
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-xs">
-          <thead className="hidden sm:table-header-group">
-            <tr className="bg-gray-700">
-              <th className="p-2 text-left text-gray-300">Maker</th>
-              <th className="p-2 text-left text-gray-300">Type</th>
-              <th className="p-2 text-left text-gray-300">BONE</th>
-              <th className="p-2 text-left text-gray-300">{tokenSymbol}</th>
-              <th className="p-2 text-left text-gray-300">Date</th>
-              <th className="p-2 text-left text-gray-300">Tx</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((tx) => (
-              <React.Fragment key={tx.id}>
-                <tr 
-                  className="border-b border-gray-700 cursor-pointer sm:cursor-default"
-                  onClick={() => toggleRow(tx.id)}
-                >
-                  <td className="p-2 text-blue-400 hidden sm:table-cell">{shortenAddress(tx.senderAddress)}</td>
-                  <td className="p-2 text-blue-400">{tx.type}</td>
-                  <td className="p-2 text-blue-400">{formatAmountV3(tx.ethAmount)}</td>
-                  <td className="p-2 text-blue-400">{formatAmountV3(tx.tokenAmount)}</td>
-                  <td className="p-2 text-blue-400 hidden sm:table-cell">{formatTimestamp(tx.timestamp)}</td>
-                  <td className="p-2 text-blue-400 hidden sm:table-cell">
-                    <a href={`https://shibariumscan.io/tx/${tx.txHash}`} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      {tx.txHash.slice(-8)}
-                    </a>
-                  </td>
-                  <td className="p-2 text-blue-400 sm:hidden">
-                    <ChevronDownIcon size={16} className={`transition-transform ${expandedRow === tx.id ? 'rotate-180' : ''}`} />
-                  </td>
-                </tr>
-                {expandedRow === tx.id && (
-                  <tr className="sm:hidden bg-gray-800">
-                    <td colSpan={4}>
-                      <div className="p-2 space-y-2">
-                        <p>Maker: {shortenAddress(tx.senderAddress)}</p>
-                        <p>Date: {formatTimestamp(tx.timestamp)}</p>
-                        <a 
-                          href={`https://shibariumscan.io/tx/${tx.txHash}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="flex items-center text-blue-400 hover:underline"
-                        >
-                          View Tx <ExternalLinkIcon size={16} className="ml-1" />
-                        </a>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {transactions.length === 0 && <p className="text-gray-400 text-center mt-4">No transaction history available</p>}
+    <div className="w-full">
+      <DesktopTable />
+      <MobileTable />
 
-      {/* Updated Pagination for transactions */}
-      {transactions.length > 0 && (
-        <div className="flex items-center justify-center mt-4 space-x-2">
+      {transactions.length === 0 && (
+        <div className="text-center py-8 text-gray-400">
+          No transactions yet
+        </div>
+      )}
+
+      {totalTransactionPages > 1 && (
+        <div className="flex justify-center mt-4 gap-2">
           <button
             onClick={() => handlePageChange(transactionPage - 1)}
             disabled={transactionPage === 1}
-            className="p-1 rounded-md bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
           >
-            <ChevronLeftIcon size={16} />
+            <ChevronLeftIcon size={20} />
           </button>
-          <div className="flex items-center space-x-1">
-            {[...Array(totalTransactionPages)].map((_, index) => {
-              const page = index + 1;
-              if (
-                page === 1 ||
-                page === totalTransactionPages ||
-                (page >= transactionPage - 1 && page <= transactionPage + 1)
-              ) {
-                return (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`px-2 py-1 text-xs rounded-md transition-colors duration-200 ${
-                      transactionPage === page
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                );
-              } else if (
-                page === transactionPage - 2 ||
-                page === transactionPage + 2
-              ) {
-                return (
-                  <span key={page} className="text-gray-500 text-xs">
-                    ...
-                  </span>
-                );
-              }
-              return null;
-            })}
-          </div>
+          {Array.from({ length: totalTransactionPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`px-3 py-1 rounded text-sm ${
+                transactionPage === page
+                  ? 'bg-[#CCFF00] text-black'
+                  : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
           <button
             onClick={() => handlePageChange(transactionPage + 1)}
             disabled={transactionPage === totalTransactionPages}
-            className="p-1 rounded-md bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
           >
-            <ChevronRightIcon size={16} />
+            <ChevronRightIcon size={20} />
           </button>
         </div>
       )}

@@ -4,6 +4,8 @@ import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { shortenAddress } from '@/utils/blockchainUtils'
 import { useAccount } from 'wagmi'
+import { useRouter } from 'next/router'
+import { toast } from 'react-toastify'
 
 const CustomConnectButton = () => {
   return (
@@ -78,7 +80,7 @@ const CustomConnectButton = () => {
                   </button>
 
                   <button onClick={openAccountModal} className="btn btn-primary text-[10px] sm:text-xs px-2 py-1">
-                  {shortenAddress(account.address)}
+                    {shortenAddress(account.address)}
                     {account.displayBalance
                       ? <span className="hidden sm:inline ml-1">({account.displayBalance})</span>
                       : ''}
@@ -96,22 +98,30 @@ const CustomConnectButton = () => {
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const { address } = useAccount()
-  const [showPopup, setShowPopup] = useState(false)
+  const router = useRouter()
 
   const handleProfileClick = (e: React.MouseEvent) => {
+    e.preventDefault()
     if (!address) {
-      e.preventDefault()
-      setShowPopup(true)
-      setTimeout(() => setShowPopup(false), 3000) // Hide popup after 3 seconds
+      toast.error('Please connect your wallet first', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      })
+      return
     }
+    router.push(`/profile/${address}`)
   }
 
   return (
-    <nav className="bg-gray-800 shadow-lg sticky top-0 z-50">
+    <nav className="bg-[#111111] shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Link href="/" className="flex items-center text-xl font-bold text-blue-400">
+          <div className="flex items-center space-x-8">
+            <Link href="/" className="flex items-center text-2xl font-bold">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="24"
@@ -129,58 +139,72 @@ const Navbar: React.FC = () => {
                 <circle cx="5" cy="19" r="2"/>
                 <path d="M5 17A12 12 0 0 1 17 5"/>
               </svg>
-              <span>Bondle.</span>
+              <span className="text-[#CCFF00]">Bondle.</span>
             </Link>
+            <div className="hidden md:flex items-center space-x-4">
+              <button 
+                onClick={handleProfileClick}
+                className="text-gray-300 hover:text-white px-3 py-2 text-sm"
+              >
+                My Profile
+              </button>
+            </div>
           </div>
-          <div className="hidden md:flex items-center space-x-3">
-            <Link href="/create" className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs">
-              Create Token
+          
+          <div className="hidden md:flex items-center space-x-4">
+            <Link href="https://t.me/bondle_xyz" target="_blank" className="text-gray-300 hover:text-white">
+              Telegram
             </Link>
-            <Link 
-              href={address ? `/profile/${address}` : '#'} 
-              className="text-gray-300 hover:text-white px-2 py-1 rounded-md text-xs"
-              onClick={handleProfileClick}
-            >
-              Profile
+            <Link href="https://x.com/bondlexyz" target="_blank" className="text-gray-300 hover:text-white">
+              Twitter
             </Link>
             <CustomConnectButton />
           </div>
+
+          {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              className="text-gray-400 hover:text-white focus:outline-none"
             >
               {isOpen ? (
-                <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                <XMarkIcon className="h-6 w-6" />
               ) : (
-                <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                <Bars3Icon className="h-6 w-6" />
               )}
             </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile menu - Updated background and styling */}
       {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link href="/create" className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-              Create Token
+        <div className="md:hidden bg-[#1a1a1a] border-t border-[#333333]">
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            <button
+              onClick={handleProfileClick}
+              className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] block px-3 py-2 text-base w-full text-left rounded-lg transition-colors"
+            >
+              My Profile
+            </button>
+            <Link 
+              href="https://t.me/bondle_xyz" 
+              target="_blank" 
+              className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] block px-3 py-2 text-base rounded-lg transition-colors"
+            >
+              Telegram
             </Link>
             <Link 
-              href={address ? `/profile/${address}` : '#'}
-              className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-              onClick={handleProfileClick}
+              href="https://x.com/bondlexyz" 
+              target="_blank" 
+              className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] block px-3 py-2 text-base rounded-lg transition-colors"
             >
-              Profile
+              Twitter
             </Link>
-            <div className="mt-4 px-3">
+            <div className="pt-4 px-3">
               <CustomConnectButton />
             </div>
           </div>
-        </div>
-      )}
-      {showPopup && (
-        <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg">
-          Please connect wallet first
         </div>
       )}
     </nav>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type SortOption = 'all' | 'recentCreated' | 'ended' | 'bomper';
+export type SortOption = 'trending' | 'new' | 'finalized';
 
 interface SortOptionsProps {
   onSort: (option: SortOption) => void;
@@ -8,23 +8,22 @@ interface SortOptionsProps {
 }
 
 const sortOptionMapping: { [key: string]: SortOption } = {
-  'All': 'all',
-  'Creation Time': 'recentCreated',
-  'Ended': 'ended',
-  'Bomper': 'bomper'
+  'Trending': 'trending',
+  'New': 'new',
+  'Finalized': 'finalized'
 };
 
 const SortOptions: React.FC<SortOptionsProps> = ({ onSort, currentSort }) => {
   return (
-    <div className="mb-5 flex flex-wrap gap-2 justify-center max-w-lg mx-auto">
+    <div className="mb-5 flex flex-wrap gap-2 justify-center">
       {Object.keys(sortOptionMapping).map((option) => (
         <button
           key={option}
           onClick={() => onSort(sortOptionMapping[option])}
-          className={`px-3 py-1 text-[10px] sm:text-xs rounded-full transition-colors duration-200 ${
+          className={`px-4 py-2 text-sm rounded-md transition-colors duration-200 ${
             currentSort === sortOptionMapping[option]
-              ? 'bg-blue-500 text-white neon-border'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+              ? 'bg-[#222222] text-white'
+              : 'text-gray-300 hover:bg-[#222222]'
           }`}
         >
           {option}

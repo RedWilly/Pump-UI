@@ -35,26 +35,30 @@ const FAQPage: React.FC = () => {
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <h1 className="text-base sm:text-lg md:text-xl font-bold text-blue-400 mb-6 sm:mb-8 text-center">Frequently Asked Questions</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-white mb-8 text-center">Frequently Asked Questions</h1>
 
         <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <div key={index} className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-all duration-300 ease-in-out">
+            <div key={index} className="bg-[#222222] rounded-lg overflow-hidden">
               <button
-                className="w-full text-left p-4 sm:p-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex justify-between items-center"
+                className="w-full text-left p-4 sm:p-5 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:ring-opacity-50 flex justify-between items-center hover:bg-[#2a2a2a] transition-colors"
                 onClick={() => toggleFAQ(index)}
               >
-                <h3 className="text-sm sm:text-base font-semibold text-blue-400 pr-4">{faq.question}</h3>
+                <h3 className="text-sm sm:text-base font-semibold text-white pr-4">{faq.question}</h3>
                 <ChevronDownIcon
-                  className={`w-5 h-5 text-blue-400 transition-transform duration-300 flex-shrink-0 ${openIndex === index ? 'transform rotate-180' : ''
-                    }`}
+                  className={`w-5 h-5 text-[#CCFF00] transition-transform duration-300 flex-shrink-0 ${
+                    openIndex === index ? 'transform rotate-180' : ''
+                  }`}
                 />
               </button>
               <div
-                className={`px-4 sm:px-5 overflow-hidden transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-[1000px] pb-4 sm:pb-5' : 'max-h-0'
-                  }`}
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  openIndex === index ? 'max-h-[1000px]' : 'max-h-0'
+                }`}
               >
-                <p className="text-xs sm:text-sm text-gray-300 whitespace-pre-line leading-relaxed">{faq.answer}</p>
+                <div className="p-4 sm:p-5 bg-[#1a1a1a]">
+                  <p className="text-xs sm:text-sm text-gray-400 whitespace-pre-line leading-relaxed">{faq.answer}</p>
+                </div>
               </div>
             </div>
           ))}

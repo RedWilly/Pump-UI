@@ -5,6 +5,9 @@ import Image from 'next/image';
 import 'chartjs-adapter-date-fns';
 import {
   ArrowUpDownIcon,
+  Globe,
+  Twitter,
+  Send as Telegram,
 } from 'lucide-react';
 import Layout from '@/components/layout/Layout';
 import TradingViewChart from '@/components/charts/TradingViewChart';
@@ -72,8 +75,6 @@ interface TokenDetailProps {
   const [isTransacting, setIsTransacting] = useState(false);
   const [transactionHash, setTransactionHash] = useState<`0x${string}` | undefined>();
 
-  const [selectedTab, setSelectedTab] = useState('trades');
-
 
   //holders
   const [tokenHolders, setTokenHolders] = useState<Awaited<ReturnType<typeof getTokenHolders>>>([]);
@@ -102,6 +103,8 @@ interface TokenDetailProps {
   const { approveTokens } = useApproveTokens();
 
   const [liquidityEvents, setLiquidityEvents] = useState<any>(null);
+
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
 
   const fetchTokenData = useCallback(
@@ -210,6 +213,7 @@ interface TokenDetailProps {
       }
       fetchAllData();
       setIsTransacting(false);
+      setRefreshCounter(prev => prev + 1);
     } else if (transactionError) {
       toast.error('Transaction failed');
       setIsTransacting(false);
@@ -325,174 +329,226 @@ interface TokenDetailProps {
 
   return (
     <Layout>
-      {/* <SEO token={tokenInfo} /> */}
-      <SEO
-        token={{
-          name: tokenInfo.name,
-          symbol: tokenInfo.symbol,
-          description: tokenInfo.description,
-          logo: tokenInfo.logo
-        }}
-      />
-      <div className="w-full min-h-screen bg-gray-900 text-white overflow-x-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header Section */}
-          <div className="flex flex-col sm:flex-row items-center mb-6 gap-4">
-            <Image src={tokenInfo.logo} alt={tokenInfo.name} width={64} height={64} className="rounded-full" />
-            <div className="text-center sm:text-left">
-              <h1 className="text-2xl sm:text-3xl font-bold text-blue-400">{tokenInfo.name}</h1>
-              <p className="text-sm text-gray-300">{tokenInfo.symbol}</p>
-            </div>
-          </div>
-
-      {/* Price and Liquidity Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-xs sm:text-sm font-semibold mb-2 text-blue-300">Current Price</h2>
-          <p className="text-[10px] sm:text-xs text-blue-400">
-            {currentPrice ? formatAmount(currentPrice.toString()) : 'Loading...'} BONE
-          </p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-xs sm:text-sm font-semibold mb-2 text-blue-300">Current Liquidity</h2>
-          <p className="text-[10px] sm:text-xs text-blue-400 mb-2">
-            {liquidityData && liquidityData[2] ? `${formatAmountV2(liquidityData[2].toString())} BONE` : '0 BONE'}
-          </p>
-          {liquidityData && liquidityData[2] && (
-            <>
-              <div className="w-full bg-gray-700 rounded-full h-4 mb-2 relative">
-                <div 
-                  className="bg-blue-600 h-full rounded-l-full transition-all duration-500 ease-out"
-                  style={{ width: `${calculateProgress(liquidityData[2])}%` }}
-                ></div>
-                <div 
-                  className="absolute top-0 left-0 w-full h-full flex items-center justify-center text-xs font-semibold text-white"
-                >
-                  {calculateProgress(liquidityData[2]).toFixed(2)}%
-                </div>
-              </div>
-              
-            </>
-          )}
-        </div>
+      <SEO token={tokenInfo} />
+      
+      {/* Mobile-first header (shown only on mobile) */}
+      <div className="lg:hidden mb-6">
+        <TokenInfo 
+          tokenInfo={tokenInfo} 
+          showHeader={true} 
+          refreshTrigger={refreshCounter}
+        />
       </div>
 
-          {/* Token Information Section */}
-          <TokenInfo tokenInfo={tokenInfo} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column (2 cols wide) */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Price Chart Section */}
+            <div className="bg-[#222222] rounded-lg p-4">
+              <h2 className="text-sm font-semibold mb-4 text-gray-400">Price Chart (USD)</h2>
+              <div className="bg-[#1a1a1a] rounded-lg p-2">
+                <TradingViewChart 
+                  data={chartData} 
+                  liquidityEvents={liquidityEvents} 
+                  tokenInfo={tokenInfo}
+                />
+              </div>
+            </div>
 
-          {/* Price Chart Section */}
-          <div className="mb-8">
-            <h2 className="text-sm sm:text-base font-semibold mb-4 text-blue-300">Price Chart (USD)</h2>
-            <div className="bg-gray-800 p-2 sm:p-4 rounded-lg shadow">
-            <TradingViewChart 
-                data={chartData} 
-                liquidityEvents={liquidityEvents} 
-                tokenInfo={tokenInfo}
+            {/* Quick Actions Section - Mobile Only */}
+            <div className="lg:hidden bg-[#222222] rounded-lg p-4">
+              <h2 className="text-sm font-semibold mb-4 text-gray-400">Quick Actions</h2>
+              <div className="bg-[#1a1a1a] rounded-lg p-4">
+                {/* From Input */}
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-gray-400">From</span>
+                    <span className="text-gray-400">
+                      Balance: {isSwapped ? tokenBalance : ethBalance} {fromToken.symbol}
+                    </span>
+                  </div>
+                  <div className="flex items-center bg-[#222222] rounded-lg p-3">
+                    <input
+                      type="number"
+                      value={fromToken.amount}
+                      onChange={handleFromAmountChange}
+                      className="w-full bg-transparent text-white outline-none text-sm"
+                      placeholder="0.00"
+                      disabled={isTransacting}
+                    />
+                    <span className="text-gray-400 ml-2">{fromToken.symbol}</span>
+                  </div>
+                </div>
+
+                {/* Swap Button */}
+                <button 
+                  onClick={handleSwap}
+                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[#CCFF00]"
+                >
+                  <ArrowUpDownIcon size={20} />
+                </button>
+
+                {/* To Input */}
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-gray-400">To (Estimated)</span>
+                    <span className="text-gray-400">
+                      Balance: {isSwapped ? ethBalance : tokenBalance} {toToken.symbol}
+                    </span>
+                  </div>
+                  <div className="flex items-center bg-[#222222] rounded-lg p-3">
+                    <input
+                      type="text"
+                      value={isCalculating ? 'Calculating...' : toToken.amount}
+                      readOnly
+                      className="w-full bg-transparent text-white outline-none text-sm"
+                      placeholder="0.00"
+                    />
+                    <span className="text-gray-400 ml-2">{toToken.symbol}</span>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <button
+                  onClick={handleAction}
+                  disabled={!fromToken.amount || isCalculating || isTransacting}
+                  className="w-full py-3 bg-[#CCFF00] text-black rounded-lg font-medium hover:bg-[#B8E600] 
+                    transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isTransacting ? 'Processing...' : actionButtonText}
+                </button>
+              </div>
+            </div>
+
+            {/* Trades and Chat Tabs */}
+            <div className="bg-[#222222] rounded-lg p-4">
+              <Tab.Group>
+                <Tab.List className="flex space-x-1 rounded-lg bg-[#1a1a1a] p-1 mb-4">
+                  <Tab
+                    className={({ selected }) =>
+                      `w-full rounded-md py-2.5 text-sm font-medium leading-5 transition-colors
+                      ${
+                        selected
+                          ? 'bg-[#333333] text-white'
+                          : 'text-gray-400 hover:bg-[#2a2a2a] hover:text-white'
+                      }`
+                    }
+                  >
+                    Trades
+                  </Tab>
+                  <Tab
+                    className={({ selected }) =>
+                      `w-full rounded-md py-2.5 text-sm font-medium leading-5 transition-colors
+                      ${
+                        selected
+                          ? 'bg-[#333333] text-white'
+                          : 'text-gray-400 hover:bg-[#2a2a2a] hover:text-white'
+                      }`
+                    }
+                  >
+                    Chat
+                  </Tab>
+                </Tab.List>
+                <Tab.Panels>
+                  <Tab.Panel>
+                    <TransactionHistory
+                      transactions={transactions}
+                      transactionPage={transactionPage}
+                      totalTransactionPages={totalTransactionPages}
+                      tokenSymbol={tokenInfo.symbol}
+                      handlePageChange={handlePageChange}
+                    />
+                  </Tab.Panel>
+                  <Tab.Panel>
+                    <Chats tokenAddress={address as string} tokenInfo={tokenInfo} />
+                  </Tab.Panel>
+                </Tab.Panels>
+              </Tab.Group>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-6">
+            {/* Token Info Header (shown only on desktop) */}
+            <div className="hidden lg:block bg-[#222222] rounded-lg p-4">
+              <TokenInfo 
+                tokenInfo={tokenInfo} 
+                showHeader={true} 
+                refreshTrigger={refreshCounter}
               />
             </div>
-          </div>
 
-          {/* Quick Actions Section */}
-          <div className="bg-gray-800 p-4 sm:p-6 rounded-lg mb-8">
-            <h2 className="text-sm sm:text-base font-semibold mb-4 text-blue-300">Quick Actions</h2>
-            <div className="bg-gray-700 p-4 rounded-lg">
-              <div className="mb-4 relative">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
-                  <label className="text-xs sm:text-sm text-gray-300 mb-1 sm:mb-0">From</label>
-                  <span className="text-[10px] sm:text-sm text-gray-400">
-                    Balance: {isSwapped ? tokenBalance : ethBalance} {fromToken.symbol}
-                  </span>
+            {/* Quick Actions (Swap) Section - Desktop Only */}
+            <div className="hidden lg:block bg-[#222222] rounded-lg p-4">
+              <h2 className="text-sm font-semibold mb-4 text-gray-400">Quick Actions</h2>
+              <div className="bg-[#1a1a1a] rounded-lg p-4">
+                {/* From Input */}
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-gray-400">From</span>
+                    <span className="text-gray-400">
+                      Balance: {isSwapped ? tokenBalance : ethBalance} {fromToken.symbol}
+                    </span>
+                  </div>
+                  <div className="flex items-center bg-[#222222] rounded-lg p-3">
+                    <input
+                      type="number"
+                      value={fromToken.amount}
+                      onChange={handleFromAmountChange}
+                      className="w-full bg-transparent text-white outline-none text-sm"
+                      placeholder="0.00"
+                      disabled={isTransacting}
+                    />
+                    <span className="text-gray-400 ml-2">{fromToken.symbol}</span>
+                  </div>
                 </div>
-                <div className="flex items-center bg-gray-600 rounded p-2">
-                  <input
-                    type="number"
-                    value={fromToken.amount}
-                    onChange={handleFromAmountChange}
-                    className="w-full bg-transparent text-white outline-none text-xs sm:text-sm"
-                    placeholder="0.00"
-                    disabled={isTransacting}
-                  />
-                  <span className="ml-2 text-[10px] sm:text-sm text-gray-300 whitespace-nowrap">{fromToken.symbol}</span>
+
+                {/* Swap Button */}
+                <button 
+                  onClick={handleSwap}
+                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[#CCFF00]"
+                >
+                  <ArrowUpDownIcon size={20} />
+                </button>
+
+                {/* To Input */}
+                <div className="mb-4">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-gray-400">To (Estimated)</span>
+                    <span className="text-gray-400">
+                      Balance: {isSwapped ? ethBalance : tokenBalance} {toToken.symbol}
+                    </span>
+                  </div>
+                  <div className="flex items-center bg-[#222222] rounded-lg p-3">
+                    <input
+                      type="text"
+                      value={isCalculating ? 'Calculating...' : toToken.amount}
+                      readOnly
+                      className="w-full bg-transparent text-white outline-none text-sm"
+                      placeholder="0.00"
+                    />
+                    <span className="text-gray-400 ml-2">{toToken.symbol}</span>
+                  </div>
                 </div>
+
+                {/* Action Button */}
+                <button
+                  onClick={handleAction}
+                  disabled={!fromToken.amount || isCalculating || isTransacting}
+                  className="w-full py-3 bg-[#CCFF00] text-black rounded-lg font-medium hover:bg-[#B8E600] 
+                    transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isTransacting ? 'Processing...' : actionButtonText}
+                </button>
               </div>
-              <button onClick={handleSwap} className="w-full flex justify-center py-2 text-gray-400 hover:text-blue-400 mb-4">
-                <ArrowUpDownIcon size={20} />
-              </button>
-              <div className="mb-4 relative">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
-                  <label className="text-xs sm:text-sm text-gray-300 mb-1 sm:mb-0">To (Estimated)</label>
-                  <span className="text-[10px] sm:text-sm text-gray-400">
-                    Balance: {isSwapped ? ethBalance : tokenBalance} {toToken.symbol}
-                  </span>
-                </div>
-                <div className="flex items-center bg-gray-600 rounded p-2">
-                  <input
-                    type="text"
-                    value={isCalculating ? 'Calculating...' : toToken.amount ? parseFloat(toToken.amount).toFixed(5) : ''}
-                    readOnly
-                    className="w-full bg-transparent text-white outline-none text-[10px] sm:text-sm"
-                    placeholder="0.00"
-                  />
-                  <span className="ml-2 text-xs sm:text-sm text-gray-300 whitespace-nowrap">{toToken.symbol}</span>
-                </div>
-              </div>
-              <button
-                onClick={handleAction}
-                className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition-colors disabled:opacity-50 text-sm sm:text-base"
-                disabled={!fromToken.amount || isCalculating || isTransacting}
-              >
-                {isTransacting ? 'Processing...' : actionButtonText} {isSwapped ? '' : tokenInfo.symbol}
-              </button>
             </div>
           </div>
+        </div>
 
-          {/* Trades and Chats Section */}
-          <div className="mb-8">
-            <Tab.Group>
-              <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
-                <Tab
-                  className={({ selected }) =>
-                    `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700
-                    ${
-                      selected
-                        ? 'bg-white shadow'
-                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
-                    }`
-                  }
-                >
-                  Trades
-                </Tab>
-                <Tab
-                  className={({ selected }) =>
-                    `w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-blue-700
-                    ${
-                      selected
-                        ? 'bg-white shadow'
-                        : 'text-blue-100 hover:bg-white/[0.12] hover:text-white'
-                    }`
-                  }
-                >
-                  Chats
-                </Tab>
-              </Tab.List>
-              <Tab.Panels className="mt-2">
-                <Tab.Panel>
-                  <TransactionHistory
-                    transactions={transactions}
-                    transactionPage={transactionPage}
-                    totalTransactionPages={totalTransactionPages}
-                    tokenSymbol={tokenInfo.symbol}
-                    handlePageChange={handlePageChange}
-                  />
-                </Tab.Panel>
-                <Tab.Panel>
-                  <Chats tokenAddress={address as string} tokenInfo={tokenInfo} />
-                </Tab.Panel>
-              </Tab.Panels>
-            </Tab.Group>
-          </div>
-
-          {/* Token Holders Section */}
+        {/* Token Holders Section (Full Width) */}
+        <div className="mt-6 bg-[#222222] rounded-lg p-4">
+          <h2 className="text-sm font-semibold mb-4 text-gray-400">Token Holders</h2>
           <TokenHolders
             tokenHolders={currentHolders}
             currentPage={currentPage}
@@ -501,13 +557,8 @@ interface TokenDetailProps {
             creatorAddress={tokenInfo.creatorAddress}
             onPageChange={paginate}
           />
-
-          {/* Share Button */}
-          <ShareButton tokenInfo={tokenInfo} />
-
         </div>
       </div>
-      {/* {process.env.NODE_ENV === 'development' && <OGPreview />} */}
     </Layout>
   );
 };

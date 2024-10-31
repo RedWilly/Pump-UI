@@ -21,105 +21,85 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
   onPageChange,
 }) => {
   return (
-    <div className="mb-8">
-      <h2 className="text-sm sm:text-base font-semibold mb-4 text-blue-300">Token Holders</h2>
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse text-xs">
-          <thead>
-            <tr className="bg-gray-700">
-              <th className="p-2 text-left text-gray-300">Address</th>
-              <th className="p-2 text-left text-gray-300">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Bonding Curve Manager as the first entry */}
-            <tr className="border-b border-gray-700">
-              <td className="p-2">
-                <div className="text-blue-400">Bonding Curve</div>
+    <div className="w-full">
+      <table className="w-full text-left">
+        <thead>
+          <tr className="bg-[#1a1a1a]">
+            <th className="px-4 py-2 text-sm text-gray-400">Holder</th>
+            <th className="px-4 py-2 text-sm text-gray-400">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {/* Bonding Curve Manager as the first entry */}
+          <tr className="border-b border-[#2a2a2a]">
+            <td className="px-4 py-2">
+              <div className="text-gray-400 text-sm">Bonding Curve</div>
+            </td>
+            <td className="px-4 py-2 text-gray-400 text-sm">Alpha</td>
+          </tr>
+          {tokenHolders.map((holder, index) => (
+            <tr key={index} className="border-b border-[#2a2a2a]">
+              <td className="px-4 py-2">
+                {holder.address === creatorAddress ? (
+                  <a
+                    href={`https://www.shibariumscan.io/address/${holder.address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-[#CCFF00] text-sm flex items-center gap-1 transition-colors"
+                  >
+                    Creator <ExternalLinkIcon size={14} />
+                  </a>
+                ) : (
+                  <a
+                    href={`https://www.shibariumscan.io/address/${holder.address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-[#CCFF00] text-sm flex items-center gap-1 transition-colors"
+                  >
+                    {shortenAddress(holder.address)} <ExternalLinkIcon size={14} />
+                  </a>
+                )}
               </td>
-              <td className="p-2 text-blue-400">Alpha</td>
+              <td className="px-4 py-2 text-gray-400 text-sm">{formatAmountV3(holder.balance)}</td>
             </tr>
-            {tokenHolders.map((holder, index) => (
-              <tr key={index} className="border-b border-gray-700">
-                <td className="p-2">
-                  {holder.address === creatorAddress ? (
-                    <a
-                      href={`https://www.shibariumscan.io/address/${holder.address}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:underline"
-                    >
-                      Creator <ExternalLinkIcon size={14} className="inline ml-1" />
-                    </a>
-                  ) : (
-                    <a
-                      href={`https://www.shibariumscan.io/address/${holder.address}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:underline"
-                    >
-                      {shortenAddress(holder.address)} <ExternalLinkIcon size={14} className="inline ml-1" />
-                    </a>
-                  )}
-                </td>
-                <td className="p-2 text-blue-400">{formatAmountV3(holder.balance)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {tokenHolders.length === 0 && <p className="text-gray-400 text-center mt-4">No token holder data available</p>}
+          ))}
+        </tbody>
+      </table>
 
-      {/* Updated Pagination for token holders */}
-      {tokenHolders.length > 0 && (
-        <div className="flex items-center justify-center mt-4 space-x-2">
+      {tokenHolders.length === 0 && (
+        <div className="text-center py-8 text-gray-400">
+          No token holder data available
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-4 gap-2">
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="p-1 rounded-md bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
           >
-            <ChevronLeftIcon size={16} />
+            <ChevronLeftIcon size={20} />
           </button>
-          <div className="flex items-center space-x-1">
-            {[...Array(totalPages)].map((_, index) => {
-              const page = index + 1;
-              if (
-                page === 1 ||
-                page === totalPages ||
-                (page >= currentPage - 1 && page <= currentPage + 1)
-              ) {
-                return (
-                  <button
-                    key={page}
-                    onClick={() => onPageChange(page)}
-                    className={`px-2 py-1 text-xs rounded-md transition-colors duration-200 ${
-                      currentPage === page
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                );
-              } else if (
-                page === currentPage - 2 ||
-                page === currentPage + 2
-              ) {
-                return (
-                  <span key={page} className="text-gray-500 text-xs">
-                    ...
-                  </span>
-                );
-              }
-              return null;
-            })}
-          </div>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`px-3 py-1 rounded text-sm ${
+                currentPage === page
+                  ? 'bg-[#CCFF00] text-black'
+                  : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
+              }`}
+            >
+              {page}
+            </button>
+          ))}
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="p-1 rounded-md bg-gray-800 text-gray-400 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
           >
-            <ChevronRightIcon size={16} />
+            <ChevronRightIcon size={20} />
           </button>
         </div>
       )}

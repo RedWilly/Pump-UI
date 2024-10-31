@@ -18,6 +18,11 @@ export interface LiquidityEvent {
     description: string;
     createdAt: string;
     updatedAt: string;
+    website: string;
+    youtube: string;
+    discord: string;
+    twitter: string;
+    telegram: string;
     _count: {
       liquidityEvents: number;
     };
@@ -36,26 +41,18 @@ export interface LiquidityEvent {
     totalPages: number;
   }
 
-  // Add this new interface to your types file
-export interface TokenWithTransactions extends Token {
-  id: string;
-  youtube: string | undefined;
-  discord: string | undefined;
-  twitter: any;
-  website: any;
-  telegram: any;
-  transactions: {
-    data: Transaction[];
-    pagination: {
-      currentPage: number;
-      pageSize: number;
-      totalCount: number;
-      totalPages: number;
-    }
+  export interface TokenWithTransactions extends Token {
+    transactions: {
+      data: Transaction[];
+      pagination: {
+        currentPage: number;
+        pageSize: number;
+        totalCount: number;
+        totalPages: number;
+      };
+    };
   }
-}
 
-// Make sure you have a Transaction interface defined, if not, add it:
 export interface Transaction {
   id: string;
   type: string;
@@ -66,7 +63,6 @@ export interface Transaction {
   tokenPrice: string;
   txHash: string;
   timestamp: string;
-  // Add any other fields that your transaction object includes
 }
 
 

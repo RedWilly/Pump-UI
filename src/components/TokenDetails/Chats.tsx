@@ -7,6 +7,7 @@ import { formatTimestamp, getRandomAvatarImage, shortenAddress } from '@/utils/c
 import { motion, AnimatePresence } from 'framer-motion';
 import { TokenWithTransactions } from '@/interface/types';
 import SiweAuth from '@/components/auth/SiweAuth';
+import { Reply, X } from 'lucide-react';
 
 interface ChatMessage {
   id: number;
@@ -25,10 +26,9 @@ interface ChatsProps {
 const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [replyToId, setReplyToId] = useState<number | undefined>(undefined);
-  const { address } = useAccount();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<ChatMessage | null>(null);
+  const { address } = useAccount();
 
   const userAvatars = useMemo(() => {
     const avatars: { [key: string]: string } = {};
@@ -50,20 +50,10 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
   const checkAuth = async () => {
     try {
       const response = await fetch('/api/auth/user');
-      if (response.ok) {
-        setIsAuthenticated(true);
-        fetchMessages();
-      } else {
-        setIsAuthenticated(false);
-      }
+      setIsAuthenticated(response.ok);
     } catch (error) {
       setIsAuthenticated(false);
     }
-  };
-
-  const handleAuthSuccess = () => {
-    setIsAuthenticated(true);
-    fetchMessages(); 
   };
 
   const fetchMessages = async () => {
@@ -72,153 +62,134 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
       setMessages(fetchedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
-      toast.error('Failed to fetch messages');
     }
   };
 
-  const handlePostMessage = async () => {
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!isAuthenticated) {
-      toast.error('Please sign in with Ethereum to post a message');
+      toast.error('Please sign in to chat');
       return;
     }
-
-    if (!newMessage.trim()) {
-      toast.error('Please enter a message');
-      return;
-    }
-
+    if (!newMessage.trim()) return;
     try {
-      await addChatMessage(address!, tokenAddress, newMessage, replyToId);
+      await addChatMessage(address!, tokenAddress, newMessage, replyingTo?.id);
       setNewMessage('');
-      setIsPopupOpen(false);
-      setReplyToId(undefined);
+      setReplyingTo(null);
       fetchMessages();
-      toast.success('Message posted successfully');
     } catch (error) {
-      console.error('Error posting message:', error);
-      toast.error('Failed to post message');
+      console.error('Error sending message:', error);
+      toast.error('Failed to send message');
     }
   };
 
-  const handleReply = (messageId: number) => {
-    setReplyToId(messageId);
-    setIsPopupOpen(true);
+  const handleReply = (message: ChatMessage) => {
+    setReplyingTo(message);
   };
 
-  const renderMessage = (msg: ChatMessage, depth: number = 0) => {
-    const isReply = depth > 0;
-    const isCreator = msg.user.toLowerCase() === tokenInfo.creatorAddress.toLowerCase();
-    return (
-      <motion.div
-        key={msg.id}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.3 }}
-        className={`bg-gray-700 p-3 rounded-lg shadow-md ${isReply ? 'ml-4 sm:ml-8 mt-2 border-l-2 border-blue-400' : 'mb-3'}`}
-      >
-        <div className="flex items-start gap-2">
-          <Image
-            src={userAvatars[msg.user] || getRandomAvatarImage()}
-            alt="User Avatar"
-            width={16}
-            height={16}
-            className="rounded-full"
-          />
-          <div className="flex-grow min-w-0">
-            <div className="flex justify-between items-center flex-wrap gap-1">
-              <span className="text-gray-300 text-[10px] font-semibold">
-                {shortenAddress(msg.user)}
-                {isCreator && <span className="ml-1 text-blue-400">(dev)</span>}
-              </span>
-              <span className="text-[7px] text-gray-500">{formatTimestamp(msg.timestamp)}</span>
-            </div>
-            <p className="text-white text-xs mt-1 break-words">{msg.message}</p>
-            <div className="flex justify-between items-center mt-2">
-              <button
-                onClick={() => handleReply(msg.id)}
-                className="text-[8px] text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Reply
-              </button>
-            </div>
-          </div>
-        </div>
-        {messages.filter(reply => reply.reply_to === msg.id).map(reply => renderMessage(reply, depth + 1))}
-      </motion.div>
-    );
+  const cancelReply = () => {
+    setReplyingTo(null);
   };
+
+  const findParentMessage = (replyId: number | null) => {
+    if (!replyId) return null;
+    return messages.find(m => m.id === replyId);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4">
+        <SiweAuth onAuthSuccess={() => setIsAuthenticated(true)} />
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-800 p-3 sm:p-4 rounded-lg mb-6 shadow-lg">
-      <h2 className="text-sm font-semibold mb-3 text-blue-300">Chats</h2>
-      {!isAuthenticated ? (
-        <SiweAuth onAuthSuccess={handleAuthSuccess} />
-      ) : (
-        <>
-          {messages.length === 0 ? (
-            <p className="text-xs sm:text-sm text-gray-400">No messages yet. Be the first to chat!</p>
-          ) : (
-            <div className="space-y-3 mb-3 max-h-80 sm:max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-              <AnimatePresence>
-                {messages.filter(msg => msg.reply_to === null).map(msg => renderMessage(msg))}
-              </AnimatePresence>
-            </div>
-          )}
-          <button
-            onClick={() => setIsPopupOpen(true)}
-            className="w-full bg-blue-500 text-white py-2 px-3 rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm font-medium shadow-md"
-          >
-            Post a message
-          </button>
-
-          <AnimatePresence>
-            {isPopupOpen && (
+    <div className="flex flex-col h-[400px] sm:h-[500px]">
+      <div className="flex-grow overflow-y-auto custom-scrollbar space-y-2 sm:space-y-4 p-2">
+        <AnimatePresence>
+          {messages.map((message) => {
+            const parentMessage = findParentMessage(message.reply_to);
+            return (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+                key={message.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className={`bg-[#1a1a1a] rounded-lg p-2 sm:p-3 ${message.reply_to ? 'ml-2 sm:ml-4 border-l-2 border-[#333333]' : ''}`}
               >
-                <motion.div
-                  initial={{ scale: 0.9, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.9, y: 20 }}
-                  className="bg-gray-800 p-4 sm:p-6 rounded-lg w-full max-w-md shadow-xl"
-                >
-                  <h3 className="text-sm sm:text-base font-semibold mb-3 text-blue-300">
-                    {replyToId !== undefined ? 'Reply' : 'Post'}
-                  </h3>
-                  <textarea
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    className="w-full bg-gray-700 text-white p-2 sm:p-3 rounded-lg mb-3 text-sm resize-none focus:ring-2 focus:ring-blue-500 outline-none"
-                    rows={4}
-                    placeholder="Enter your message..."
+                {parentMessage && (
+                  <div className="mb-1 sm:mb-2 text-[10px] sm:text-xs text-gray-400 bg-[#222222] p-1.5 sm:p-2 rounded">
+                    <span className="font-medium">{shortenAddress(parentMessage.user)}</span>: 
+                    <span className="line-clamp-1">{parentMessage.message}</span>
+                  </div>
+                )}
+                <div className="flex items-start gap-1.5 sm:gap-2">
+                  <Image
+                    src={userAvatars[message.user] || getRandomAvatarImage()}
+                    alt="Avatar"
+                    width={20}
+                    height={20}
+                    className="rounded-full hidden sm:block"
                   />
-                  <div className="flex justify-end space-x-3">
+                  <div className="flex-grow min-w-0">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs sm:text-sm font-medium text-gray-300">
+                        {shortenAddress(message.user)}
+                        {message.user.toLowerCase() === tokenInfo.creatorAddress.toLowerCase() && 
+                          <span className="ml-1 text-[#CCFF00] text-[10px] sm:text-xs">(dev)</span>
+                        }
+                      </span>
+                      <span className="text-[10px] sm:text-xs text-gray-500">{formatTimestamp(message.timestamp)}</span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-200 mt-0.5 sm:mt-1 break-words">{message.message}</p>
                     <button
-                      onClick={() => {
-                        setIsPopupOpen(false);
-                        setReplyToId(undefined);
-                      }}
-                      className="bg-gray-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-700 transition-colors text-xs sm:text-sm font-medium"
+                      onClick={() => handleReply(message)}
+                      className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-400 hover:text-[#CCFF00] flex items-center gap-0.5 sm:gap-1"
                     >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={handlePostMessage}
-                      className="bg-blue-500 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition-colors text-xs sm:text-sm font-medium"
-                    >
-                      Post
+                      <Reply size={10} className="sm:w-3 sm:h-3" />
+                      Reply
                     </button>
                   </div>
-                </motion.div>
+                </div>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </>
-      )}
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      <form onSubmit={handleSendMessage} className="mt-2 sm:mt-4 space-y-1 sm:space-y-2 p-2">
+        {replyingTo && (
+          <div className="flex items-center justify-between bg-[#222222] p-1.5 sm:p-2 rounded-lg text-xs sm:text-sm">
+            <span className="text-gray-400">
+              Replying to <span className="text-[#CCFF00]">{shortenAddress(replyingTo.user)}</span>
+            </span>
+            <button
+              type="button"
+              onClick={cancelReply}
+              className="text-gray-400 hover:text-white"
+            >
+              <X size={14} className="sm:w-4 sm:h-4" />
+            </button>
+          </div>
+        )}
+        <div className="flex gap-1.5 sm:gap-2">
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-grow bg-[#1a1a1a] text-white rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#CCFF00]"
+          />
+          <button
+            type="submit"
+            disabled={!newMessage.trim()}
+            className="bg-[#CCFF00] text-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-[#B8E600] transition-colors disabled:opacity-50"
+          >
+            Send
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

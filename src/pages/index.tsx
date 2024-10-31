@@ -10,13 +10,14 @@ import SEO from '@/components/seo/SEO';
 import { useWebSocket } from '@/components/providers/WebSocketProvider';
 import { Switch } from '@/components/ui/switch';
 import Spinner from '@/components/ui/Spinner';
+import { useRouter } from 'next/router';
 
 const TOKENS_PER_PAGE = 12;
 
 const Home: React.FC = () => {
   const [tokens, setTokens] = useState<PaginatedResponse<Token | TokenWithLiquidityEvents> | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sort, setSort] = useState<SortOption>('all');
+  const [sort, setSort] = useState<SortOption>('trending');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [noRecentTokens, setNoRecentTokens] = useState(false);
@@ -26,6 +27,8 @@ const Home: React.FC = () => {
   const [displayedNewTokens, setDisplayedNewTokens] = useState<Token[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { newTokens } = useWebSocket();
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     console.log('Effect triggered. Current sort:', sort, 'Current page:', currentPage);
@@ -75,17 +78,17 @@ const Home: React.FC = () => {
         fetchedTokens = await searchTokens(searchQuery, currentPage, TOKENS_PER_PAGE);
       } else {
         switch (sort) {
-          case 'all':
+          case 'trending':
             fetchedTokens = await getAllTokens(currentPage, TOKENS_PER_PAGE);
             break;
-          case 'recentCreated':
+          case 'new':
             fetchedTokens = await getRecentTokens(currentPage, TOKENS_PER_PAGE, 1);
             if (fetchedTokens === null) {
               setNoRecentTokens(true);
               fetchedTokens = { data: [], totalCount: 0, currentPage: 1, totalPages: 1 };
             }
             break;
-          case 'ended':
+          case 'finalized':
             try {
               fetchedTokens = await getTokensWithLiquidity(currentPage, TOKENS_PER_PAGE);
             } catch (liquidityError) {
@@ -96,14 +99,6 @@ const Home: React.FC = () => {
                 throw liquidityError;
               }
             }
-            break;
-          case 'bomper':
-            fetchedTokens = {
-              data: [],
-              totalCount: 0,
-              currentPage: 1,
-              totalPages: 1
-            };
             break;
           default:
             fetchedTokens = await getAllTokens(currentPage, TOKENS_PER_PAGE);
@@ -191,6 +186,10 @@ const Home: React.FC = () => {
     });
   };
 
+  const handleLaunchToken = () => {
+    router.push('/create');
+  };
+
   // console.log('Rendering component. isLoading:', isLoading, 'tokens:', tokens, 'filteredTokens:', filteredTokens);
 
   return (
@@ -200,33 +199,38 @@ const Home: React.FC = () => {
         description="The ultimate platform for launching and trading memecoins on Shibarium. Create your own tokens effortlessly and engage in fair, dynamic trading."
         image="seo/home.jpg"
       />
-      <HowItWorksPopup />
+      <HowItWorksPopup isVisible={showHowItWorks} onClose={() => setShowHowItWorks(false)} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-lg sm:text-xl font-bold text-blue-400 mb-6">Explore Tokens</h1>
-        <SearchFilter onSearch={handleSearch} />
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 space-y-4 sm:space-y-0">
-          <SortOptions onSort={handleSort} currentSort={sort} />
-          <div className="flex items-center space-x-1">
-            <Switch
-              checked={showNewTokens}
-              onCheckedChange={toggleNewTokens}
-              aria-label="Toggle new tokens"
-              className="data-[state=checked]:bg-blue-500"
-            />
-            <span className="text-xs text-gray-400">Show new tokens</span>
-            {newTokensBuffer.length > 0 && !showNewTokens && (
-              <span className="text-xs text-blue-400">({newTokensBuffer.length} new)</span>
-            )}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold mb-2">Discover the next trending token,</h1>
+          <h2 className="text-2xl mb-6">before everyone else!</h2>
+          <div className="grid grid-cols-2 gap-3 max-w-lg mx-auto px-4">
+            <button 
+              onClick={() => setShowHowItWorks(true)} 
+              className="w-full bg-white text-black px-3 sm:px-6 py-2 rounded-full hover:bg-gray-100 transition-colors text-xs sm:text-base"
+            >
+              How does it work?
+            </button>
+            <button 
+              onClick={handleLaunchToken}
+              className="w-full bg-[#CCFF00] text-black px-3 sm:px-6 py-2 rounded-full hover:bg-[#B8E600] transition-colors text-xs sm:text-base"
+            >
+              Launch your token
+            </button>
           </div>
         </div>
+
+        <div className="mb-8">
+          <SearchFilter onSearch={handleSearch} />
+          <SortOptions onSort={handleSort} currentSort={sort} />
+        </div>
+
         {isLoading ? (
           <div className="flex justify-center items-center mt-10">
             <Spinner size="medium" />
           </div>
         ) : error ? (
           <div className="text-center text-red-500 text-xl mt-10">{error}</div>
-        ) : sort === 'bomper' ? (
-          <div className="text-center text-white text-xs mt-10">NOTHING HERE FOR YOU</div>
         ) : noRecentTokens ? (
           <div className="text-center text-white text-xs mt-10">No tokens created in the last hour. Check back soon.</div>
         ) : noLiquidityTokens ? (
@@ -237,7 +241,7 @@ const Home: React.FC = () => {
             currentPage={currentPage}
             totalPages={tokens?.totalPages || 1}
             onPageChange={handlePageChange}
-            isEnded={sort === 'ended'}
+            isEnded={sort === 'finalized'}
           />
         ) : (
           <div className="text-center text-white text-xs mt-10">No tokens found matching your criteria.</div>

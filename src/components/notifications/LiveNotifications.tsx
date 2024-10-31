@@ -40,7 +40,6 @@ const LiveNotifications: React.FC = () => {
           logo: data.data.logo
         };
       default:
-        console.error('Unknown notification type:', data.type);
         return {
           message: 'New activity',
           type: 'buy',
@@ -120,10 +119,10 @@ const LiveNotifications: React.FC = () => {
   if (!isVisible || !currentNotification) return null;
 
   return (
-    <div className="bg-blue-500 text-white py-1 overflow-hidden sticky top-0 z-50">
+    <div className="bg-[#222222] text-white py-1 overflow-hidden sticky top-0 z-50 border-b border-[#333333]">
       <div ref={containerRef} className="flex whitespace-nowrap items-center">
         <div className="flex items-center space-x-2 mx-3">
-          <span className="text-xs font-medium">{currentNotification.message}</span>
+          <span className="text-xs font-medium text-gray-400">{currentNotification.message}</span>
           {currentNotification.logo && (
             <Image
               src={currentNotification.logo}
