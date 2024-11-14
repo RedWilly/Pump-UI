@@ -28,7 +28,6 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
 
   // Calculate total supply excluding only the token contract
   const totalSupply = allHolders.reduce((sum, holder) => {
-    // Skip if the holder is the token contract
     if (holder.address.toLowerCase() === tokenAddress.toLowerCase()) {
       return sum;
     }
@@ -37,7 +36,6 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
 
   // Calculate percentage for a holder
   const calculatePercentage = (balance: string, address: string): string => {
-    // Return 0% only for token contract
     if (address.toLowerCase() === tokenAddress.toLowerCase()) {
       return '0%';
     }
@@ -47,7 +45,6 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
     const percentage = (BigInt(balance) * BigInt(10000) / totalSupply);
     const percentageNumber = Number(percentage) / 100;
     
-    // Format based on size
     if (percentageNumber < 0.001) {
       return '<0.001%';
     } else if (percentageNumber < 0.01) {
@@ -58,16 +55,24 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
       return percentageNumber.toFixed(2) + '%';
     }
   };
-  
-  // Find bonding curve holder from complete list
+
+  // Find bonding curve holder
   const bondingCurveHolder = allHolders.find(
     holder => holder.address.toLowerCase() === bondingCurveAddress.toLowerCase()
   );
 
-  // Filter displayed holders (excluding only token contract)
+  // Filter holders (excluding token contract AND bonding curve address) and paginate
   const filteredHolders = allHolders.filter(holder => 
-    holder.address.toLowerCase() !== tokenAddress.toLowerCase()
+    holder.address.toLowerCase() !== tokenAddress.toLowerCase() && 
+    holder.address.toLowerCase() !== bondingCurveAddress.toLowerCase()
   );
+
+  // Calculate pagination
+  const holdersPerPage = 10;
+  const startIndex = (currentPage - 1) * holdersPerPage;
+  const endIndex = startIndex + holdersPerPage;
+  const paginatedHolders = filteredHolders.slice(startIndex, endIndex);
+  const actualTotalPages = Math.ceil(filteredHolders.length / holdersPerPage);
 
   return (
     <div className="w-full">
@@ -95,7 +100,7 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
               {bondingCurveHolder ? calculatePercentage(bondingCurveHolder.balance, bondingCurveHolder.address) : '0%'}
             </td>
           </tr>
-          {filteredHolders.map((holder, index) => (
+          {paginatedHolders.map((holder, index) => (
             <tr key={index} className="border-b border-[#2a2a2a]">
               <td className="px-4 py-2">
                 {holder.address === creatorAddress ? (
@@ -126,13 +131,13 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
         </tbody>
       </table>
 
-      {tokenHolders.length === 0 && (
+      {filteredHolders.length === 0 && (
         <div className="text-center py-8 text-gray-400">
           No token holder data available
         </div>
       )}
 
-      {totalPages > 1 && (
+      {actualTotalPages > 1 && (
         <div className="flex justify-center mt-4 gap-2">
           <button
             onClick={() => onPageChange(currentPage - 1)}
@@ -141,7 +146,7 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
           >
             <ChevronLeftIcon size={20} />
           </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          {Array.from({ length: actualTotalPages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
               onClick={() => onPageChange(page)}
@@ -156,7 +161,7 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
           ))}
           <button
             onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === actualTotalPages}
             className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
           >
             <ChevronRightIcon size={20} />

@@ -293,7 +293,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
               {isCompleted 
                 ? 'Completed' 
                 : liquidityData && liquidityData[2] 
-                  ? `${calculateProgress(liquidityData[2]).toFixed(1)}%` 
+                  ? `${calculateProgress(liquidityData[2]).toFixed(4)}%` 
                   : '0%'}
             </span>
           </div>

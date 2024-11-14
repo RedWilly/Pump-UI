@@ -1,9 +1,9 @@
 import { formatUnits, parseUnits, maxUint256, decodeEventLog, Log, TransactionReceipt, UserRejectedRequestError } from 'viem';
-import { useReadContract, useWriteContract, useBalance, useWaitForTransactionReceipt, usePublicClient, useAccount } from 'wagmi';
+import { useReadContract, useWriteContract, useBalance, useWaitForTransactionReceipt, usePublicClient, useAccount, useContractRead } from 'wagmi';
 import BondingCurveManagerABI from '@/abi/BondingCurveManager.json';
 import ERC20ABI from '@/abi/ERC20.json';
-import { useCallback } from 'react';
-import oldTokens from '@/abi/old_token.json';
+import { useCallback, useMemo } from 'react';
+import oldTokenAddresses from '@/abi/old_token.json';
 
 // Helper function to determine which contract address to use
 export const getBondingCurveAddress = (tokenAddress?: `0x${string}` | null): `0x${string}` => {
@@ -12,8 +12,17 @@ export const getBondingCurveAddress = (tokenAddress?: `0x${string}` | null): `0x
   }
 
   // Check if token is in old_token.json
-  const isOldToken = oldTokens.includes(tokenAddress) || oldTokens.includes(tokenAddress.toLowerCase());
+  const isOldToken = oldTokenAddresses.some(addr => 
+    addr.toLowerCase() === tokenAddress.toLowerCase()
+  );
   
+  // console.log('getBondingCurveAddress:', {
+  //   tokenAddress,
+  //   isOldToken,
+  //   oldAddress: process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS_OLD,
+  //   newAddress: process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS
+  // });
+
   return (isOldToken 
     ? process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS_OLD 
     : process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS) as `0x${string}`;
@@ -47,15 +56,77 @@ export function useMarketCap(tokenAddress: `0x${string}` | null) {
   return { data: data as bigint | undefined, refetch };
 }
 
-export function useTokenLiquidity(tokenAddress: `0x${string}` | null) {
-  const { data, refetch } = useReadContract({
+// Add the old contract ABI for the tokens function
+const OLD_TOKENS_ABI = [{
+  "inputs": [{
+    "internalType": "address",
+    "name": "",
+    "type": "address"
+  }],
+  "name": "tokens",
+  "outputs": [{
+    "internalType": "contract BondingCurveToken",
+    "name": "token",
+    "type": "address"
+  }, {
+    "internalType": "bool",
+    "name": "isListed",
+    "type": "bool"
+  }, {
+    "internalType": "uint256",
+    "name": "ethBalance",
+    "type": "uint256"
+  }],
+  "stateMutability": "view",
+  "type": "function"
+}];
+
+// Update the type definition to be more specific
+type OldTokenLiquidityResponse = [string, boolean, bigint];
+type NewTokenLiquidityResponse = [string, bigint, bigint, boolean];
+type TransformedLiquidityData = [string, bigint, bigint, boolean] | undefined;
+
+export const useTokenLiquidity = (tokenAddress: `0x${string}` | null) => {
+  const isOldContract = tokenAddress ? oldTokenAddresses.some(addr => 
+    addr.toLowerCase() === tokenAddress.toLowerCase()
+  ) : false;
+
+  const { data, isError, isLoading, refetch } = useContractRead({
     address: getBondingCurveAddress(tokenAddress),
-    abi: BondingCurveManagerABI,
+    abi: isOldContract ? OLD_TOKENS_ABI : BondingCurveManagerABI,
     functionName: 'tokens',
-    args: [tokenAddress],
+    args: tokenAddress ? [tokenAddress] : undefined,
+    query: {
+      enabled: !!tokenAddress,
+    }
   });
-  return { data: data as [string, boolean, bigint] | undefined, refetch };
-}
+
+  // Transform the response based on contract version
+  const transformedData = useMemo<TransformedLiquidityData>(() => {
+    if (!data) return undefined;
+
+    try {
+      if (isOldContract) {
+        // Old contract format: [token, isListed, ethBalance]
+        const [token, isListed, ethBalance] = data as OldTokenLiquidityResponse;
+        return [token, BigInt(0), ethBalance, isListed];
+      }
+
+      // New contract format: [token, tokenBalance, ethBalance, isListed]
+      const [token, tokenBalance, ethBalance, isListed] = data as NewTokenLiquidityResponse;
+      return [token, tokenBalance, ethBalance, isListed];
+    } catch (error) {
+      return undefined;
+    }
+  }, [data, isOldContract]);
+
+  return {
+    data: transformedData,
+    isError,
+    isLoading,
+    refetch,
+  };
+};
 
 export function useCalcBuyReturn(tokenAddress: `0x${string}`, ethAmount: bigint) {
   const { data, isLoading } = useReadContract({

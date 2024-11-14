@@ -290,7 +290,7 @@ const Home: React.FC = () => {
         ) : error ? (
           <div className="text-center text-red-500 text-xl mt-10">{error}</div>
         ) : noRecentTokens ? (
-          <div className="text-center text-white text-xs mt-10">No tokens created in the last hour. Check back soon.</div>
+          <div className="text-center text-white text-xs mt-10">No tokens created in the last 24 hours. Check back soon.</div>
         ) : noLiquidityTokens ? (
           <div className="text-center text-white text-xs mt-10">No tokens Listed Yet.</div>
         ) : filteredTokens.length > 0 ? (

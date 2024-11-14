@@ -378,7 +378,7 @@ interface TokenDetailProps {
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-400">From</span>
                     <span className="text-gray-400">
-                      Balance: {isSwapped ? tokenBalance : ethBalance} {fromToken.symbol}
+                      Balance: {isSwapped ? tokenBalance : ethBalance}
                     </span>
                   </div>
                   <div className="flex items-center bg-[#222222] rounded-lg p-3">
@@ -411,9 +411,9 @@ interface TokenDetailProps {
                 {/* To Input */}
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-gray-400">To (Estimated)</span>
+                    <span className="text-gray-400">To</span>
                     <span className="text-gray-400">
-                      Balance: {isSwapped ? ethBalance : tokenBalance} {toToken.symbol}
+                      Balance: {isSwapped ? ethBalance : tokenBalance}
                     </span>
                   </div>
                   <div className="flex items-center bg-[#222222] rounded-lg p-3">
@@ -586,6 +586,8 @@ interface TokenDetailProps {
             allHolders={tokenHolders}
           />
         </div>
+         {/* Share Button */}
+         <ShareButton tokenInfo={tokenInfo} />
       </div>
     </Layout>
   );
