@@ -22,7 +22,7 @@ export async function getAllTokensTrends(page: number = 1, pageSize: number = 13
 }
 
 
-export async function getRecentTokens(page: number = 1, pageSize: number = 20, hours: number = 24): Promise<PaginatedResponse<Token> | null> {
+export async function getRecentTokens(page: number = 1, pageSize: number = 20, hours: number = 1): Promise<PaginatedResponse<Token> | null> {
   try {
     const response = await axios.get(`${API_BASE_URL}/api/tokens/recent`, {
       params: { page, pageSize, hours }

@@ -81,7 +81,7 @@ const Home: React.FC = () => {
             fetchedTokens = await getAllTokensTrends(currentPage, TOKENS_PER_PAGE);
             break;
           case 'new':
-            fetchedTokens = await getRecentTokens(currentPage, TOKENS_PER_PAGE, 1);
+            fetchedTokens = await getRecentTokens(currentPage, TOKENS_PER_PAGE, 24);
             if (fetchedTokens === null) {
               setNoRecentTokens(true);
               fetchedTokens = { data: [], totalCount: 0, currentPage: 1, totalPages: 1 };
