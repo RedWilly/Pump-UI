@@ -288,7 +288,7 @@ export function useCreateToken() {
       throw new Error('TokenCreated event not found in transaction logs');
     } catch (error) {
       
-      console.error('Error in createToken function:', error);
+      // console.error('Error in createToken function:', error);
       if (error instanceof UserRejectedRequestError) {
         throw error;
       }
