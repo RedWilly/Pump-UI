@@ -9,8 +9,8 @@
 :root {
   --background: #111111;
   --foreground: #ffffff;
-  --primary: #CCFF00;
-  --primary-hover: #B8E600;
+  --primary: #60A5FA;
+  --primary-hover: #4B82EC;
   --card: #222222;
   --card-hover: #2a2a2a;
 }
@@ -45,7 +45,7 @@ body {
   }
 
   .btn-primary {
-    @apply bg-[#CCFF00] text-black px-4 py-2 rounded-lg hover:bg-[#B8E600] transition-colors;
+    @apply bg-[#60A5FA] text-black px-4 py-2 rounded-lg hover:bg-[#4B82EC] transition-colors;
   }
 
   .btn-secondary {

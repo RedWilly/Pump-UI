@@ -3,7 +3,61 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "addLP",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "tokenAddress",
+				"type": "address"
+			}
+		],
+		"name": "buy",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "symbol",
+				"type": "string"
+			}
+		],
+		"name": "create",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
 				"name": "_uniRouter",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_bancorFormula",
+				"type": "address"
+			},
+			{
+				"internalType": "address payable",
+				"name": "_feeRecipient",
 				"type": "address"
 			}
 		],
@@ -17,13 +71,92 @@
 	},
 	{
 		"inputs": [],
-		"name": "IncorrectCreationFee",
+		"name": "InsufficientPoolbalance",
 		"type": "error"
 	},
 	{
 		"inputs": [],
-		"name": "NoFeesToWithdraw",
+		"name": "InvalidLpFeePercentage",
 		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "InvalidRecipient",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "MaxPoolBalanceReached",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "PairCreationFailed",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "tokenAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "tokenAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "sell",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_bancorFormula",
+				"type": "address"
+			}
+		],
+		"name": "setBancorFormula",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address payable",
+				"name": "_newRecipient",
+				"type": "address"
+			}
+		],
+		"name": "setFeeRecipient",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_lpFeePercentage",
+				"type": "uint256"
+			}
+		],
+		"name": "setLpFeePercentage",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -33,6 +166,11 @@
 	{
 		"inputs": [],
 		"name": "TokenDoesNotExist",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "TokenTransferFailed",
 		"type": "error"
 	},
 	{
@@ -186,14 +324,18 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "tokenAddress",
+				"name": "newOwner",
 				"type": "address"
 			}
 		],
-		"name": "buy",
+		"name": "transferOwnership",
 		"outputs": [],
-		"stateMutability": "payable",
+		"stateMutability": "nonpayable",
 		"type": "function"
+	},
+	{
+		"stateMutability": "payable",
+		"type": "receive"
 	},
 	{
 		"inputs": [
@@ -246,19 +388,20 @@
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "symbol",
-				"type": "string"
+				"internalType": "address",
+				"name": "tokenAddress",
+				"type": "address"
 			}
 		],
-		"name": "create",
-		"outputs": [],
-		"stateMutability": "payable",
+		"name": "getCurrentTokenPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -269,7 +412,7 @@
 				"type": "address"
 			}
 		],
-		"name": "getCurrentTokenPrice",
+		"name": "getMarketCap",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -313,31 +456,6 @@
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "tokenAddress",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "sell",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [
 			{
 				"internalType": "uint256",
@@ -372,41 +490,22 @@
 				"type": "address"
 			},
 			{
-				"internalType": "bool",
-				"name": "isListed",
-				"type": "bool"
+				"internalType": "uint256",
+				"name": "tokenbalance",
+				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
 				"name": "ethBalance",
 				"type": "uint256"
+			},
+			{
+				"internalType": "bool",
+				"name": "isListed",
+				"type": "bool"
 			}
 		],
 		"stateMutability": "view",
 		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "withdrawFees",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"stateMutability": "payable",
-		"type": "receive"
 	}
 ]

@@ -1,15 +1,27 @@
 import { formatUnits, parseUnits, maxUint256, decodeEventLog, Log, TransactionReceipt, UserRejectedRequestError } from 'viem';
-import { useReadContract, useWriteContract, useBalance, useWaitForTransactionReceipt, usePublicClient } from 'wagmi';
+import { useReadContract, useWriteContract, useBalance, useWaitForTransactionReceipt, usePublicClient, useAccount } from 'wagmi';
 import BondingCurveManagerABI from '@/abi/BondingCurveManager.json';
 import ERC20ABI from '@/abi/ERC20.json';
 import { useCallback } from 'react';
+import oldTokens from '@/abi/old_token.json';
 
-const BONDING_CURVE_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
-const CREATION_FEE = parseUnits('1', 18);
+// Helper function to determine which contract address to use
+export const getBondingCurveAddress = (tokenAddress?: `0x${string}` | null): `0x${string}` => {
+  if (!tokenAddress) {
+    return process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
+  }
+
+  // Check if token is in old_token.json
+  const isOldToken = oldTokens.includes(tokenAddress) || oldTokens.includes(tokenAddress.toLowerCase());
+  
+  return (isOldToken 
+    ? process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS_OLD 
+    : process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS) as `0x${string}`;
+};
 
 export function useCurrentTokenPrice(tokenAddress: `0x${string}`) {
   const { data, refetch } = useReadContract({
-    address: BONDING_CURVE_MANAGER_ADDRESS,
+    address: getBondingCurveAddress(tokenAddress),
     abi: BondingCurveManagerABI,
     functionName: 'getCurrentTokenPrice',
     args: [tokenAddress],
@@ -25,9 +37,19 @@ export function useTotalSupply(tokenAddress: `0x${string}`) {
   });
 }
 
+export function useMarketCap(tokenAddress: `0x${string}` | null) {
+  const { data, refetch } = useReadContract({
+    address: getBondingCurveAddress(tokenAddress),
+    abi: BondingCurveManagerABI,
+    functionName: 'getMarketCap',
+    args: [tokenAddress],
+  });
+  return { data: data as bigint | undefined, refetch };
+}
+
 export function useTokenLiquidity(tokenAddress: `0x${string}` | null) {
   const { data, refetch } = useReadContract({
-    address: BONDING_CURVE_MANAGER_ADDRESS,
+    address: getBondingCurveAddress(tokenAddress),
     abi: BondingCurveManagerABI,
     functionName: 'tokens',
     args: [tokenAddress],
@@ -37,7 +59,7 @@ export function useTokenLiquidity(tokenAddress: `0x${string}` | null) {
 
 export function useCalcBuyReturn(tokenAddress: `0x${string}`, ethAmount: bigint) {
   const { data, isLoading } = useReadContract({
-    address: BONDING_CURVE_MANAGER_ADDRESS,
+    address: getBondingCurveAddress(tokenAddress),
     abi: BondingCurveManagerABI,
     functionName: 'calculateCurvedBuyReturn',
     args: [tokenAddress, ethAmount],
@@ -47,7 +69,7 @@ export function useCalcBuyReturn(tokenAddress: `0x${string}`, ethAmount: bigint)
 
 export function useCalcSellReturn(tokenAddress: `0x${string}`, tokenAmount: bigint) {
   const { data, isLoading } = useReadContract({
-    address: BONDING_CURVE_MANAGER_ADDRESS,
+    address: getBondingCurveAddress(tokenAddress),
     abi: BondingCurveManagerABI,
     functionName: 'calculateCurvedSellReturn',
     args: [tokenAddress, tokenAmount],
@@ -104,6 +126,7 @@ export function useCreateToken() {
   const { writeContractAsync } = useWriteContract();
   const { data: transactionReceipt, isLoading, isSuccess, isError, error } = useWaitForTransactionReceipt();
   const publicClient = usePublicClient();
+  // const { address } = useAccount();
 
   const createToken = async (name: string, symbol: string, initialPurchaseAmount: bigint) => {
     if (!publicClient) {
@@ -112,13 +135,27 @@ export function useCreateToken() {
 
     try {
       console.log('Initiating token creation transaction...');
-      const totalValue = CREATION_FEE + initialPurchaseAmount;
+      const totalValue = initialPurchaseAmount;
+
+      // // First estimate the gas
+      // const estimatedGas = await publicClient.estimateContractGas({
+      //   address: process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`,
+      //   abi: BondingCurveManagerABI,
+      //   functionName: 'create',
+      //   args: [name, symbol],
+      //   value: totalValue,
+      //   account: address,
+      // });
+
+      // const gasLimit = (estimatedGas);
+
       const hash = await writeContractAsync({
-        address: BONDING_CURVE_MANAGER_ADDRESS,
+        address: process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`,
         abi: BondingCurveManagerABI,
         functionName: 'create',
         args: [name, symbol],
         value: totalValue,
+        // gas: gasLimit
       });
       console.log('Token creation transaction sent. Hash:', hash);
 
@@ -159,7 +196,7 @@ export function useCreateToken() {
       console.log('Transaction confirmed. Receipt:', receipt);
 
       const tokenCreatedLog = receipt.logs.find(log => 
-        log.address.toLowerCase() === BONDING_CURVE_MANAGER_ADDRESS.toLowerCase()
+        log.address.toLowerCase() === (process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`).toLowerCase()
       ) as Log | undefined;
 
       if (tokenCreatedLog) {
@@ -192,13 +229,13 @@ export function useCreateToken() {
   return { createToken, isLoading: isLoading || isSuccess === false , UserRejectedRequestError};
 }
 
-export function useBuyTokens() {
+export function useBuyTokens(tokenAddress?: string) {
   const { writeContractAsync, data, error, isPending } = useWriteContract();
 
   const buyTokens = async (tokenAddress: `0x${string}`, ethAmount: bigint) => {
     try {
       const result = await writeContractAsync({
-        address: BONDING_CURVE_MANAGER_ADDRESS,
+        address: getBondingCurveAddress(tokenAddress),
         abi: BondingCurveManagerABI,
         functionName: 'buy',
         args: [tokenAddress],
@@ -214,13 +251,13 @@ export function useBuyTokens() {
   return { buyTokens, data, error, isPending };
 }
 
-export function useSellTokens() {
+export function useSellTokens(tokenAddress?: string) {
   const { writeContractAsync, data, error, isPending } = useWriteContract();
 
   const sellTokens = async (tokenAddress: `0x${string}`, amount: bigint) => {
     try {
       const result = await writeContractAsync({
-        address: BONDING_CURVE_MANAGER_ADDRESS,
+        address: getBondingCurveAddress(tokenAddress),
         abi: BondingCurveManagerABI,
         functionName: 'sell',
         args: [tokenAddress, amount],
@@ -239,12 +276,13 @@ export function useApproveTokens() {
   const { writeContractAsync, data, error, isPending } = useWriteContract();
 
   const approveTokens = async (tokenAddress: `0x${string}`) => {
+    const bondingCurveAddress = getBondingCurveAddress(tokenAddress);
     try {
       const result = await writeContractAsync({
-        address: tokenAddress,
+        address: tokenAddress,  // The token contract address
         abi: ERC20ABI,
         functionName: 'approve',
-        args: [BONDING_CURVE_MANAGER_ADDRESS, maxUint256],
+        args: [bondingCurveAddress, maxUint256],  // Approve the bonding curve contract
       });
       return result;
     } catch (error) {

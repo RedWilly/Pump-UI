@@ -41,12 +41,12 @@ const FAQPage: React.FC = () => {
           {faqs.map((faq, index) => (
             <div key={index} className="bg-[#222222] rounded-lg overflow-hidden">
               <button
-                className="w-full text-left p-4 sm:p-5 focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:ring-opacity-50 flex justify-between items-center hover:bg-[#2a2a2a] transition-colors"
+                className="w-full text-left p-4 sm:p-5 focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-opacity-50 flex justify-between items-center hover:bg-[#2a2a2a] transition-colors"
                 onClick={() => toggleFAQ(index)}
               >
                 <h3 className="text-sm sm:text-base font-semibold text-white pr-4">{faq.question}</h3>
                 <ChevronDownIcon
-                  className={`w-5 h-5 text-[#CCFF00] transition-transform duration-300 flex-shrink-0 ${
+                  className={`w-5 h-5 text-[#60A5FA] transition-transform duration-300 flex-shrink-0 ${
                     openIndex === index ? 'transform rotate-180' : ''
                   }`}
                 />

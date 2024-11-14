@@ -39,7 +39,7 @@ const AboutPage: React.FC = () => {
               { icon: BeakerIcon, title: "Customization", description: "Various curve shapes allow for different token economics." },
             ].map((item, index) => (
               <div key={index} className="bg-[#222222] rounded-lg p-6 flex flex-col items-center text-center hover:bg-[#2a2a2a] transition-colors">
-                <item.icon className="h-12 w-12 text-[#CCFF00] mb-4" />
+                <item.icon className="h-12 w-12 text-[#60A5FA] mb-4" />
                 <h3 className="text-sm sm:text-base font-semibold text-white mb-2">{item.title}</h3>
                 <p className="text-gray-400 text-xs sm:text-sm">{item.description}</p>
               </div>
@@ -58,7 +58,7 @@ const AboutPage: React.FC = () => {
                 { title: "Flexible Token Economics", description: "Different curve shapes allow for various economic models to suit project needs." },
               ].map((item, index) => (
                 <li key={index} className="flex items-start">
-                  <svg className="h-6 w-6 text-[#CCFF00] mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-6 w-6 text-[#60A5FA] mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <div>

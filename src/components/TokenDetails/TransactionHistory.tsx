@@ -41,7 +41,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 href={`https://shibariumscan.io/address/${tx.senderAddress}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#CCFF00] text-sm transition-colors"
+                className="text-gray-400 hover:text-[#60A5FA] text-sm transition-colors"
               >
                 {shortenAddress(tx.senderAddress)}
               </a>
@@ -55,7 +55,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 href={`https://shibariumscan.io/tx/${tx.txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#CCFF00] text-sm transition-colors"
+                className="text-gray-400 hover:text-[#60A5FA] text-sm transition-colors"
               >
                 {tx.txHash.slice(0, 8)}
               </a>
@@ -101,7 +101,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     href={`https://shibariumscan.io/address/${tx.senderAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#CCFF00]"
+                    className="text-gray-400 hover:text-[#60A5FA]"
                   >
                     {shortenAddress(tx.senderAddress)}
                   </a>
@@ -116,7 +116,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     href={`https://shibariumscan.io/tx/${tx.txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#CCFF00] flex items-center gap-1"
+                    className="text-gray-400 hover:text-[#60A5FA] flex items-center gap-1"
                   >
                     View <ExternalLinkIcon size={12} />
                   </a>
@@ -155,7 +155,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
               onClick={() => handlePageChange(page)}
               className={`px-3 py-1 rounded text-sm ${
                 transactionPage === page
-                  ? 'bg-[#CCFF00] text-black'
+                  ? 'bg-[#60A5FA] text-black'
                   : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
               }`}
             >

@@ -41,7 +41,7 @@ const HowItWorksPopup: React.FC<HowItWorksPopupProps> = ({ isVisible, onClose })
             {steps.map((step, index) => (
               <div key={index} className="flex items-center gap-4">
                 <div className="bg-[#1a1a1a] p-3 rounded-lg">
-                  <step.icon className="h-6 w-6 text-[#CCFF00]" />
+                  <step.icon className="h-6 w-6 text-[#60A5FA]" />
                 </div>
                 <p className="text-gray-400">{step.text}</p>
               </div>
@@ -50,7 +50,7 @@ const HowItWorksPopup: React.FC<HowItWorksPopupProps> = ({ isVisible, onClose })
 
           <button
             onClick={onClose}
-            className="w-full mt-8 py-3 bg-[#CCFF00] text-black rounded-lg font-medium hover:bg-[#B8E600] transition-colors"
+            className="w-full mt-8 py-3 bg-[#60A5FA] text-black rounded-lg font-medium hover:bg-[#4B82EC] transition-colors"
           >
             Got it!
           </button>

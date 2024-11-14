@@ -139,7 +139,7 @@ const Navbar: React.FC = () => {
                 <circle cx="5" cy="19" r="2"/>
                 <path d="M5 17A12 12 0 0 1 17 5"/>
               </svg>
-              <span className="text-[#CCFF00]">Bondle.</span>
+              <span className="text-[#60A5FA]">Bondle.</span>
             </Link>
             <div className="hidden md:flex items-center space-x-4">
               <button 

@@ -42,7 +42,7 @@ const TokenBalanceItem: React.FC<TokenBalanceItemProps> = ({ tokenAddress, symbo
       <p className="text-gray-400 text-[10px] sm:text-xs mt-2">
         Address: 
         <span 
-          className="text-[#CCFF00] hover:underline ml-1 cursor-pointer"
+          className="text-[#60A5FA] hover:underline ml-1 cursor-pointer"
           onClick={handleAddressClick}
         >
           {formatAddressV2(tokenAddress)}
@@ -82,7 +82,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
                 onClick={() => onPageChange(page)}
                 className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
                   currentPage === page
-                    ? 'bg-[#CCFF00] text-black'
+                    ? 'bg-[#60A5FA] text-black'
                     : 'bg-[#222222] text-gray-400 hover:bg-[#2a2a2a]'
                 }`}
               >

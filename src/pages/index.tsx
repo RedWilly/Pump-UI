@@ -217,7 +217,7 @@ const Home: React.FC = () => {
             </button>
             <button 
               onClick={handleLaunchToken}
-              className="w-full bg-[#CCFF00] text-black px-3 sm:px-6 py-2 rounded-full hover:bg-[#B8E600] transition-colors text-xs sm:text-base"
+              className="w-full bg-[#60A5FA] text-black px-3 sm:px-6 py-2 rounded-full hover:bg-[#4B82EC] transition-colors text-xs sm:text-base"
             >
               Launch your token
             </button>
@@ -226,7 +226,61 @@ const Home: React.FC = () => {
 
         <div className="mb-8">
           <SearchFilter onSearch={handleSearch} />
-          <SortOptions onSort={handleSort} currentSort={sort} />
+          <div className="mb-4">
+            <div className="flex flex-col gap-2 md:hidden">
+              <div className="flex justify-center">
+                <SortOptions onSort={handleSort} currentSort={sort} />
+              </div>
+              <div className="flex justify-center items-center gap-2">
+                <span className="text-sm text-gray-400">Live Updates</span>
+                <Switch
+                  checked={showNewTokens}
+                  onCheckedChange={toggleNewTokens}
+                  className={`${
+                    showNewTokens ? 'bg-[#60A5FA]' : 'bg-gray-600'
+                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-offset-2 focus:ring-offset-gray-800`}
+                >
+                  <span
+                    className={`${
+                      showNewTokens ? 'translate-x-6' : 'translate-x-1'
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+                {!showNewTokens && newTokensBuffer.length > 0 && (
+                  <span className="text-xs text-[#60A5FA]">
+                    {newTokensBuffer.length} new {newTokensBuffer.length === 1 ? 'token' : 'tokens'}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="hidden md:flex md:items-center md:justify-between">
+              <div className="flex justify-center flex-grow">
+                <SortOptions onSort={handleSort} currentSort={sort} />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-400">Live Updates</span>
+                <Switch
+                  checked={showNewTokens}
+                  onCheckedChange={toggleNewTokens}
+                  className={`${
+                    showNewTokens ? 'bg-[#60A5FA]' : 'bg-gray-600'
+                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-offset-2 focus:ring-offset-gray-800`}
+                >
+                  <span
+                    className={`${
+                      showNewTokens ? 'translate-x-6' : 'translate-x-1'
+                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                  />
+                </Switch>
+                {!showNewTokens && newTokensBuffer.length > 0 && (
+                  <span className="text-xs text-[#60A5FA]">
+                    {newTokensBuffer.length} new {newTokensBuffer.length === 1 ? 'token' : 'tokens'}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {isLoading ? (

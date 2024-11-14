@@ -7,7 +7,7 @@ interface LoadingBarProps {
 
 const LoadingBar: React.FC<LoadingBarProps> = ({ 
   size = 'medium',
-  color = '#CCFF00'
+  color = '#60A5FA'
 }) => {
   const sizeClasses = {
     small: 'w-32 h-1',

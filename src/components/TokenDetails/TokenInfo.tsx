@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ExternalLinkIcon, Copy } from 'lucide-react';
-import { TokenWithTransactions } from '@/interface/types';
+import { TokenWithTransactions, PriceCache } from '@/interface/types';
 import { formatTimestamp, shortenAddress, formatAddressV2, formatAmount } from '@/utils/blockchainUtils';
-import { Globe, Twitter, Send as Telegram } from 'lucide-react';
-import { useTokenLiquidity, useCurrentTokenPrice } from '@/utils/blockchainUtils';
+import { Globe, Twitter, Send as Telegram, Youtube, MessageCircle as Discord } from 'lucide-react';
+import { useTokenLiquidity, useCurrentTokenPrice, useMarketCap, formatAmountV2 } from '@/utils/blockchainUtils';
 import { formatUnits } from 'viem';
 import { toast } from 'react-toastify';
+import { getCurrentPrice } from '@/utils/api';
 
 interface TokenInfoProps {
   tokenInfo: TokenWithTransactions;
@@ -14,18 +15,57 @@ interface TokenInfoProps {
   liquidityEvents?: any;
 }
 
+// Add cache duration constant (5 minutes)
+// Add price cache outside component to share across instances
+const CACHE_DURATION = 5 * 60 * 1000;
+let priceCache: PriceCache | null = null;
+
 const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, refreshTrigger = 0, liquidityEvents }) => {
+  const [flrPrice, setFlrPrice] = useState<string>('0');
   const tokenAddress = tokenInfo?.address as `0x${string}`;
   const shouldFetchLiquidity = !liquidityEvents?.liquidityEvents?.length;
   const { data: liquidityData, refetch: refetchLiquidity } = useTokenLiquidity(shouldFetchLiquidity ? tokenAddress : null);
   const { data: currentPrice, refetch: refetchPrice } = useCurrentTokenPrice(tokenAddress);
+  const { data: marketCap, refetch: refetchMarketCap } = useMarketCap(tokenAddress);
+
+  useEffect(() => {
+    const fetchFlrPrice = async () => {
+      try {
+        // Check if we have a valid cached price
+        if (priceCache && Date.now() - priceCache.timestamp < CACHE_DURATION) {
+          setFlrPrice(priceCache.price);
+          return;
+        }
+
+        // If no valid cache, fetch new price
+        const price = await getCurrentPrice();
+        
+        // Update cache
+        priceCache = {
+          price,
+          timestamp: Date.now()
+        };
+        
+        setFlrPrice(price);
+      } catch (error) {
+        console.error('Error fetching FLR price:', error);
+      }
+    };
+
+    fetchFlrPrice();
+    const interval = setInterval(fetchFlrPrice, 60000); // Still check every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
 
   useEffect(() => {
     if (shouldFetchLiquidity) {
       refetchLiquidity();
     }
     refetchPrice();
-  }, [refreshTrigger, refetchLiquidity, refetchPrice, shouldFetchLiquidity]);
+    refetchMarketCap();
+  }, [refreshTrigger, refetchLiquidity, refetchPrice, refetchMarketCap, shouldFetchLiquidity]);
 
   const isCompleted = liquidityEvents?.liquidityEvents?.length > 0;
 
@@ -41,6 +81,17 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
   const truncateDescription = (description: string, maxLength: number = 100) => {
     if (description.length <= maxLength) return description;
     return `${description.slice(0, maxLength)}...`;
+  };
+
+  const formatUsdValue = (flrAmount: string): string => {
+    const flrValue = parseFloat(formatAmountV2(flrAmount));
+    const usdValue = flrValue * parseFloat(flrPrice);
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(usdValue);
   };
 
   const TokenDetails = () => (
@@ -70,6 +121,24 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
           label="Current Price" 
           value={currentPrice ? `${formatAmount(currentPrice.toString())} BONE` : 'Loading...'}
         />
+      </div>
+
+      {/* Updated Market Cap to show only USD value */}
+      <div className="bg-[#1a1a1a] p-3 rounded-lg text-center">
+        <div className="text-xs text-gray-400 mb-1">Market Cap</div>
+          <div className="text-sm text-white">
+            {marketCap ? (
+            //   <>
+            //   <div>{formatAmountV2(marketCap.toString())} FLR</div>
+            //   <div className="text-gray-400 text-xs mt-1">
+            //     {formatUsdValue(marketCap.toString())}
+            //   </div>
+            // </>
+              formatUsdValue(marketCap.toString())
+            ) : (
+              'Loading...'
+            )}
+        </div>
       </div>
     </div>
   );
@@ -110,7 +179,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   href={tokenInfo.website} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-gray-400 hover:text-[#CCFF00] transition-colors"
+                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
                 >
                   <Globe size={24} />
                 </a>
@@ -120,7 +189,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   href={tokenInfo.twitter} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-gray-400 hover:text-[#CCFF00] transition-colors"
+                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
                 >
                   <Twitter size={24} />
                 </a>
@@ -130,9 +199,29 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   href={tokenInfo.telegram} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-gray-400 hover:text-[#CCFF00] transition-colors"
+                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
                 >
                   <Telegram size={24} />
+                </a>
+              )}
+              {tokenInfo.discord && (
+                <a 
+                  href={tokenInfo.discord} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
+                >
+                  <Discord size={24} />
+                </a>
+              )}
+              {tokenInfo.youtube && (
+                <a 
+                  href={tokenInfo.youtube} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
+                >
+                  <Youtube size={24} />
                 </a>
               )}
             </div>
@@ -163,20 +252,32 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
               <div className="flex gap-3 mt-4">
                 {tokenInfo.website && (
                   <a href={tokenInfo.website} target="_blank" rel="noopener noreferrer" 
-                    className="text-gray-400 hover:text-[#CCFF00]">
+                    className="text-gray-400 hover:text-[#60A5FA]">
                     <Globe size={20} />
                   </a>
                 )}
                 {tokenInfo.twitter && (
                   <a href={tokenInfo.twitter} target="_blank" rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#CCFF00]">
+                    className="text-gray-400 hover:text-[#60A5FA]">
                     <Twitter size={20} />
                   </a>
                 )}
                 {tokenInfo.telegram && (
                   <a href={tokenInfo.telegram} target="_blank" rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#CCFF00]">
+                    className="text-gray-400 hover:text-[#60A5FA]">
                     <Telegram size={20} />
+                  </a>
+                )}
+                {tokenInfo.discord && (
+                  <a href={tokenInfo.discord} target="_blank" rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-[#60A5FA]">
+                    <Discord size={20} />
+                  </a>
+                )}
+                {tokenInfo.youtube && (
+                  <a href={tokenInfo.youtube} target="_blank" rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-[#60A5FA]">
+                    <Youtube size={20} />
                   </a>
                 )}
               </div>
@@ -188,7 +289,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
         <div className="bg-[#1a1a1a] p-4 rounded-lg">
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-400">Progress to DEX</span>
-            <span className={isCompleted ? "text-[#CCFF00]" : "text-white"}>
+            <span className={isCompleted ? "text-[#60A5FA]" : "text-white"}>
               {isCompleted 
                 ? 'Completed' 
                 : liquidityData && liquidityData[2] 
@@ -198,7 +299,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
           </div>
           <div className="w-full bg-[#333333] rounded-full h-2.5">
             <div
-              className="bg-[#CCFF00] h-2.5 rounded-full transition-all duration-500"
+              className="bg-[#60A5FA] h-2.5 rounded-full transition-all duration-500"
               style={{ 
                 width: isCompleted 
                   ? '100%' 
@@ -234,7 +335,7 @@ const InfoItem: React.FC<{
             href={link} 
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
-            className="hover:text-[#CCFF00] transition-colors flex items-center gap-1"
+            className="hover:text-[#60A5FA] transition-colors flex items-center gap-1"
           >
             {value}
             {isExternal && <ExternalLinkIcon size={12} />}
@@ -242,7 +343,7 @@ const InfoItem: React.FC<{
           {copyValue && (
             <button
               onClick={() => copyToClipboard(copyValue)}
-              className="text-gray-400 hover:text-[#CCFF00] transition-colors"
+              className="text-gray-400 hover:text-[#60A5FA] transition-colors"
             >
               <Copy size={12} />
             </button>

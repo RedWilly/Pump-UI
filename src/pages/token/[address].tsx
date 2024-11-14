@@ -22,9 +22,9 @@ import {
   useTokenAllowance,
   useApproveTokens,
   formatAmountV2,
+  getBondingCurveAddress,
 } from '@/utils/blockchainUtils';
 import { getTokenInfoAndTransactions, getTokenUSDPriceHistory, getTokenHolders, getTokenLiquidityEvents } from '@/utils/api';
-import { formatTimestamp, formatAmount } from '@/utils/blockchainUtils';
 import { parseUnits, formatUnits } from 'viem';
 import { useAccount, useWaitForTransactionReceipt } from 'wagmi';
 import { useDebounce } from 'use-debounce';
@@ -41,8 +41,6 @@ import TokenInfo from '@/components/TokenDetails/TokenInfo';
 import Chats from '@/components/TokenDetails/Chats';
 // import OGPreview from '@/components/OGPreview'
 
-
-const BONDING_CURVE_MANAGER_ADDRESS = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
 
 interface TokenDetailProps {
   initialTokenInfo: TokenWithTransactions;
@@ -96,7 +94,11 @@ interface TokenDetailProps {
   const { data: sellReturnData, isLoading: isSellCalculating } = useCalcSellReturn(address as `0x${string}`, parseUnits(debouncedFromAmount || '0', 18));
 
   const { ethBalance: fetchedEthBalance, tokenBalance: fetchedTokenBalance, refetch: refetchUserBalance } = useUserBalance(userAddress as `0x${string}`, address as `0x${string}`);
-  const { data: tokenAllowance } = useTokenAllowance(address as `0x${string}`, userAddress as `0x${string}`, BONDING_CURVE_MANAGER_ADDRESS);
+  const { data: tokenAllowance } = useTokenAllowance(
+    address as `0x${string}`, 
+    userAddress as `0x${string}`, 
+    getBondingCurveAddress(address as `0x${string}`)
+  );
 
   const { buyTokens } = useBuyTokens();
   const { sellTokens } = useSellTokens();
@@ -310,6 +312,23 @@ interface TokenDetailProps {
     toast.success('Copied');
   };
 
+  const handleMaxClick = () => {
+    if (isSwapped) {
+      // For token balance, use the exact balance without formatting
+      if (fetchedTokenBalance) {
+        const exactTokenBalance = formatUnits(fetchedTokenBalance, 18);
+        setFromToken(prev => ({ ...prev, amount: exactTokenBalance }));
+      }
+    } else {
+      // For ETH balance, use 95% of the balance to reserve for gas
+      if (fetchedEthBalance) {
+        const exactEthBalance = formatUnits(fetchedEthBalance, 18);
+        const maxEthAmount = (parseFloat(exactEthBalance) * 0.95).toString();
+        setFromToken(prev => ({ ...prev, amount: maxEthAmount }));
+      }
+    }
+  };
+
   if (!tokenInfo) {
     return (
       <Layout>
@@ -319,13 +338,6 @@ interface TokenDetailProps {
       </Layout>
     );
   }
-
-  // const calculateProgress = (currentLiquidity: bigint): number => {
-  //   const liquidityInEth = parseFloat(formatUnits(currentLiquidity, 18));
-  //   const target = Number(process.env.NEXT_PUBLIC_DEX_TARGET);
-  //   const progress = (liquidityInEth / target) * 100;
-  //   return Math.min(progress, 100);
-  // };
 
   return (
     <Layout>
@@ -378,6 +390,12 @@ interface TokenDetailProps {
                       placeholder="0.00"
                       disabled={isTransacting}
                     />
+                    <button
+                      onClick={handleMaxClick}
+                      className="text-xs text-[#60A5FA] hover:text-[#4B82EC] font-medium px-2 py-1 rounded transition-colors"
+                    >
+                      MAX
+                    </button>
                     <span className="text-gray-400 ml-2">{fromToken.symbol}</span>
                   </div>
                 </div>
@@ -385,7 +403,7 @@ interface TokenDetailProps {
                 {/* Swap Button */}
                 <button 
                   onClick={handleSwap}
-                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[#CCFF00]"
+                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[#60A5FA]"
                 >
                   <ArrowUpDownIcon size={20} />
                 </button>
@@ -414,7 +432,7 @@ interface TokenDetailProps {
                 <button
                   onClick={handleAction}
                   disabled={!fromToken.amount || isCalculating || isTransacting}
-                  className="w-full py-3 bg-[#CCFF00] text-black rounded-lg font-medium hover:bg-[#B8E600] 
+                  className="w-full py-3 bg-[#60A5FA] text-black rounded-lg font-medium hover:bg-[#4B82EC] 
                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isTransacting ? 'Processing...' : actionButtonText}
@@ -502,6 +520,12 @@ interface TokenDetailProps {
                       placeholder="0.00"
                       disabled={isTransacting}
                     />
+                    <button
+                      onClick={handleMaxClick}
+                      className="text-xs text-[#60A5FA] hover:text-[#4B82EC] font-medium px-2 py-1 rounded transition-colors"
+                    >
+                      MAX
+                    </button>
                     <span className="text-gray-400 ml-2">{fromToken.symbol}</span>
                   </div>
                 </div>
@@ -509,7 +533,7 @@ interface TokenDetailProps {
                 {/* Swap Button */}
                 <button 
                   onClick={handleSwap}
-                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[#CCFF00]"
+                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[#60A5FA]"
                 >
                   <ArrowUpDownIcon size={20} />
                 </button>
@@ -538,7 +562,7 @@ interface TokenDetailProps {
                 <button
                   onClick={handleAction}
                   disabled={!fromToken.amount || isCalculating || isTransacting}
-                  className="w-full py-3 bg-[#CCFF00] text-black rounded-lg font-medium hover:bg-[#B8E600] 
+                  className="w-full py-3 bg-[#60A5FA] text-black rounded-lg font-medium hover:bg-[#4B82EC] 
                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isTransacting ? 'Processing...' : actionButtonText}
@@ -557,7 +581,9 @@ interface TokenDetailProps {
             totalPages={Math.ceil(tokenHolders.length / holdersPerPage)}
             tokenSymbol={tokenInfo.symbol}
             creatorAddress={tokenInfo.creatorAddress}
+            tokenAddress={address as string}
             onPageChange={paginate}
+            allHolders={tokenHolders}
           />
         </div>
       </div>

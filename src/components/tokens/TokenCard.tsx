@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Token, TokenWithLiquidityEvents } from '@/interface/types';
 import { useTokenLiquidity, formatTimestampV1, formatTimestamp, formatAmountV2 } from '@/utils/blockchainUtils';
 import { useRouter } from 'next/router';
-import { Globe, Twitter, Send as Telegram, Clock } from 'lucide-react';
+import { Globe, Twitter, Send as Telegram, Clock, Youtube, MessageCircle as Discord } from 'lucide-react';
 import LoadingBar from '@/components/ui/LoadingBar';
 
 interface TokenCardProps {
@@ -21,17 +21,20 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) =
 
   useEffect(() => {
     if (shouldFetchLiquidity && liquidityData && liquidityData[2]) {
-      setCurrentLiquidity(liquidityData[2].toString());
+      const liquidityValue = liquidityData[2].toString();
+      setCurrentLiquidity(liquidityValue);
     }
-  }, [liquidityData, shouldFetchLiquidity]);
+  }, [liquidityData, shouldFetchLiquidity, token]);
 
   const calculateProgress = (liquidity: string): number => {
     if (token._count?.liquidityEvents > 0) {
       return 100;
     }
-    const currentValue = parseFloat(formatAmountV2(liquidity));
+    // Convert from Wei to Ether (divide by 10^18)
+    const currentValue = Number(liquidity) / 10**18;
     const target = Number(process.env.NEXT_PUBLIC_DEX_TARGET);
-    return Math.min((currentValue / target) * 100, 100);
+    const percentage = (currentValue / target) * 100;
+    return Math.min(percentage, 100);
   };
 
   const progress = calculateProgress(currentLiquidity);
@@ -72,6 +75,28 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) =
           <Telegram size={16} />
         </a>
       )}
+      {token.discord && (
+        <a 
+          href={token.discord} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-gray-400 hover:text-white"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Discord size={16} />
+        </a>
+      )}
+      {token.youtube && (
+        <a 
+          href={token.youtube} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-gray-400 hover:text-white"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Youtube size={16} />
+        </a>
+      )}
     </div>
   );
 
@@ -106,11 +131,11 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) =
             <div className="space-y-3 mb-4">
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-400">Progress to DEX</span>
-                <span className="text-[#CCFF00]">Completed</span>
+                <span className="text-[#60A5FA]">Completed</span>
               </div>
               <div className="w-full bg-[#333333] rounded-full h-2">
                 <div
-                  className="bg-[#CCFF00] h-2 rounded-full transition-all duration-500 w-full"
+                  className="bg-[#60A5FA] h-2 rounded-full transition-all duration-500 w-full"
                 />
               </div>
             </div>
@@ -120,7 +145,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) =
                 href={uniswapLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 text-center py-2 text-sm bg-[#CCFF00] text-black rounded-md hover:bg-[#B8E600] transition-colors"
+                className="flex-1 text-center py-2 text-sm bg-[#60A5FA] text-black rounded-md hover:bg-[#4B82EC] transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
                 Trade
@@ -169,24 +194,24 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) =
               <div className="space-y-2">
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-gray-400">Progress to DEX</span>
-                  <span className={`${isCompleted ? 'text-[#CCFF00]' : 'text-white'}`}>
+                  <span className={`${isCompleted ? 'text-[#60A5FA]' : 'text-white'}`}>
                     {isCompleted ? 'Completed' : `${progress.toFixed(1)}%`}
                   </span>
                 </div>
                 <div className="w-full bg-[#333333] rounded-full h-2">
                   <div
-                    className="bg-[#CCFF00] h-2 rounded-full transition-all duration-500"
+                    className="bg-[#60A5FA] h-2 rounded-full transition-all duration-500"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
               </div>
             </div>
 
-            <button 
-              className="w-full py-2 text-sm bg-[#CCFF00] text-black rounded-md hover:bg-[#B8E600] transition-colors mt-4"
+            {/* <button 
+              className="w-full py-2 text-sm bg-[#60A5FA] text-black rounded-md hover:bg-[#4B82EC] transition-colors mt-4"
             >
               View Details
-            </button>
+            </button> */}
           </div>
         </div>
       </Link>

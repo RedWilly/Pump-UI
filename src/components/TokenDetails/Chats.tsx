@@ -137,7 +137,7 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
                       <span className="text-xs sm:text-sm font-medium text-gray-300">
                         {shortenAddress(message.user)}
                         {message.user.toLowerCase() === tokenInfo.creatorAddress.toLowerCase() && 
-                          <span className="ml-1 text-[#CCFF00] text-[10px] sm:text-xs">(dev)</span>
+                          <span className="ml-1 text-[#60A5FA] text-[10px] sm:text-xs">(dev)</span>
                         }
                       </span>
                       <span className="text-[10px] sm:text-xs text-gray-500">{formatTimestamp(message.timestamp)}</span>
@@ -145,7 +145,7 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
                     <p className="text-xs sm:text-sm text-gray-200 mt-0.5 sm:mt-1 break-words">{message.message}</p>
                     <button
                       onClick={() => handleReply(message)}
-                      className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-400 hover:text-[#CCFF00] flex items-center gap-0.5 sm:gap-1"
+                      className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-400 hover:text-[#60A5FA] flex items-center gap-0.5 sm:gap-1"
                     >
                       <Reply size={10} className="sm:w-3 sm:h-3" />
                       Reply
@@ -162,7 +162,7 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
         {replyingTo && (
           <div className="flex items-center justify-between bg-[#222222] p-1.5 sm:p-2 rounded-lg text-xs sm:text-sm">
             <span className="text-gray-400">
-              Replying to <span className="text-[#CCFF00]">{shortenAddress(replyingTo.user)}</span>
+              Replying to <span className="text-[#60A5FA]">{shortenAddress(replyingTo.user)}</span>
             </span>
             <button
               type="button"
@@ -179,12 +179,12 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-grow bg-[#1a1a1a] text-white rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#CCFF00]"
+            className="flex-grow bg-[#1a1a1a] text-white rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#60A5FA]"
           />
           <button
             type="submit"
             disabled={!newMessage.trim()}
-            className="bg-[#CCFF00] text-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-[#B8E600] transition-colors disabled:opacity-50"
+            className="bg-[#60A5FA] text-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-[#4B82EC] transition-colors disabled:opacity-50"
           >
             Send
           </button>

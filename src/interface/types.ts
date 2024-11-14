@@ -89,3 +89,8 @@ export interface TokenHolder {
 export interface TransactionResponse extends Omit<PaginatedResponse<Transaction>, 'data'> {
   transactions: Transaction[];
 }
+
+export interface PriceCache {
+  price: string;
+  timestamp: number;
+}

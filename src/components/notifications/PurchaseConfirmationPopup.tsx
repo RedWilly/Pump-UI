@@ -28,13 +28,14 @@ const PurchaseConfirmationPopup: React.FC<PurchaseConfirmationPopupProps> = ({ o
         </button>
         <h2 className="text-sm font-bold text-white mb-2">How many {tokenSymbol} do you want to buy? - amount in Bone</h2>
         <p className="text-[10px] sm:text-xs text-gray-400 mb-3 italic leading-tight">
-          Tip: It&apos;s optional, but buying a small amount helps protect your coin from snipers
+          Tip: It&apos;s optional, but buying a small amount helps protect your coin from snipers. 
+          When creating, creators can buy up to 5% of the trading supply; any excess BONE is refunded.
         </p>
         <input
           type="number"
           value={purchaseAmount}
           onChange={(e) => setPurchaseAmount(e.target.value)}
-          className="w-full py-2 px-3 bg-[#1a1a1a] border border-[#333333] rounded-md text-white mb-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#CCFF00] focus:border-[#CCFF00] transition-colors"
+          className="w-full py-2 px-3 bg-[#1a1a1a] border border-[#333333] rounded-md text-white mb-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:border-[#60A5FA] transition-colors"
           placeholder={`0.0 (optional)`}
         />
         <div className="flex justify-end space-x-3 mb-3">
@@ -46,13 +47,13 @@ const PurchaseConfirmationPopup: React.FC<PurchaseConfirmationPopupProps> = ({ o
           </button>
           <button 
             onClick={handleConfirm} 
-            className="px-3 py-1.5 bg-[#CCFF00] text-black rounded-md text-xs sm:text-sm hover:bg-[#B8E600] transition-colors"
+            className="px-3 py-1.5 bg-[#60A5FA] text-black rounded-md text-xs sm:text-sm hover:bg-[#4B82EC] transition-colors"
           >
             Confirm
           </button>
         </div>
         <p className="text-[8px] sm:text-xs text-gray-400 text-center">
-          Cost to deploy: ~1 BONE
+          Cost to deploy: ~0 BONE
         </p>
       </div>
     </div>

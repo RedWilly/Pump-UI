@@ -59,7 +59,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, currentPage, totalPages, 
                 onClick={() => onPageChange(page)}
                 className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
                   currentPage === page
-                    ? 'bg-[#CCFF00] text-black'
+                    ? 'bg-[#60A5FA] text-black'
                     : 'bg-[#222222] text-gray-400 hover:bg-[#2a2a2a]'
                 }`}
               >
