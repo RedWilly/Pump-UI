@@ -81,7 +81,31 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, liquidityEvents, tokenInf
         wickDownColor: '#ef5350'
       });
 
-      const enhancedChartData = enhanceSmallCandles(data);
+      //const enhancedChartData = enhanceSmallCandles(data);
+
+      // Sort and deduplicate data
+      const sortedData = [...data].sort((a, b) => {
+        if (a.time === b.time) {
+          // For same timestamps, maintain original order
+          return data.indexOf(a) - data.indexOf(b);
+        }
+        return a.time - b.time;
+      });
+
+      // Remove duplicates by slightly incrementing timestamps
+      const processedData = sortedData.reduce((acc: ChartDataPoint[], curr, idx) => {
+        if (idx > 0 && curr.time === acc[acc.length - 1].time) {
+          // Add 1 second to duplicate timestamps
+          curr = { ...curr, time: curr.time + 1 };
+        }
+        acc.push(curr);
+        return acc;
+      }, []);
+
+      const enhancedChartData = enhanceSmallCandles(processedData);
+      // TODO: add different chart types (bars, line, area, etc)
+
+    
       candleSeries.setData(enhancedChartData.map(item => ({
         time: item.time as Time,
         open: item.open,

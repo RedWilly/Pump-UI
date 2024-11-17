@@ -94,7 +94,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ tokenInfo, isOpen, onClose }) =
         </div>
         <div className="flex items-center justify-center mb-4 sm:mb-6">
           <img 
-            src={tokenInfo.logo} 
+            src={tokenInfo.logo || '/chats/noimg.svg'} 
             alt={`${tokenInfo.name} logo`} 
             className="w-12 h-12 sm:w-16 sm:h-16 rounded-full"
           />

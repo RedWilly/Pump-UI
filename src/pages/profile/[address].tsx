@@ -268,7 +268,7 @@ const ProfilePage: React.FC = () => {
                       onClick={() => handleTokenClick(token.address)}
                     >
                       {token.logo && (
-                        <img src={token.logo} alt={`${token.name} logo`} className="w-16 h-16 mr-3 sm:mr-4 rounded-lg" />
+                        <img  src={token.logo || '/chats/noimg.svg'} alt={`${token.name} logo`} className="w-16 h-16 mr-3 sm:mr-4 rounded-lg" />
                       )}
                       <div>
                         <h3 className="text-xs sm:text-sm font-semibold text-white mb-1">

@@ -7,6 +7,7 @@ import { useTokenLiquidity, useCurrentTokenPrice, useMarketCap, formatAmountV2 }
 import { formatUnits } from 'viem';
 import { toast } from 'react-toastify';
 import { getCurrentPrice } from '@/utils/api';
+import Image from 'next/image';
 
 interface TokenInfoProps {
   tokenInfo: TokenWithTransactions;
@@ -151,7 +152,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
           {/* Full-width image container for mobile */}
           <div className="w-full h-[200px] mb-4 bg-[#1a1a1a] rounded-b-xl overflow-hidden">
             <img 
-              src={tokenInfo.logo} 
+              src={tokenInfo.logo || '/chats/noimg.svg'} 
               alt={tokenInfo.name} 
               className="w-full h-full object-cover"
             />
@@ -232,7 +233,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
         <div className="hidden lg:block">
           <div className="flex items-start gap-4">
             <img 
-              src={tokenInfo.logo} 
+              src={tokenInfo.logo || '/chats/noimg.svg'} 
               alt={tokenInfo.name} 
               className="w-24 h-24 rounded-lg"
             />

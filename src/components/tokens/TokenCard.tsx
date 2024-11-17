@@ -114,7 +114,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) =
             <div className="flex gap-4 mb-4">
               <div className="w-24 h-24 flex-shrink-0">
                 <img 
-                  src={token.logo} 
+                  src={token.logo || '/chats/noimg.svg'} 
                   alt={token.name} 
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -170,7 +170,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) =
           <div className="flex gap-4 mb-4">
             <div className="w-24 h-24 flex-shrink-0">
               <img 
-                src={token.logo} 
+                src={token.logo || '/chats/noimg.svg'} 
                 alt={token.name} 
                 className="w-full h-full object-cover rounded-lg"
               />
