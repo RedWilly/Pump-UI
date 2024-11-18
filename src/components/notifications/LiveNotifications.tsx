@@ -5,6 +5,7 @@ import { formatAmountV2 } from '@/utils/blockchainUtils';
 
 interface Notification {
   message: string;
+  secondPart: string;
   type: 'buy' | 'sell' | 'tokenCreated';
   logo?: string;
 }
@@ -23,25 +24,29 @@ const LiveNotifications: React.FC = () => {
     switch (data.type) {
       case 'buy':
         return {
-          message: `${addressEnd} Bought ${formatAmountV2(data.data.tokenAmount)} ${data.data.symbol} with ${formatAmountV2(data.data.ethAmount)} BONE`,
+          message: `${addressEnd} Bought ${formatAmountV2(data.data.tokenAmount)} ${data.data.symbol}`,
+          secondPart: `with ${formatAmountV2(data.data.ethAmount)} BONE`,
           type: 'buy',
           logo: data.data.logo
         };
       case 'sell':
         return {
-          message: `${addressEnd} Sold ${formatAmountV2(data.data.tokenAmount)} ${data.data.symbol} for ${formatAmountV2(data.data.ethAmount)} BONE`,
+          message: `${addressEnd} Sold ${formatAmountV2(data.data.tokenAmount)} ${data.data.symbol}`,
+          secondPart: `for ${formatAmountV2(data.data.ethAmount)} BONE`,
           type: 'sell',
           logo: data.data.logo
         };
       case 'tokenCreated':
         return {
-          message: `${data.data.symbol} Created by ${addressEnd}`,
+          message: `${data.data.symbol}`,
+          secondPart: `Created by ${addressEnd}`,
           type: 'tokenCreated',
           logo: data.data.logo
         };
       default:
         return {
           message: 'New activity',
+          secondPart: '',
           type: 'buy',
           logo: undefined
         };
@@ -122,16 +127,21 @@ const LiveNotifications: React.FC = () => {
     <div className="bg-[#222222] text-white py-1 overflow-hidden sticky top-0 z-50 border-b border-[#333333]">
       <div ref={containerRef} className="flex whitespace-nowrap items-center">
         <div className="flex items-center space-x-2 mx-3">
-          <span className="text-xs font-medium text-gray-400">{currentNotification.message}</span>
-          {currentNotification.logo && (
-            <Image
-              src={currentNotification.logo}
-              alt="Token Logo"
-              width={12}
-              height={12}
-              className="rounded-full"
-            />
-          )}
+          <span className="text-xs font-medium text-gray-400">
+            {currentNotification.message}
+            {currentNotification.logo && (
+              <span className="inline-flex items-center mx-1">
+                <Image
+                  src={currentNotification.logo}
+                  alt="Token Logo"
+                  width={12}
+                  height={12}
+                  className="rounded-full"
+                />
+              </span>
+            )}
+            {currentNotification.secondPart}
+          </span>
         </div>
       </div>
     </div>
