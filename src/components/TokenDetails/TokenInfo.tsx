@@ -84,9 +84,21 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
     return `${description.slice(0, maxLength)}...`;
   };
 
+  // const formatUsdValue = (flrAmount: string): string => {
+  //   const flrValue = parseFloat(formatAmountV2(flrAmount));
+  //   const usdValue = flrValue * parseFloat(flrPrice);
+  //   return new Intl.NumberFormat('en-US', {
+  //     style: 'currency',
+  //     currency: 'USD',
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2
+  //   }).format(usdValue);
+  // };
+
   const formatUsdValue = (flrAmount: string): string => {
-    const flrValue = parseFloat(formatAmountV2(flrAmount));
+    const flrValue = Number(flrAmount) / 10**18;
     const usdValue = flrValue * parseFloat(flrPrice);
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
