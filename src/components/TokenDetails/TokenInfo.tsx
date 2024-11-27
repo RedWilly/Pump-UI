@@ -16,8 +16,8 @@ interface TokenInfoProps {
   liquidityEvents?: any;
 }
 
-// Add cache duration constant (5 minutes)
-// Add price cache outside component to share across instances
+// cache duration constant (5 minutes)
+// price cache outside component to share across instances
 const CACHE_DURATION = 5 * 60 * 1000;
 let priceCache: PriceCache | null = null;
 
@@ -83,17 +83,6 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
     if (description.length <= maxLength) return description;
     return `${description.slice(0, maxLength)}...`;
   };
-
-  // const formatUsdValue = (flrAmount: string): string => {
-  //   const flrValue = parseFloat(formatAmountV2(flrAmount));
-  //   const usdValue = flrValue * parseFloat(flrPrice);
-  //   return new Intl.NumberFormat('en-US', {
-  //     style: 'currency',
-  //     currency: 'USD',
-  //     minimumFractionDigits: 2,
-  //     maximumFractionDigits: 2
-  //   }).format(usdValue);
-  // };
 
   const formatUsdValue = (flrAmount: string): string => {
     const flrValue = Number(flrAmount) / 10**18;

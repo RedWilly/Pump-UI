@@ -20,6 +20,28 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
 }) => {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
+  const getPaginationRange = (current: number, total: number) => {
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    if (current <= 2) {
+      return [1, 2, 3, '...', total];
+    }
+
+    if (current >= total - 1) {
+      return [1, '...', total - 2, total - 1, total];
+    }
+
+    return [
+      1,
+      '...',
+      current,
+      '...',
+      total
+    ];
+  };
+
   // Desktop view table
   const DesktopTable = () => (
     <table className="w-full text-left hidden md:table">
@@ -149,18 +171,23 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           >
             <ChevronLeftIcon size={20} />
           </button>
-          {Array.from({ length: totalTransactionPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`px-3 py-1 rounded text-sm ${
-                transactionPage === page
-                  ? 'bg-[#60A5FA] text-black'
-                  : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
-              }`}
-            >
-              {page}
-            </button>
+          {getPaginationRange(transactionPage, totalTransactionPages).map((page, index) => (
+            <React.Fragment key={index}>
+              {page === '...' ? (
+                <span className="px-3 py-1 text-gray-400">...</span>
+              ) : (
+                <button
+                  onClick={() => handlePageChange(page as number)}
+                  className={`px-3 py-1 rounded text-sm ${
+                    transactionPage === page
+                      ? 'bg-[#F53669] text-black'
+                      : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
+                  }`}
+                >
+                  {page}
+                </button>
+              )}
+            </React.Fragment>
           ))}
           <button
             onClick={() => handlePageChange(transactionPage + 1)}

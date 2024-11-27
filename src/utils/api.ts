@@ -14,10 +14,28 @@ export async function getAllTokens(page: number = 1, pageSize: number = 13): Pro
   return response.data;
 }
 
-export async function getAllTokensTrends(page: number = 1, pageSize: number = 13): Promise<PaginatedResponse<Token>> {
-  const response = await axios.get(`${API_BASE_URL}/api/tokens/trending`, {
-    params: { page, pageSize }
+export async function getAllTokensTrends(): Promise<Token[]> {
+  const response = await axios.get(`${API_BASE_URL}/api/tokens/trending`);
+  return response.data;
+}
+
+//GET /api/volume/total
+export async function getTotalVolume(): Promise<{ totalVolume: number }> {
+  const response = await axios.get(`${API_BASE_URL}/api/volume/total`);
+  return response.data;
+}
+
+//GET /api/volume/range?hours=24
+export async function getVolumeRange(hours: number): Promise<{ totalVolume: number }> {
+  const response = await axios.get(`${API_BASE_URL}/api/volume/range`, {
+    params: { hours }
   });
+  return response.data;
+}
+
+//GET /api/tokens/total-count
+export async function getTotalTokenCount(): Promise<{ totalTokens: number }> {
+  const response = await axios.get(`${API_BASE_URL}/api/tokens/total-count`);
   return response.data;
 }
 

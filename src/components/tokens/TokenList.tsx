@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import TokenCard from './TokenCard';
 import { Token, TokenWithLiquidityEvents } from '@/interface/types';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
 import LoadingBar from '@/components/ui/LoadingBar';
+import { SortOption } from '../ui/SortOptions';
 
 interface TokenListProps {
   tokens: (Token | TokenWithLiquidityEvents)[];
@@ -11,11 +12,28 @@ interface TokenListProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   isEnded: boolean;
+  sortType: SortOption;
+  itemsPerPage: number;
+  isFullList?: boolean;
 }
 
-const TokenList: React.FC<TokenListProps> = ({ tokens, currentPage, totalPages, onPageChange, isEnded }) => {
+interface TokenLiquidityData {
+  [key: string]: bigint;
+}
+
+const TokenList: React.FC<TokenListProps> = ({ 
+  tokens, 
+  currentPage, 
+  totalPages, 
+  onPageChange, 
+  isEnded,
+  sortType,
+  itemsPerPage,
+  isFullList
+}) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [liquidityData, setLiquidityData] = useState<TokenLiquidityData>({});
 
   const handleTokenClick = async (tokenAddress: string) => {
     setIsLoading(true);
@@ -23,15 +41,45 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, currentPage, totalPages, 
     setIsLoading(false);
   };
 
+  const updateLiquidityData = (tokenAddress: string, amount: bigint) => {
+    setLiquidityData(prev => ({
+      ...prev,
+      [tokenAddress]: amount
+    }));
+  };
+
+    // Sort and paginate tokens
+    const displayTokens = useMemo(() => {
+      let sortedTokens = [...tokens];
+      
+      if (sortType === 'marketcap') {
+        sortedTokens.sort((a, b) => {
+          const liquidityA = liquidityData[a.address] || BigInt(0);
+          const liquidityB = liquidityData[b.address] || BigInt(0);
+          return liquidityB > liquidityA ? 1 : -1;
+        });
+      }
+  
+      // If we're handling the full list, paginate here
+      if (isFullList) {
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      return sortedTokens.slice(startIndex, endIndex);
+    }
+  
+    return sortedTokens;
+  }, [tokens, sortType, liquidityData, currentPage, itemsPerPage, isFullList]);
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
-        {tokens.map((token) => (
+         {displayTokens.map((token) => (
           <TokenCard 
             key={token.id} 
             token={token} 
             isEnded={isEnded} 
             onTokenClick={handleTokenClick}
+            onLiquidityUpdate={(amount) => updateLiquidityData(token.address, amount)}
           />
         ))}
       </div>

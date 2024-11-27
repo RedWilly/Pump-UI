@@ -12,7 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import Spinner from '@/components/ui/Spinner';
 import { useRouter } from 'next/router';
 
-const TOKENS_PER_PAGE = 12;
+const TOKENS_PER_PAGE = 100;
 
 const Home: React.FC = () => {
   const [tokens, setTokens] = useState<PaginatedResponse<Token | TokenWithLiquidityEvents> | null>(null);
@@ -28,6 +28,7 @@ const Home: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { newTokens } = useWebSocket();
   const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const [allTrendingTokens, setAllTrendingTokens] = useState<Token[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -78,10 +79,58 @@ const Home: React.FC = () => {
       } else {
         switch (sort) {
           case 'trending':
-            fetchedTokens = await getAllTokensTrends(currentPage, TOKENS_PER_PAGE);
+          case 'marketcap':
+            // Handle both trending and marketcap cases
+            if (allTrendingTokens.length === 0) {
+              const trendingTokens = await getAllTokensTrends();
+              setAllTrendingTokens(trendingTokens);
+              
+              if (sort === 'marketcap') {
+                fetchedTokens = {
+                  data: trendingTokens,
+                  totalCount: trendingTokens.length,
+                  currentPage: currentPage,
+                  totalPages: Math.ceil(trendingTokens.length / TOKENS_PER_PAGE),
+                  fullList: true
+                };
+              } else {
+                const startIndex = (currentPage - 1) * TOKENS_PER_PAGE;
+                const endIndex = startIndex + TOKENS_PER_PAGE;
+                const paginatedTokens = trendingTokens.slice(startIndex, endIndex);
+                
+                fetchedTokens = {
+                  data: paginatedTokens,
+                  totalCount: trendingTokens.length,
+                  currentPage: currentPage,
+                  totalPages: Math.ceil(trendingTokens.length / TOKENS_PER_PAGE)
+                };
+              }
+            } else {
+              if (sort === 'marketcap') {
+                fetchedTokens = {
+                  data: allTrendingTokens,
+                  totalCount: allTrendingTokens.length,
+                  currentPage: currentPage,
+                  totalPages: Math.ceil(allTrendingTokens.length / TOKENS_PER_PAGE),
+                  fullList: true
+                };
+              } else {
+                const startIndex = (currentPage - 1) * TOKENS_PER_PAGE;
+                const endIndex = startIndex + TOKENS_PER_PAGE;
+                const paginatedTokens = allTrendingTokens.slice(startIndex, endIndex);
+                
+                fetchedTokens = {
+                  data: paginatedTokens,
+                  totalCount: allTrendingTokens.length,
+                  currentPage: currentPage,
+                  totalPages: Math.ceil(allTrendingTokens.length / TOKENS_PER_PAGE)
+                };
+              }
+            }
             break;
+
           case 'new':
-            fetchedTokens = await getRecentTokens(currentPage, TOKENS_PER_PAGE, 24);
+            fetchedTokens = await getRecentTokens(currentPage, TOKENS_PER_PAGE, 1);
             if (fetchedTokens === null) {
               setNoRecentTokens(true);
               fetchedTokens = { data: [], totalCount: 0, currentPage: 1, totalPages: 1 };
@@ -100,7 +149,7 @@ const Home: React.FC = () => {
             }
             break;
           default:
-            fetchedTokens = await getAllTokensTrends(currentPage, TOKENS_PER_PAGE);
+            fetchedTokens = { data: [], totalCount: 0, currentPage: 1, totalPages: 1 };
         }
       }
 
@@ -109,7 +158,8 @@ const Home: React.FC = () => {
         totalCount: fetchedTokens.totalCount,
         currentPage: fetchedTokens.currentPage || 1,
         totalPages: fetchedTokens.totalPages || 1,
-        tokens: []
+        tokens: [],
+        fullList: fetchedTokens.fullList
       };
 
       setTokens(adjustedTokens);
@@ -142,11 +192,31 @@ const Home: React.FC = () => {
     }
   };
 
-  const handleSort = (option: SortOption) => {
+  const handleSort = async (option: SortOption) => {
     console.log('Sort option changed:', option);
-    setSort(option);
-    setCurrentPage(1);
-    setSearchQuery('');
+    setIsLoading(true);
+    
+    try {
+      // If switching to marketcap and we don't have trending tokens, fetch them
+      if (option === 'marketcap' && allTrendingTokens.length === 0) {
+        const trendingTokens = await getAllTokensTrends();
+        setAllTrendingTokens(trendingTokens);
+      }
+      
+      // Only clear trending tokens when switching to 'new' or 'finalized'
+      if (option === 'new' || option === 'finalized') {
+        setAllTrendingTokens([]);
+      }
+      
+      setSort(option);
+      setCurrentPage(1);
+      setSearchQuery('');
+    } catch (error) {
+      console.error('Error handling sort:', error);
+      setError('Failed to sort tokens. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -300,6 +370,9 @@ const Home: React.FC = () => {
             totalPages={tokens?.totalPages || 1}
             onPageChange={handlePageChange}
             isEnded={sort === 'finalized'}
+            sortType={sort}
+            itemsPerPage={TOKENS_PER_PAGE}
+            isFullList={tokens?.fullList}
           />
         ) : (
           <div className="text-center text-white text-xs mt-10">No tokens found matching your criteria.</div>

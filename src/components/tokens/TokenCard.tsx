@@ -10,9 +10,10 @@ interface TokenCardProps {
   token: Token | TokenWithLiquidityEvents;
   isEnded: boolean;
   onTokenClick: (address: string) => void;
+  onLiquidityUpdate?: (liquidityAmount: bigint) => void;
 }
 
-const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) => {
+const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick, onLiquidityUpdate }) => {
   const [currentLiquidity, setCurrentLiquidity] = useState<string>('0');
   const tokenAddress = token.address as `0x${string}`;
   const shouldFetchLiquidity = !token._count?.liquidityEvents;
@@ -20,11 +21,25 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick }) =
   const router = useRouter();
 
   useEffect(() => {
-    if (shouldFetchLiquidity && liquidityData && liquidityData[2]) {
-      const liquidityValue = liquidityData[2].toString();
-      setCurrentLiquidity(liquidityValue);
+    if (shouldFetchLiquidity && 
+        liquidityData && 
+        liquidityData[2] && 
+        liquidityData[2].toString() !== currentLiquidity) {
+      
+      const newLiquidity = liquidityData[2].toString();
+      setCurrentLiquidity(newLiquidity);
+      
+      if (onLiquidityUpdate) {
+        onLiquidityUpdate(liquidityData[2]);
+      }
     }
-  }, [liquidityData, shouldFetchLiquidity, token]);
+  }, [
+    liquidityData, 
+    shouldFetchLiquidity, 
+    onLiquidityUpdate, 
+    currentLiquidity, 
+    token.address
+  ]);
 
   const calculateProgress = (liquidity: string): number => {
     if (token._count?.liquidityEvents > 0) {

@@ -4,29 +4,32 @@ import BondingCurveManagerABI from '@/abi/BondingCurveManager.json';
 import ERC20ABI from '@/abi/ERC20.json';
 import { useCallback, useMemo } from 'react';
 import oldTokenAddresses from '@/abi/old_token.json';
+import oldTokenAddresses1 from '@/abi/old_token1.json';
 
 // Helper function to determine which contract address to use
-export const getBondingCurveAddress = (tokenAddress?: `0x${string}` | null): `0x${string}` => {
+export const getBondingCurveAddress = (tokenAddress: `0x${string}` | null): `0x${string}` => {
   if (!tokenAddress) {
     return process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
   }
 
-  // Check if token is in old_token.json
-  const isOldToken = oldTokenAddresses.some(addr => 
-    addr.toLowerCase() === tokenAddress.toLowerCase()
-  );
-  
-  // console.log('getBondingCurveAddress:', {
-  //   tokenAddress,
-  //   isOldToken,
-  //   oldAddress: process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS_OLD,
-  //   newAddress: process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS
-  // });
+  // Normalize the tokenAddress to lowercase
+  const normalizedTokenAddress = tokenAddress.toLowerCase();
 
-  return (isOldToken 
-    ? process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS_OLD 
-    : process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS) as `0x${string}`;
+  // Extract contract addresses from environment variables
+  const oldAddress = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS_OLD as `0x${string}`;
+  const oldAddress1 = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS_OLD1 as `0x${string}`;
+  const newAddress = process.env.NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS as `0x${string}`;
+
+  // Check if the tokenAddress matches any old token list
+  if (oldTokenAddresses.some(addr => addr.toLowerCase() === normalizedTokenAddress)) {
+    return oldAddress;
+  } else if (oldTokenAddresses1.some(addr => addr.toLowerCase() === normalizedTokenAddress)) {
+    return oldAddress1;
+  }
+
+  return newAddress;
 };
+
 
 export function useCurrentTokenPrice(tokenAddress: `0x${string}`) {
   const { data, refetch } = useReadContract({
@@ -47,11 +50,16 @@ export function useTotalSupply(tokenAddress: `0x${string}`) {
 }
 
 export function useMarketCap(tokenAddress: `0x${string}` | null) {
+  const bondingCurveAddress = getBondingCurveAddress(tokenAddress);
+  console.log('bondingCurveAddress', bondingCurveAddress);
   const { data, refetch } = useReadContract({
-    address: getBondingCurveAddress(tokenAddress),
+    address: bondingCurveAddress,
     abi: BondingCurveManagerABI,
     functionName: 'getMarketCap',
-    args: [tokenAddress],
+    args: tokenAddress ? [tokenAddress] : undefined,
+    query: {
+      enabled: !!tokenAddress,
+    }
   });
   return { data: data as bigint | undefined, refetch };
 }
@@ -91,8 +99,10 @@ export const useTokenLiquidity = (tokenAddress: `0x${string}` | null) => {
     addr.toLowerCase() === tokenAddress.toLowerCase()
   ) : false;
 
+  const bondingCurveAddress = getBondingCurveAddress(tokenAddress);
+  
   const { data, isError, isLoading, refetch } = useContractRead({
-    address: getBondingCurveAddress(tokenAddress),
+    address: bondingCurveAddress,
     abi: isOldContract ? OLD_TOKENS_ABI : BondingCurveManagerABI,
     functionName: 'tokens',
     args: tokenAddress ? [tokenAddress] : undefined,
