@@ -15,9 +15,17 @@ const nextConfig = {
   },
   async rewrites() {
     return [
+      // {
+      //   source: '/api/:path*',
+      //   destination: '/api/proxy',
+      // },
       {
-        source: '/api/:path*',
-        destination: '/api/proxy',
+        source: '/api/proxy/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/:path*`,
+      },
+      {
+        source: '/robots.txt',
+        destination: '/api/robots',
       },
     ];
   },
