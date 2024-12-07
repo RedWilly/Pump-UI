@@ -243,6 +243,7 @@ export async function getTokensByCreator(
     const response = await axios.get(`${API_BASE_URL}/api/tokens/creator/${creatorAddress}`, {
       params: { page, pageSize }
     });
+    console.log('getTokensByCreator', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching tokens by creator:', error);

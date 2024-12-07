@@ -8,6 +8,7 @@ import { formatTimestamp, formatAddressV2, formatAmountV3, useERC20Balance } fro
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
 import SEO from '@/components/seo/SEO';
 import LoadingBar from '@/components/ui/LoadingBar';
+import TokenUpdateModal from '@/components/token/TokenUpdateModal';
 
 interface TransactionResponse extends Omit<PaginatedResponse<Transaction>, 'data'> {
     transactions: Transaction[];
@@ -147,6 +148,8 @@ const ProfilePage: React.FC = () => {
   const [createdTokens, setCreatedTokens] = useState<Token[]>([]);
   const [createdTokensPage, setCreatedTokensPage] = useState(1);
   const [createdTokensTotalPages, setCreatedTokensTotalPages] = useState(1);
+  const [selectedToken, setSelectedToken] = useState<Token | null>(null);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
   const addressToUse = (profileAddress as string) || connectedAddress || '';
 
@@ -154,7 +157,7 @@ const ProfilePage: React.FC = () => {
     setIsLoading(true);
     try {
         const response: TransactionResponse = await getTransactionsByAddress(address, page);
-      setTransactions(response.transactions); // Change this line
+      setTransactions(response.transactions); 
       setTotalPages(response.totalPages);
     } catch (error) {
       console.error('Error fetching transactions:', error);
@@ -187,6 +190,13 @@ const ProfilePage: React.FC = () => {
     }
   }, []);
 
+  const handleTokenUpdate = useCallback(async () => {
+    // Refresh the tokens list
+    if (addressToUse) {
+      await fetchCreatedTokens(addressToUse, createdTokensPage);
+    }
+  }, [addressToUse, createdTokensPage, fetchCreatedTokens]);
+
   useEffect(() => {
     if (addressToUse) {
       fetchTransactions(addressToUse, currentPage);
@@ -213,6 +223,20 @@ const ProfilePage: React.FC = () => {
 
   const handleCreatedTokensPageChange = (newPage: number) => {
     setCreatedTokensPage(newPage);
+  };
+
+  const isTokenIncomplete = (token: Token) => {
+    // Count how many social links are set
+    const socialCount = [
+      token.website,
+      token.telegram,
+      token.discord,
+      token.twitter,
+      token.youtube
+    ].filter(Boolean).length;
+
+    // Return true if token needs more info (is incomplete)
+    return !token.logo || !token.description || socialCount < 3;
   };
 
   return (
@@ -264,9 +288,25 @@ const ProfilePage: React.FC = () => {
                   {createdTokens.map((token) => (
                     <div 
                       key={token.address}
-                      className="bg-[#222222] rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-200 flex items-start"
+                      className="bg-[#222222] rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-200 flex items-start relative"
                       onClick={() => handleTokenClick(token.address)}
                     >
+                      {connectedAddress && 
+                        connectedAddress.toLowerCase() === addressToUse.toLowerCase() && 
+                        isTokenIncomplete(token) && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedToken(token);
+                            setIsUpdateModalOpen(true);
+                          }}
+                          className="absolute top-2 right-2 p-2 rounded-full bg-[#333333] hover:bg-[#444444] transition-colors duration-200"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                        </button>
+                      )}
                       {token.logo && (
                         <img  src={token.logo || '/chats/noimg.svg'} alt={`${token.name} logo`} className="w-16 h-16 mr-3 sm:mr-4 rounded-lg" />
                       )}
@@ -341,6 +381,17 @@ const ProfilePage: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <LoadingBar size="large" />
         </div>
+      )}
+      {selectedToken && (
+        <TokenUpdateModal
+          token={selectedToken}
+          isOpen={isUpdateModalOpen}
+          onClose={() => {
+            setIsUpdateModalOpen(false);
+            setSelectedToken(null);
+          }}
+          onUpdate={handleTokenUpdate}
+        />
       )}
     </Layout>
   );
