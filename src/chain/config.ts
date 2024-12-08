@@ -27,24 +27,25 @@ const shibariumConfig: ChainConfig = {
 }
 
 // Flare Chain Configuration
-const flareConfig: ChainConfig = {
-  apiBaseUrl: process.env.FLARE_NEXT_PUBLIC_API_BASE_URL!,
-  wsBaseUrl: process.env.FLARE_NEXT_PUBLIC_WS_BASE_URL!,
-  blockscoutUrl: process.env.FLARE_NEXT_PUBLIC_BLOCKSCOUT_URL!,
-  dexTarget: Number(process.env.FLARE_NEXT_PUBLIC_DEX_TARGET),
-  contractAddresses: [
-    process.env.FLARE_NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS!
-  ].filter(Boolean)
-}
+// const flareConfig: ChainConfig = {
+//   apiBaseUrl: process.env.FLARE_NEXT_PUBLIC_API_BASE_URL!,
+//   wsBaseUrl: process.env.FLARE_NEXT_PUBLIC_WS_BASE_URL!,
+//   blockscoutUrl: process.env.FLARE_NEXT_PUBLIC_BLOCKSCOUT_URL!,
+//   dexTarget: Number(process.env.FLARE_NEXT_PUBLIC_DEX_TARGET),
+//   contractAddresses: [
+//     process.env.FLARE_NEXT_PUBLIC_BONDING_CURVE_MANAGER_ADDRESS!
+//   ].filter(Boolean)
+// }
 
 // Chain configurations mapped by chainId
 export const chainConfigs: ChainConfigs = {
   [shibarium.id]: shibariumConfig,
-  [flare.id]: flareConfig,
+  // [flare.id]: flareConfig,
 }
 
 // Supported chains for the application
-export const supportedChains: Chain[] = [shibarium, flare]
+// export const supportedChains: Chain[] = [shibarium, flare]
+export const supportedChains: Chain[] = [shibarium]
 
 // Helper function to get chain configuration by chainId
 export const getChainConfig = (chainId: number): ChainConfig | undefined => {
