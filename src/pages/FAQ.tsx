@@ -39,14 +39,14 @@ const FAQPage: React.FC = () => {
 
         <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <div key={index} className="bg-[#222222] rounded-lg overflow-hidden">
+            <div key={index} className="bg-[var(--card)] rounded-lg overflow-hidden">
               <button
-                className="w-full text-left p-4 sm:p-5 focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-opacity-50 flex justify-between items-center hover:bg-[#2a2a2a] transition-colors"
+                className="w-full text-left p-4 sm:p-5 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-opacity-50 flex justify-between items-center hover:bg-[var(--card-hover)] transition-colors"
                 onClick={() => toggleFAQ(index)}
               >
                 <h3 className="text-sm sm:text-base font-semibold text-white pr-4">{faq.question}</h3>
                 <ChevronDownIcon
-                  className={`w-5 h-5 text-[#60A5FA] transition-transform duration-300 flex-shrink-0 ${
+                  className={`w-5 h-5 text-[var(--primary)] transition-transform duration-300 flex-shrink-0 ${
                     openIndex === index ? 'transform rotate-180' : ''
                   }`}
                 />
@@ -56,7 +56,7 @@ const FAQPage: React.FC = () => {
                   openIndex === index ? 'max-h-[1000px]' : 'max-h-0'
                 }`}
               >
-                <div className="p-4 sm:p-5 bg-[#1a1a1a]">
+                <div className="p-4 sm:p-5 bg-[var(--card2)]">
                   <p className="text-xs sm:text-sm text-gray-400 whitespace-pre-line leading-relaxed">{faq.answer}</p>
                 </div>
               </div>

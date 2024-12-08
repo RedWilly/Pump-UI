@@ -95,7 +95,7 @@ const TokenList: React.FC<TokenListProps> = ({
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="p-2 rounded-md bg-[#222222] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-md bg-[var(--card)] text-gray-400 hover:bg-[var(--card-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeftIcon className="h-5 w-5" />
           </button>
@@ -107,8 +107,8 @@ const TokenList: React.FC<TokenListProps> = ({
                 onClick={() => onPageChange(page)}
                 className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
                   currentPage === page
-                    ? 'bg-[#60A5FA] text-black'
-                    : 'bg-[#222222] text-gray-400 hover:bg-[#2a2a2a]'
+                    ? 'bg-[var(--primary)] text-black'
+                    : 'bg-[var(--card)] text-gray-400 hover:bg-[var(--card-hover)]'
                 }`}
               >
                 {page}
@@ -119,7 +119,7 @@ const TokenList: React.FC<TokenListProps> = ({
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="p-2 rounded-md bg-[#222222] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2 rounded-md bg-[var(--card)] text-gray-400 hover:bg-[var(--card-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRightIcon className="h-5 w-5" />
           </button>

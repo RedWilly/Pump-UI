@@ -89,8 +89,8 @@ const PriceChart: React.FC<PriceChartProps> = ({ data, liquidityEvents, tokenInf
             }}
             className={`px-3 py-1 text-xs rounded-md transition-colors ${
               chartType === type
-                ? 'bg-[#60A5FA] text-black'
-                : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
+                ? 'bg-[var(--primary)] text-black'
+                : 'bg-[var(--card2)] text-gray-400 hover:bg-[var(--card-hover)]'
             }`}
           >
             {type.charAt(0).toUpperCase() + type.slice(1)}

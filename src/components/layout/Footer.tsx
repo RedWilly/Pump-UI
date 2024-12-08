@@ -14,13 +14,13 @@ const Footer: React.FC = () => {
           <nav className="flex space-x-4">
             <Link 
               href="/about" 
-              className="text-[10px] sm:text-xs text-gray-400 hover:text-[#4B82EC] transition-colors"
+              className="text-[10px] sm:text-xs text-gray-400 hover:text-[var(--primary-hover)] transition-colors"
             >
               About
             </Link>
             <Link 
               href="/FAQ" 
-              className="text-[10px] sm:text-xs text-gray-400 hover:text-[#4B82EC] transition-colors"
+              className="text-[10px] sm:text-xs text-gray-400 hover:text-[var(--primary-hover)] transition-colors"
             >
               FAQ
             </Link>

@@ -139,7 +139,7 @@ const Navbar: React.FC = () => {
                 <circle cx="5" cy="19" r="2"/>
                 <path d="M5 17A12 12 0 0 1 17 5"/>
               </svg>
-              <span className="text-[#60A5FA]">Bondle.</span>
+              <span className="text-[var(--primary)]">Bondle.</span>
             </Link>
             <div className="hidden md:flex items-center space-x-4">
               <button 
@@ -179,25 +179,25 @@ const Navbar: React.FC = () => {
 
       {/* Mobile menu - Updated background and styling */}
       {isOpen && (
-        <div className="md:hidden bg-[#1a1a1a] border-t border-[#333333]">
+        <div className="md:hidden bg-[var(--card2)] border-t border-[var(--card-boarder)]">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <button
               onClick={handleProfileClick}
-              className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] block px-3 py-2 text-base w-full text-left rounded-lg transition-colors"
+              className="text-gray-300 hover:text-white hover:bg-[var(--card-hover)] block px-3 py-2 text-base w-full text-left rounded-lg transition-colors"
             >
               My Profile
             </button>
             <Link 
               href="https://t.me/bondle_xyz" 
               target="_blank" 
-              className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] block px-3 py-2 text-base rounded-lg transition-colors"
+              className="text-gray-300 hover:text-white hover:bg-[var(--card-hover)] block px-3 py-2 text-base rounded-lg transition-colors"
             >
               Telegram
             </Link>
             <Link 
               href="https://x.com/bondlexyz" 
               target="_blank" 
-              className="text-gray-300 hover:text-white hover:bg-[#2a2a2a] block px-3 py-2 text-base rounded-lg transition-colors"
+              className="text-gray-300 hover:text-white hover:bg-[var(--card-hover)] block px-3 py-2 text-base rounded-lg transition-colors"
             >
               Twitter
             </Link>

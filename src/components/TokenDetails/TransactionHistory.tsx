@@ -46,7 +46,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
   const DesktopTable = () => (
     <table className="w-full text-left hidden md:table">
       <thead>
-        <tr className="bg-[#1a1a1a]">
+        <tr className="bg-[var(--card2)]">
           <th className="px-4 py-2 text-sm text-gray-400">Maker</th>
           <th className="px-4 py-2 text-sm text-gray-400">Type</th>
           <th className="px-4 py-2 text-sm text-gray-400">BONE</th>
@@ -57,13 +57,13 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       </thead>
       <tbody>
         {transactions.map((tx) => (
-          <tr key={tx.id} className="border-b border-[#2a2a2a]">
+          <tr key={tx.id} className="border-b border-[var(--card-hover)]">
             <td className="px-4 py-2">
               <a 
                 href={`https://shibariumscan.io/address/${tx.senderAddress}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#60A5FA] text-sm transition-colors"
+                className="text-gray-400 hover:text-[var(--primary)] text-sm transition-colors"
               >
                 {shortenAddress(tx.senderAddress)}
               </a>
@@ -77,7 +77,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                 href={`https://shibariumscan.io/tx/${tx.txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#60A5FA] text-sm transition-colors"
+                className="text-gray-400 hover:text-[var(--primary)] text-sm transition-colors"
               >
                 {tx.txHash.slice(0, 8)}
               </a>
@@ -94,7 +94,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
       {transactions.map((tx) => (
         <div key={tx.id} className="mb-2">
           <div 
-            className="bg-[#1a1a1a] p-3 rounded-lg cursor-pointer"
+            className="bg-[var(--card2)] p-3 rounded-lg cursor-pointer"
             onClick={() => setExpandedRow(expandedRow === tx.id ? null : tx.id)}
           >
             <div className="flex items-center justify-between">
@@ -116,14 +116,14 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
             </div>
 
             {expandedRow === tx.id && (
-              <div className="mt-3 pt-3 border-t border-[#2a2a2a] space-y-2">
+              <div className="mt-3 pt-3 border-t border-[var(--card-hover)] space-y-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-400">Maker:</span>
                   <a 
                     href={`https://shibariumscan.io/address/${tx.senderAddress}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#60A5FA]"
+                    className="text-gray-400 hover:text-[var(--primary)]"
                   >
                     {shortenAddress(tx.senderAddress)}
                   </a>
@@ -138,7 +138,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                     href={`https://shibariumscan.io/tx/${tx.txHash}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#60A5FA] flex items-center gap-1"
+                    className="text-gray-400 hover:text-[var(--primary)] flex items-center gap-1"
                   >
                     View <ExternalLinkIcon size={12} />
                   </a>
@@ -167,7 +167,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           <button
             onClick={() => handlePageChange(transactionPage - 1)}
             disabled={transactionPage === 1}
-            className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
+            className="p-1 rounded bg-[var(--card2)] text-gray-400 hover:bg-[var(--card-hover)] disabled:opacity-50"
           >
             <ChevronLeftIcon size={20} />
           </button>
@@ -180,8 +180,8 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
                   onClick={() => handlePageChange(page as number)}
                   className={`px-3 py-1 rounded text-sm ${
                     transactionPage === page
-                      ? 'bg-[#F53669] text-black'
-                      : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
+                      ? 'bg-[var(--primary)] text-black'
+                      : 'bg-[var(--card2)] text-gray-400 hover:bg-[var(--card-hover)]'
                   }`}
                 >
                   {page}
@@ -192,7 +192,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({
           <button
             onClick={() => handlePageChange(transactionPage + 1)}
             disabled={transactionPage === totalTransactionPages}
-            className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
+            className="p-1 rounded bg-[var(--card2)] text-gray-400 hover:bg-[var(--card-hover)] disabled:opacity-50"
           >
             <ChevronRightIcon size={20} />
           </button>

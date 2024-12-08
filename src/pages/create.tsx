@@ -221,7 +221,7 @@ const CreateToken: React.FC = () => {
         <div className="relative mb-6 flex justify-center">
           <button
             type="button"
-            className="text-gray-400 hover:text-[#60A5FA] transition-colors duration-200 flex items-center bg-[#222222] px-3 py-2 rounded-full"
+            className="text-gray-400 hover:text-[var(--primary)] transition-colors duration-200 flex items-center bg-[var(--card)] px-3 py-2 rounded-full"
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
           >
@@ -229,7 +229,7 @@ const CreateToken: React.FC = () => {
             <span className="text-[10px] sm:text-xs">Deployment Cost Info</span>
           </button>
           {showTooltip && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 top-12 bg-[#1a1a1a] text-gray-400 p-4 rounded-md shadow-lg z-10 w-64 border border-[#333333]">
+            <div className="absolute left-1/2 transform -translate-x-1/2 top-12 bg-[var(--card2)] text-gray-400 p-4 rounded-md shadow-lg z-10 w-64 border border-[var(--card-boarder)]">
               <p className="text-[8px] sm:text-xs">
                 Cost to deploy: Only pay for gas 😎
               </p>
@@ -237,7 +237,7 @@ const CreateToken: React.FC = () => {
           )}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-[#222222] p-4 sm:p-6 rounded-lg">
+        <form onSubmit={handleSubmit} className="space-y-6 bg-[var(--card)] p-4 sm:p-6 rounded-lg">
           {/* Token Name and Symbol inputs */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -250,7 +250,7 @@ const CreateToken: React.FC = () => {
                 value={tokenName}
                 onChange={(e) => setTokenName(e.target.value)}
                 required
-                className="w-full py-2 px-3 bg-[#1a1a1a] border border-[#333333] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:border-[#60A5FA] transition duration-150 ease-in-out"
+                className="w-full py-2 px-3 bg-[var(--card2)] border border-[var(--card-boarder)] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition duration-150 ease-in-out"
                 placeholder="Enter token name"
               />
             </div>
@@ -264,7 +264,7 @@ const CreateToken: React.FC = () => {
                 value={tokenSymbol}
                 onChange={(e) => setTokenSymbol(e.target.value)}
                 required
-                className="w-full py-2 px-3 bg-[#1a1a1a] border border-[#333333] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:border-[#60A5FA] transition duration-150 ease-in-out"
+                className="w-full py-2 px-3 bg-[var(--card2)] border border-[var(--card-boarder)] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition duration-150 ease-in-out"
                 placeholder="Enter token symbol"
               />
             </div>
@@ -280,7 +280,7 @@ const CreateToken: React.FC = () => {
               value={tokenDescription}
               onChange={(e) => setTokenDescription(e.target.value)}
               rows={4}
-              className="w-full py-2 px-3 bg-[#1a1a1a] border border-[#333333] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:border-[#60A5FA] transition duration-150 ease-in-out"
+              className="w-full py-2 px-3 bg-[var(--card2)] border border-[var(--card-boarder)] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition duration-150 ease-in-out"
               placeholder="Describe your token"
             />
           </div>
@@ -291,7 +291,7 @@ const CreateToken: React.FC = () => {
               Token Image
             </label>
             <div
-              className="mt-1 flex justify-center items-center px-4 py-4 border-2 border-[#333333] border-dashed rounded-md hover:border-[#60A5FA] transition duration-150 ease-in-out bg-[#1a1a1a]"
+              className="mt-1 flex justify-center items-center px-4 py-4 border-2 border-[var(--card-boarder)] border-dashed rounded-md hover:border-[var(--primary)] transition duration-150 ease-in-out bg-[var(--card2)]"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
             >
@@ -301,7 +301,7 @@ const CreateToken: React.FC = () => {
                   <div className="flex flex-col sm:flex-row text-[9px] sm:text-sm text-gray-400 items-center">
                     <label
                       htmlFor="tokenImage"
-                      className="cursor-pointer bg-[#222222] rounded-md font-medium text-[#60A5FA] hover:text-[#4B82EC] focus-within:outline-none focus-within:ring-2 focus-within:ring-[#60A5FA] transition duration-150 ease-in-out px-3 py-2 mb-2 sm:mb-0 sm:mr-2"
+                      className="cursor-pointer bg-[var(--card)] rounded-md font-medium text-[var(--primary)] hover:text-[var(--primary-hover)] focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--primary)] transition duration-150 ease-in-out px-3 py-2 mb-2 sm:mb-0 sm:mr-2"
                     >
                       <span>Upload a file</span>
                       <input
@@ -331,18 +331,18 @@ const CreateToken: React.FC = () => {
                 <img
                   src={tokenImageUrl}
                   alt="Token preview"
-                  className="h-24 w-24 object-cover rounded-full mx-auto border-2 border-[#60A5FA]"
+                  className="h-24 w-24 object-cover rounded-full mx-auto border-2 border-[var(--primary)]"
                 />
               </div>
             </div>
           )}
 
           {/* Collapsible Social Media Section */}
-          <div className="border border-[#333333] rounded-md overflow-hidden">
+          <div className="border border-[var(--card-boarder)] rounded-md overflow-hidden">
             <button
               type="button"
               onClick={toggleSocialSection}
-              className="w-full flex justify-between items-center p-3 bg-[#1a1a1a] text-white hover:bg-[#2a2a2a] transition-colors duration-200"
+              className="w-full flex justify-between items-center p-3 bg-[var(--card2)] text-white hover:bg-[var(--card-hover)] transition-colors duration-200"
             >
               <span className="font-medium text-[10px] sm:text-xs">Social Media Links (Optional)</span>
               {isSocialExpanded ? (
@@ -352,7 +352,7 @@ const CreateToken: React.FC = () => {
               )}
             </button>
             {isSocialExpanded && (
-              <div className="p-4 bg-[#222222] grid grid-cols-1 sm:grid-cols-2 gap-4 text-[10px] sm:text-xs">
+              <div className="p-4 bg-[var(--card)] grid grid-cols-1 sm:grid-cols-2 gap-4 text-[10px] sm:text-xs">
                 {[
                   { id: 'website', label: 'Website', value: website, setter: setWebsite },
                   { id: 'telegram', label: 'Telegram', value: telegram, setter: setTelegram },
@@ -369,7 +369,7 @@ const CreateToken: React.FC = () => {
                       id={item.id}
                       value={item.value}
                       onChange={(e) => item.setter(e.target.value)}
-                      className="w-full py-2 px-3 bg-[#1a1a1a] border border-[#333333] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:border-[#60A5FA] transition duration-150 ease-in-out"
+                      className="w-full py-2 px-3 bg-[var(--card2)] border border-[var(--card-boarder)] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition duration-150 ease-in-out"
                       placeholder="optional"
                     />
                   </div>
@@ -385,8 +385,8 @@ const CreateToken: React.FC = () => {
               disabled={isButtonDisabled}
               className={`w-full py-3 px-4 rounded-lg text-xs sm:text-sm font-medium transition duration-150 ease-in-out ${
                 isButtonDisabled
-                  ? 'bg-[#333333] text-gray-400 cursor-not-allowed'
-                  : 'bg-[#60A5FA] text-black hover:bg-[#4B82EC]'
+                  ? 'bg-[var(--card-boarder)] text-gray-400 cursor-not-allowed'
+                  : 'bg-[var(--primary)] text-black hover:bg-[var(--primary-hover)]'
               }`}
             >
               {getButtonText()}

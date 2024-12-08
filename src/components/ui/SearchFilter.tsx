@@ -26,7 +26,7 @@ const SearchFilter = forwardRef<HTMLInputElement, SearchFilterProps>(({ onSearch
         placeholder="Search tokens..."
         value={searchInput}
         onChange={handleInputChange}
-        className="w-full py-2 pl-10 pr-4 text-sm bg-[#222222] text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-[#60A5FA] transition-colors duration-200"
+        className="w-full py-2 pl-10 pr-4 text-sm bg-[var(--card)] text-white rounded-lg focus:outline-none focus:ring-1 focus:ring-[var(--primary)] transition-colors duration-200"
       />
       <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
     </div>

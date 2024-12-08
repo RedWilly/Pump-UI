@@ -358,9 +358,9 @@ interface TokenDetailProps {
           {/* Left Column (2 cols wide) */}
           <div className="lg:col-span-2 space-y-6">
             {/* Price Chart Section */}
-            <div className="bg-[#222222] rounded-lg p-4">
+            <div className="bg-[var(--card)] rounded-lg p-4">
               <h2 className="text-sm font-semibold mb-4 text-gray-400">Price Chart (USD)</h2>
-              <div className="bg-[#1a1a1a] rounded-lg p-2">
+              <div className="bg-[var(--card2)] rounded-lg p-2">
                 <TradingViewChart 
                   data={chartData} 
                   liquidityEvents={liquidityEvents} 
@@ -370,9 +370,9 @@ interface TokenDetailProps {
             </div>
 
             {/* Quick Actions Section - Mobile Only */}
-            <div className="lg:hidden bg-[#222222] rounded-lg p-4">
+            <div className="lg:hidden bg-[var(--card)] rounded-lg p-4">
               <h2 className="text-sm font-semibold mb-4 text-gray-400">Quick Actions</h2>
-              <div className="bg-[#1a1a1a] rounded-lg p-4">
+              <div className="bg-[var(--card2)] rounded-lg p-4">
                 {/* From Input */}
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-2">
@@ -381,7 +381,7 @@ interface TokenDetailProps {
                       Balance: {isSwapped ? tokenBalance : ethBalance}
                     </span>
                   </div>
-                  <div className="flex items-center bg-[#222222] rounded-lg p-3">
+                  <div className="flex items-center bg-[var(--card)] rounded-lg p-3">
                     <input
                       type="number"
                       value={fromToken.amount}
@@ -392,7 +392,7 @@ interface TokenDetailProps {
                     />
                     <button
                       onClick={handleMaxClick}
-                      className="text-xs text-[#60A5FA] hover:text-[#4B82EC] font-medium px-2 py-1 rounded transition-colors"
+                      className="text-xs text-[var(--primary)] hover:text-[var(--primary-hover)] font-medium px-2 py-1 rounded transition-colors"
                     >
                       MAX
                     </button>
@@ -403,7 +403,7 @@ interface TokenDetailProps {
                 {/* Swap Button */}
                 <button 
                   onClick={handleSwap}
-                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[#60A5FA]"
+                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[var(--primary)]"
                 >
                   <ArrowUpDownIcon size={20} />
                 </button>
@@ -416,7 +416,7 @@ interface TokenDetailProps {
                       Balance: {isSwapped ? ethBalance : tokenBalance}
                     </span>
                   </div>
-                  <div className="flex items-center bg-[#222222] rounded-lg p-3">
+                  <div className="flex items-center bg-[var(--card)] rounded-lg p-3">
                     <input
                       type="text"
                       value={isCalculating ? 'Calculating...' : toToken.amount}
@@ -432,7 +432,7 @@ interface TokenDetailProps {
                 <button
                   onClick={handleAction}
                   disabled={!fromToken.amount || isCalculating || isTransacting}
-                  className="w-full py-3 bg-[#60A5FA] text-black rounded-lg font-medium hover:bg-[#4B82EC] 
+                  className="w-full py-3 bg-[var(--primary)] text-black rounded-lg font-medium hover:bg-[var(--primary-hover)] 
                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isTransacting ? 'Processing...' : actionButtonText}
@@ -441,16 +441,16 @@ interface TokenDetailProps {
             </div>
 
             {/* Trades and Chat Tabs */}
-            <div className="bg-[#222222] rounded-lg p-4">
+            <div className="bg-[var(--card)] rounded-lg p-4">
               <Tab.Group>
-                <Tab.List className="flex space-x-1 rounded-lg bg-[#1a1a1a] p-1 mb-4">
+                <Tab.List className="flex space-x-1 rounded-lg bg-[var(--card2)] p-1 mb-4">
                   <Tab
                     className={({ selected }) =>
                       `w-full rounded-md py-2.5 text-sm font-medium leading-5 transition-colors
                       ${
                         selected
-                          ? 'bg-[#333333] text-white'
-                          : 'text-gray-400 hover:bg-[#2a2a2a] hover:text-white'
+                          ? 'bg-[var(--card-boarder)] text-white'
+                          : 'text-gray-400 hover:bg-[var(--card-hover)] hover:text-white'
                       }`
                     }
                   >
@@ -461,8 +461,8 @@ interface TokenDetailProps {
                       `w-full rounded-md py-2.5 text-sm font-medium leading-5 transition-colors
                       ${
                         selected
-                          ? 'bg-[#333333] text-white'
-                          : 'text-gray-400 hover:bg-[#2a2a2a] hover:text-white'
+                          ? 'bg-[var(--card-boarder)] text-white'
+                          : 'text-gray-400 hover:bg-[var(--card-hover)] hover:text-white'
                       }`
                     }
                   >
@@ -490,7 +490,7 @@ interface TokenDetailProps {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Token Info Header (shown only on desktop) */}
-            <div className="hidden lg:block bg-[#222222] rounded-lg p-4">
+            <div className="hidden lg:block bg-[var(--card)] rounded-lg p-4">
               <TokenInfo 
                 tokenInfo={tokenInfo} 
                 showHeader={true} 
@@ -500,9 +500,9 @@ interface TokenDetailProps {
             </div>
 
             {/* Quick Actions (Swap) Section - Desktop Only */}
-            <div className="hidden lg:block bg-[#222222] rounded-lg p-4">
+            <div className="hidden lg:block bg-[var(--card)] rounded-lg p-4">
               <h2 className="text-sm font-semibold mb-4 text-gray-400">Quick Actions</h2>
-              <div className="bg-[#1a1a1a] rounded-lg p-4">
+              <div className="bg-[var(--card2)] rounded-lg p-4">
                 {/* From Input */}
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-2">
@@ -511,7 +511,7 @@ interface TokenDetailProps {
                       Balance: {isSwapped ? tokenBalance : ethBalance} {fromToken.symbol}
                     </span>
                   </div>
-                  <div className="flex items-center bg-[#222222] rounded-lg p-3">
+                  <div className="flex items-center bg-[var(--card)] rounded-lg p-3">
                     <input
                       type="number"
                       value={fromToken.amount}
@@ -522,7 +522,7 @@ interface TokenDetailProps {
                     />
                     <button
                       onClick={handleMaxClick}
-                      className="text-xs text-[#60A5FA] hover:text-[#4B82EC] font-medium px-2 py-1 rounded transition-colors"
+                      className="text-xs text-[var(--primary)] hover:text-[var(--primary-hover)] font-medium px-2 py-1 rounded transition-colors"
                     >
                       MAX
                     </button>
@@ -533,7 +533,7 @@ interface TokenDetailProps {
                 {/* Swap Button */}
                 <button 
                   onClick={handleSwap}
-                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[#60A5FA]"
+                  className="w-full flex justify-center p-2 text-gray-400 hover:text-[var(--primary)]"
                 >
                   <ArrowUpDownIcon size={20} />
                 </button>
@@ -546,7 +546,7 @@ interface TokenDetailProps {
                       Balance: {isSwapped ? ethBalance : tokenBalance} {toToken.symbol}
                     </span>
                   </div>
-                  <div className="flex items-center bg-[#222222] rounded-lg p-3">
+                  <div className="flex items-center bg-[var(--card)] rounded-lg p-3">
                     <input
                       type="text"
                       value={isCalculating ? 'Calculating...' : toToken.amount}
@@ -562,7 +562,7 @@ interface TokenDetailProps {
                 <button
                   onClick={handleAction}
                   disabled={!fromToken.amount || isCalculating || isTransacting}
-                  className="w-full py-3 bg-[#60A5FA] text-black rounded-lg font-medium hover:bg-[#4B82EC] 
+                  className="w-full py-3 bg-[var(--primary)] text-black rounded-lg font-medium hover:bg-[var(--primary-hover)] 
                     transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isTransacting ? 'Processing...' : actionButtonText}
@@ -573,7 +573,7 @@ interface TokenDetailProps {
         </div>
 
         {/* Token Holders Section (Full Width) */}
-        <div className="mt-6 bg-[#222222] rounded-lg p-4">
+        <div className="mt-6 bg-[var(--card)] rounded-lg p-4">
           <h2 className="text-sm font-semibold mb-4 text-gray-400">Token Holders</h2>
           <TokenHolders
             tokenHolders={currentHolders}

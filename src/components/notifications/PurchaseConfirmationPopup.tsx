@@ -18,7 +18,7 @@ const PurchaseConfirmationPopup: React.FC<PurchaseConfirmationPopupProps> = ({ o
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-2 sm:p-4">
-      <div className="bg-[#222222] p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm relative">
+      <div className="bg-[var(--card)] p-4 sm:p-6 rounded-lg shadow-xl w-full max-w-xs sm:max-w-sm relative">
         <button
           onClick={onCancel}
           className="absolute top-2 right-2 text-gray-400 hover:text-white transition-colors"
@@ -35,19 +35,19 @@ const PurchaseConfirmationPopup: React.FC<PurchaseConfirmationPopupProps> = ({ o
           type="number"
           value={purchaseAmount}
           onChange={(e) => setPurchaseAmount(e.target.value)}
-          className="w-full py-2 px-3 bg-[#1a1a1a] border border-[#333333] rounded-md text-white mb-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:border-[#60A5FA] transition-colors"
+          className="w-full py-2 px-3 bg-[var(--card2)] border border-[var(--card-boarder)] rounded-md text-white mb-3 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-colors"
           placeholder={`0.0 (optional)`}
         />
         <div className="flex justify-end space-x-3 mb-3">
           <button 
             onClick={onCancel} 
-            className="px-3 py-1.5 bg-[#1a1a1a] text-white rounded-md text-xs sm:text-sm hover:bg-[#2a2a2a] transition-colors"
+            className="px-3 py-1.5 bg-[var(--card2)] text-white rounded-md text-xs sm:text-sm hover:bg-[var(--card-hover)] transition-colors"
           >
             Cancel
           </button>
           <button 
             onClick={handleConfirm} 
-            className="px-3 py-1.5 bg-[#60A5FA] text-black rounded-md text-xs sm:text-sm hover:bg-[#4B82EC] transition-colors"
+            className="px-3 py-1.5 bg-[var(--primary)] text-black rounded-md text-xs sm:text-sm hover:bg-[var(--primary-hover)] transition-colors"
           >
             Confirm
           </button>

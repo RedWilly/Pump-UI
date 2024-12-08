@@ -7,7 +7,7 @@ interface LoadingBarProps {
 
 const LoadingBar: React.FC<LoadingBarProps> = ({ 
   size = 'medium',
-  color = '#60A5FA'
+  color = 'var(--primary)'
 }) => {
   const sizeClasses = {
     small: 'w-32 h-1',
@@ -17,7 +17,7 @@ const LoadingBar: React.FC<LoadingBarProps> = ({
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">
-      <div className={`${sizeClasses[size]} bg-[#333333] rounded-full overflow-hidden`}>
+      <div className={`${sizeClasses[size]} bg-[var(--card-boarder)] rounded-full overflow-hidden`}>
         <div
           className="h-full rounded-full animate-loading-bar"
           style={{ 

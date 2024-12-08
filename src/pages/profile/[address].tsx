@@ -35,7 +35,7 @@ const TokenBalanceItem: React.FC<TokenBalanceItemProps> = ({ tokenAddress, symbo
 
   return (
     <div 
-      className="bg-[#222222] rounded-lg p-4 cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-200"
+      className="bg-[var(--card)] rounded-lg p-4 cursor-pointer hover:bg-[var(--card-hover)] transition-colors duration-200"
       onClick={onClick}
     >
       <h3 className="text-xs sm:text-sm font-semibold text-white mb-2">{symbol}</h3>
@@ -43,7 +43,7 @@ const TokenBalanceItem: React.FC<TokenBalanceItemProps> = ({ tokenAddress, symbo
       <p className="text-gray-400 text-[10px] sm:text-xs mt-2">
         Address: 
         <span 
-          className="text-[#60A5FA] hover:underline ml-1 cursor-pointer"
+          className="text-[var(--primary)] hover:underline ml-1 cursor-pointer"
           onClick={handleAddressClick}
         >
           {formatAddressV2(tokenAddress)}
@@ -65,7 +65,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-md bg-[#222222] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 rounded-md bg-[var(--card)] text-gray-400 hover:bg-[var(--card-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5" />
       </button>
@@ -83,8 +83,8 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
                 onClick={() => onPageChange(page)}
                 className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
                   currentPage === page
-                    ? 'bg-[#60A5FA] text-black'
-                    : 'bg-[#222222] text-gray-400 hover:bg-[#2a2a2a]'
+                    ? 'bg-[var(--primary)] text-black'
+                    : 'bg-[var(--card)] text-gray-400 hover:bg-[var(--card-hover)]'
                 }`}
               >
                 {page}
@@ -106,7 +106,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-md bg-[#222222] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 rounded-md bg-[var(--card)] text-gray-400 hover:bg-[var(--card-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5" />
       </button>
@@ -124,8 +124,8 @@ const TokenTab: React.FC<TokenTabProps> = ({ title, isActive, onClick }) => (
   <button
     className={`w-full rounded-lg py-2.5 text-xs sm:text-sm font-medium leading-5 ${
       isActive
-        ? 'bg-[#333333] text-white'
-        : 'text-gray-400 hover:bg-[#2a2a2a] hover:text-white'
+        ? 'bg-[var(--card-boarder)] text-white'
+        : 'text-gray-400 hover:bg-[var(--card-hover)] hover:text-white'
     }`}
     onClick={onClick}
   >
@@ -252,7 +252,7 @@ const ProfilePage: React.FC = () => {
         </h1>
         
         <div className="mb-8">
-          <div className="flex justify-center mb-4 space-x-1 bg-[#1a1a1a] rounded-lg p-1">
+          <div className="flex justify-center mb-4 space-x-1 bg-[var(--card2)] rounded-lg p-1">
             <TokenTab title="Tokens Held" isActive={activeTab === 'held'} onClick={() => setActiveTab('held')} />
             <TokenTab title="Tokens Created" isActive={activeTab === 'created'} onClick={() => setActiveTab('created')} />
           </div>
@@ -288,7 +288,7 @@ const ProfilePage: React.FC = () => {
                   {createdTokens.map((token) => (
                     <div 
                       key={token.address}
-                      className="bg-[#222222] rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-200 flex items-start relative"
+                      className="bg-[var(--card)] rounded-lg p-3 sm:p-4 cursor-pointer hover:bg-[var(--card-hover)] transition-colors duration-200 flex items-start relative"
                       onClick={() => handleTokenClick(token.address)}
                     >
                       {connectedAddress && 
@@ -300,7 +300,7 @@ const ProfilePage: React.FC = () => {
                             setSelectedToken(token);
                             setIsUpdateModalOpen(true);
                           }}
-                          className="absolute top-2 right-2 p-2 rounded-full bg-[#333333] hover:bg-[#444444] transition-colors duration-200"
+                          className="absolute top-2 right-2 p-2 rounded-full bg-[var(--card-boarder)] hover:bg-[#444444] transition-colors duration-200"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
@@ -340,9 +340,9 @@ const ProfilePage: React.FC = () => {
               <LoadingBar size="medium" />
             </div>
           ) : transactions && transactions.length > 0 ? (
-            <div className="overflow-x-auto bg-[#222222] rounded-lg">
-              <table className="min-w-full divide-y divide-[#333333]">
-                <thead className="bg-[#1a1a1a]">
+            <div className="overflow-x-auto bg-[var(--card)] rounded-lg">
+              <table className="min-w-full divide-y divide-[var(--card-boarder)]">
+                <thead className="bg-[var(--card2)]">
                   <tr>
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wider">Token</th>
@@ -351,9 +351,9 @@ const ProfilePage: React.FC = () => {
                     <th className="px-4 py-3 text-left text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#333333]">
+                <tbody className="divide-y divide-[var(--card-boarder)]">
                   {transactions.map((tx) => (
-                    <tr key={tx.id} className="hover:bg-[#2a2a2a] transition-colors duration-150">
+                    <tr key={tx.id} className="hover:bg-[var(--card-hover)] transition-colors duration-150">
                       <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{tx.type}</td>
                       <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{getTokenSymbol(tx.recipientAddress)}</td>
                       <td className="px-4 py-3 whitespace-nowrap text-[10px] sm:text-xs text-gray-300">{formatAmountV3(tx.tokenAmount)}</td>
@@ -365,7 +365,7 @@ const ProfilePage: React.FC = () => {
               </table>
             </div>
           ) : (
-            <p className="text-gray-400 bg-[#222222] rounded-lg p-4">No recent transactions.</p>
+            <p className="text-gray-400 bg-[var(--card)] rounded-lg p-4">No recent transactions.</p>
           )}
           
           {totalPages > 1 && (

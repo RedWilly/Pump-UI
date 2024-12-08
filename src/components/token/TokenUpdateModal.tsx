@@ -194,7 +194,7 @@ export const TokenUpdateModal: React.FC<TokenUpdateModalProps> = ({
                 <>
                   <div
                     className={`border border-dashed rounded-lg p-3 text-center cursor-pointer ${
-                      isDragging ? 'border-blue-500 bg-[#1a1a1a]' : 'border-gray-600'
+                      isDragging ? 'border-blue-500 bg-[var(--card2)]' : 'border-gray-600'
                     }`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -238,7 +238,7 @@ export const TokenUpdateModal: React.FC<TokenUpdateModalProps> = ({
                   <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full bg-[#1a1a1a] text-white text-sm rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm resize-none"
+                    className="w-full bg-[var(--card2)] text-white text-sm rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm resize-none"
                     rows={3}
                     placeholder="Enter your token's description..."
                   />
@@ -255,7 +255,7 @@ export const TokenUpdateModal: React.FC<TokenUpdateModalProps> = ({
                     type="text"
                     value={twitter}
                     onChange={(e) => setTwitter(e.target.value)}
-                    className="w-full bg-[#1a1a1a] text-white text-sm h-9 rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
+                    className="w-full bg-[var(--card2)] text-white text-sm h-9 rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
                     placeholder="https://twitter.com/username"
                   />
                 </div>
@@ -270,7 +270,7 @@ export const TokenUpdateModal: React.FC<TokenUpdateModalProps> = ({
                     type="text"
                     value={telegram}
                     onChange={(e) => setTelegram(e.target.value)}
-                    className="w-full bg-[#1a1a1a] text-white text-sm h-9 rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
+                    className="w-full bg-[var(--card2)] text-white text-sm h-9 rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
                     placeholder="https://t.me/username"
                   />
                 </div>
@@ -285,7 +285,7 @@ export const TokenUpdateModal: React.FC<TokenUpdateModalProps> = ({
                     type="text"
                     value={website}
                     onChange={(e) => setWebsite(e.target.value)}
-                    className="w-full bg-[#1a1a1a] text-white text-sm h-9 rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
+                    className="w-full bg-[var(--card2)] text-white text-sm h-9 rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
                     placeholder="https://example.com"
                   />
                 </div>
@@ -300,7 +300,7 @@ export const TokenUpdateModal: React.FC<TokenUpdateModalProps> = ({
                     type="text"
                     value={discord}
                     onChange={(e) => setDiscord(e.target.value)}
-                    className="w-full bg-[#1a1a1a] text-white text-sm h-9 rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
+                    className="w-full bg-[var(--card2)] text-white text-sm h-9 rounded-lg border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm"
                     placeholder="https://discord.gg/invite"
                   />
                 </div>

@@ -126,7 +126,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
       </div>
 
       {/* Updated Market Cap to show only USD value */}
-      <div className="bg-[#1a1a1a] p-3 rounded-lg text-center">
+      <div className="bg-[var(--card2)] p-3 rounded-lg text-center">
         <div className="text-xs text-gray-400 mb-1">Market Cap</div>
           <div className="text-sm text-white">
             {marketCap ? (
@@ -151,7 +151,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
         {/* Mobile Header (hidden on desktop) */}
         <div className="lg:hidden flex flex-col">
           {/* Full-width image container for mobile */}
-          <div className="w-full h-[200px] mb-4 bg-[#1a1a1a] rounded-b-xl overflow-hidden">
+          <div className="w-full h-[200px] mb-4 bg-[var(--card2)] rounded-b-xl overflow-hidden">
             <img 
               src={tokenInfo.logo || '/chats/noimg.svg'} 
               alt={tokenInfo.name} 
@@ -181,7 +181,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   href={tokenInfo.website} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
+                  className="text-gray-400 hover:text-[var(--primary)] transition-colors"
                 >
                   <Globe size={24} />
                 </a>
@@ -191,7 +191,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   href={tokenInfo.twitter} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
+                  className="text-gray-400 hover:text-[var(--primary)] transition-colors"
                 >
                   <Twitter size={24} />
                 </a>
@@ -201,7 +201,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   href={tokenInfo.telegram} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
+                  className="text-gray-400 hover:text-[var(--primary)] transition-colors"
                 >
                   <Telegram size={24} />
                 </a>
@@ -211,7 +211,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   href={tokenInfo.discord} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
+                  className="text-gray-400 hover:text-[var(--primary)] transition-colors"
                 >
                   <Discord size={24} />
                 </a>
@@ -221,7 +221,7 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   href={tokenInfo.youtube} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="text-gray-400 hover:text-[#60A5FA] transition-colors"
+                  className="text-gray-400 hover:text-[var(--primary)] transition-colors"
                 >
                   <Youtube size={24} />
                 </a>
@@ -254,31 +254,31 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
               <div className="flex gap-3 mt-4">
                 {tokenInfo.website && (
                   <a href={tokenInfo.website} target="_blank" rel="noopener noreferrer" 
-                    className="text-gray-400 hover:text-[#60A5FA]">
+                    className="text-gray-400 hover:text-[var(--primary)]">
                     <Globe size={20} />
                   </a>
                 )}
                 {tokenInfo.twitter && (
                   <a href={tokenInfo.twitter} target="_blank" rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#60A5FA]">
+                    className="text-gray-400 hover:text-[var(--primary)]">
                     <Twitter size={20} />
                   </a>
                 )}
                 {tokenInfo.telegram && (
                   <a href={tokenInfo.telegram} target="_blank" rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#60A5FA]">
+                    className="text-gray-400 hover:text-[var(--primary)]">
                     <Telegram size={20} />
                   </a>
                 )}
                 {tokenInfo.discord && (
                   <a href={tokenInfo.discord} target="_blank" rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#60A5FA]">
+                    className="text-gray-400 hover:text-[var(--primary)]">
                     <Discord size={20} />
                   </a>
                 )}
                 {tokenInfo.youtube && (
                   <a href={tokenInfo.youtube} target="_blank" rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#60A5FA]">
+                    className="text-gray-400 hover:text-[var(--primary)]">
                     <Youtube size={20} />
                   </a>
                 )}
@@ -288,10 +288,10 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
         </div>
 
         {/* Progress Bar (shared between mobile and desktop) */}
-        <div className="bg-[#1a1a1a] p-4 rounded-lg">
+        <div className="bg-[var(--card2)] p-4 rounded-lg">
           <div className="flex justify-between text-sm mb-2">
             <span className="text-gray-400">Progress to DEX</span>
-            <span className={isCompleted ? "text-[#60A5FA]" : "text-white"}>
+            <span className={isCompleted ? "text-[var(--primary)]" : "text-white"}>
               {isCompleted 
                 ? 'Completed' 
                 : liquidityData && liquidityData[2] 
@@ -299,9 +299,9 @@ const TokenInfo: React.FC<TokenInfoProps> = ({ tokenInfo, showHeader = false, re
                   : '0%'}
             </span>
           </div>
-          <div className="w-full bg-[#333333] rounded-full h-2.5">
+          <div className="w-full bg-[var(--card-boarder)] rounded-full h-2.5">
             <div
-              className="bg-[#60A5FA] h-2.5 rounded-full transition-all duration-500"
+              className="bg-[var(--primary)] h-2.5 rounded-full transition-all duration-500"
               style={{ 
                 width: isCompleted 
                   ? '100%' 
@@ -328,7 +328,7 @@ const InfoItem: React.FC<{
   isExternal?: boolean;
   copyValue?: string;
 }> = ({ label, value, link, isExternal, copyValue }) => (
-  <div className="bg-[#1a1a1a] p-3 rounded-lg">
+  <div className="bg-[var(--card2)] p-3 rounded-lg">
     <div className="text-xs text-gray-400 mb-1">{label}</div>
     <div className="text-sm text-white flex items-center gap-2">
       {link ? (
@@ -337,7 +337,7 @@ const InfoItem: React.FC<{
             href={link} 
             target={isExternal ? "_blank" : undefined}
             rel={isExternal ? "noopener noreferrer" : undefined}
-            className="hover:text-[#60A5FA] transition-colors flex items-center gap-1"
+            className="hover:text-[var(--primary)] transition-colors flex items-center gap-1"
           >
             {value}
             {isExternal && <ExternalLinkIcon size={12} />}
@@ -345,7 +345,7 @@ const InfoItem: React.FC<{
           {copyValue && (
             <button
               onClick={() => copyToClipboard(copyValue)}
-              className="text-gray-400 hover:text-[#60A5FA] transition-colors"
+              className="text-gray-400 hover:text-[var(--primary)] transition-colors"
             >
               <Copy size={12} />
             </button>

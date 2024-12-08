@@ -26,7 +26,7 @@ const HowItWorksPopup: React.FC<HowItWorksPopupProps> = ({ isVisible, onClose })
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#222222] rounded-lg relative max-w-md w-full">
+      <div className="bg-[var(--card)] rounded-lg relative max-w-md w-full">
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
@@ -40,8 +40,8 @@ const HowItWorksPopup: React.FC<HowItWorksPopupProps> = ({ isVisible, onClose })
           <div className="space-y-6">
             {steps.map((step, index) => (
               <div key={index} className="flex items-center gap-4">
-                <div className="bg-[#1a1a1a] p-3 rounded-lg">
-                  <step.icon className="h-6 w-6 text-[#60A5FA]" />
+                <div className="bg-[var(--card2)] p-3 rounded-lg">
+                  <step.icon className="h-6 w-6 text-[var(--primary)]" />
                 </div>
                 <p className="text-gray-400">{step.text}</p>
               </div>
@@ -50,7 +50,7 @@ const HowItWorksPopup: React.FC<HowItWorksPopupProps> = ({ isVisible, onClose })
 
           <button
             onClick={onClose}
-            className="w-full mt-8 py-3 bg-[#60A5FA] text-black rounded-lg font-medium hover:bg-[#4B82EC] transition-colors"
+            className="w-full mt-8 py-3 bg-[var(--primary)] text-black rounded-lg font-medium hover:bg-[var(--primary-hover)] transition-colors"
           >
             Got it!
           </button>

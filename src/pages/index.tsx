@@ -287,7 +287,7 @@ const Home: React.FC = () => {
             </button>
             <button 
               onClick={handleLaunchToken}
-              className="w-full bg-[#60A5FA] text-black px-3 sm:px-6 py-2 rounded-full hover:bg-[#4B82EC] transition-colors text-xs sm:text-base"
+              className="w-full bg-[var(--primary)] text-black px-3 sm:px-6 py-2 rounded-full hover:bg-[var(--primary-hover)] transition-colors text-xs sm:text-base"
             >
               Launch your token
             </button>
@@ -307,8 +307,8 @@ const Home: React.FC = () => {
                   checked={showNewTokens}
                   onCheckedChange={toggleNewTokens}
                   className={`${
-                    showNewTokens ? 'bg-[#60A5FA]' : 'bg-gray-600'
-                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-offset-2 focus:ring-offset-gray-800`}
+                    showNewTokens ? 'bg-[var(--primary)]' : 'bg-gray-600'
+                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:ring-offset-gray-800`}
                 >
                   <span
                     className={`${
@@ -317,7 +317,7 @@ const Home: React.FC = () => {
                   />
                 </Switch>
                 {!showNewTokens && newTokensBuffer.length > 0 && (
-                  <span className="text-xs text-[#60A5FA]">
+                  <span className="text-xs text-[var(--primary)]">
                     {newTokensBuffer.length} new {newTokensBuffer.length === 1 ? 'token' : 'tokens'}
                   </span>
                 )}
@@ -334,8 +334,8 @@ const Home: React.FC = () => {
                   checked={showNewTokens}
                   onCheckedChange={toggleNewTokens}
                   className={`${
-                    showNewTokens ? 'bg-[#60A5FA]' : 'bg-gray-600'
-                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[#60A5FA] focus:ring-offset-2 focus:ring-offset-gray-800`}
+                    showNewTokens ? 'bg-[var(--primary)]' : 'bg-gray-600'
+                  } relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-2 focus:ring-offset-gray-800`}
                 >
                   <span
                     className={`${
@@ -344,7 +344,7 @@ const Home: React.FC = () => {
                   />
                 </Switch>
                 {!showNewTokens && newTokensBuffer.length > 0 && (
-                  <span className="text-xs text-[#60A5FA]">
+                  <span className="text-xs text-[var(--primary)]">
                     {newTokensBuffer.length} new {newTokensBuffer.length === 1 ? 'token' : 'tokens'}
                   </span>
                 )}

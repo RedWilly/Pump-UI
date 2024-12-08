@@ -116,10 +116,10 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className={`bg-[#1a1a1a] rounded-lg p-2 sm:p-3 ${message.reply_to ? 'ml-2 sm:ml-4 border-l-2 border-[#333333]' : ''}`}
+                className={`bg-[var(--card2)] rounded-lg p-2 sm:p-3 ${message.reply_to ? 'ml-2 sm:ml-4 border-l-2 border-[var(--card-boarder)]' : ''}`}
               >
                 {parentMessage && (
-                  <div className="mb-1 sm:mb-2 text-[10px] sm:text-xs text-gray-400 bg-[#222222] p-1.5 sm:p-2 rounded">
+                  <div className="mb-1 sm:mb-2 text-[10px] sm:text-xs text-gray-400 bg-[var(--card)] p-1.5 sm:p-2 rounded">
                     <span className="font-medium">{shortenAddress(parentMessage.user)}</span>: 
                     <span className="line-clamp-1">{parentMessage.message}</span>
                   </div>
@@ -137,7 +137,7 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
                       <span className="text-xs sm:text-sm font-medium text-gray-300">
                         {shortenAddress(message.user)}
                         {message.user.toLowerCase() === tokenInfo.creatorAddress.toLowerCase() && 
-                          <span className="ml-1 text-[#60A5FA] text-[10px] sm:text-xs">(dev)</span>
+                          <span className="ml-1 text-[var(--primary)] text-[10px] sm:text-xs">(dev)</span>
                         }
                       </span>
                       <span className="text-[10px] sm:text-xs text-gray-500">{formatTimestamp(message.timestamp)}</span>
@@ -145,7 +145,7 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
                     <p className="text-xs sm:text-sm text-gray-200 mt-0.5 sm:mt-1 break-words">{message.message}</p>
                     <button
                       onClick={() => handleReply(message)}
-                      className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-400 hover:text-[#60A5FA] flex items-center gap-0.5 sm:gap-1"
+                      className="mt-1 sm:mt-2 text-[10px] sm:text-xs text-gray-400 hover:text-[var(--primary)] flex items-center gap-0.5 sm:gap-1"
                     >
                       <Reply size={10} className="sm:w-3 sm:h-3" />
                       Reply
@@ -160,9 +160,9 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
 
       <form onSubmit={handleSendMessage} className="mt-2 sm:mt-4 space-y-1 sm:space-y-2 p-2">
         {replyingTo && (
-          <div className="flex items-center justify-between bg-[#222222] p-1.5 sm:p-2 rounded-lg text-xs sm:text-sm">
+          <div className="flex items-center justify-between bg-[var(--card)] p-1.5 sm:p-2 rounded-lg text-xs sm:text-sm">
             <span className="text-gray-400">
-              Replying to <span className="text-[#60A5FA]">{shortenAddress(replyingTo.user)}</span>
+              Replying to <span className="text-[var(--primary)]">{shortenAddress(replyingTo.user)}</span>
             </span>
             <button
               type="button"
@@ -179,12 +179,12 @@ const Chats: React.FC<ChatsProps> = ({ tokenAddress, tokenInfo }) => {
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="flex-grow bg-[#1a1a1a] text-white rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[#60A5FA]"
+            className="flex-grow bg-[var(--card2)] text-white rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-[var(--primary)]"
           />
           <button
             type="submit"
             disabled={!newMessage.trim()}
-            className="bg-[#60A5FA] text-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-[#4B82EC] transition-colors disabled:opacity-50"
+            className="bg-[var(--primary)] text-black px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium hover:bg-[var(--primary-hover)] transition-colors disabled:opacity-50"
           >
             Send
           </button>

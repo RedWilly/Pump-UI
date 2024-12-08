@@ -9,7 +9,7 @@ const AboutPage: React.FC = () => {
         <h1 className="text-xl sm:text-2xl font-bold text-white mb-8 text-center">About Bondle</h1>
         
         <div className="mb-12">
-          <div className="bg-[#222222] rounded-lg p-6 md:p-8">
+          <div className="bg-[var(--card)] rounded-lg p-6 md:p-8">
             <h2 className="text-base sm:text-lg font-semibold text-white mb-4">What is Bondle?</h2>
             <div className="text-gray-400 text-xs sm:text-sm leading-relaxed space-y-4">
               <p>
@@ -38,8 +38,8 @@ const AboutPage: React.FC = () => {
               { icon: ArrowPathIcon, title: "Liquidity Pool", description: "Each token has its own liquidity pool that grows and shrinks with trades." },
               { icon: BeakerIcon, title: "Customization", description: "Various curve shapes allow for different token economics." },
             ].map((item, index) => (
-              <div key={index} className="bg-[#222222] rounded-lg p-6 flex flex-col items-center text-center hover:bg-[#2a2a2a] transition-colors">
-                <item.icon className="h-12 w-12 text-[#60A5FA] mb-4" />
+              <div key={index} className="bg-[var(--card)] rounded-lg p-6 flex flex-col items-center text-center hover:bg-[var(--card-hover)] transition-colors">
+                <item.icon className="h-12 w-12 text-[var(--primary)] mb-4" />
                 <h3 className="text-sm sm:text-base font-semibold text-white mb-2">{item.title}</h3>
                 <p className="text-gray-400 text-xs sm:text-sm">{item.description}</p>
               </div>
@@ -49,7 +49,7 @@ const AboutPage: React.FC = () => {
         
         <div>
           <h2 className="text-xl font-semibold text-white mb-6 text-center">Benefits of Bonding Curves</h2>
-          <div className="bg-[#222222] rounded-lg p-6 md:p-8">
+          <div className="bg-[var(--card)] rounded-lg p-6 md:p-8">
             <ul className="space-y-4 text-gray-400 text-xs sm:text-sm">
               {[
                 { title: "Continuous Liquidity", description: "Tokens can always be bought or sold, ensuring a fluid market." },
@@ -58,7 +58,7 @@ const AboutPage: React.FC = () => {
                 { title: "Flexible Token Economics", description: "Different curve shapes allow for various economic models to suit project needs." },
               ].map((item, index) => (
                 <li key={index} className="flex items-start">
-                  <svg className="h-6 w-6 text-[#60A5FA] mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-6 w-6 text-[var(--primary)] mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   <div>

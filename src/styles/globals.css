@@ -12,7 +12,9 @@
   --primary: #60A5FA;
   --primary-hover: #4B82EC;
   --card: #222222;
+  --card2: #1a1a1a;
   --card-hover: #2a2a2a;
+  --card-boarder: #333333;
 }
 
 body {
@@ -45,11 +47,11 @@ body {
   }
 
   .btn-primary {
-    @apply bg-[#60A5FA] text-black px-4 py-2 rounded-lg hover:bg-[#4B82EC] transition-colors;
+    @apply bg-[var(--primary)] text-black px-4 py-2 rounded-lg hover:bg-[var(--primary-hover)] transition-colors;
   }
 
   .btn-secondary {
-    @apply bg-[#222222] text-white px-4 py-2 rounded-lg hover:bg-[#2a2a2a] transition-colors;
+    @apply bg-[var(--card)] text-white px-4 py-2 rounded-lg hover:bg-[var(--card-hover)] transition-colors;
   }
 
   .card {
@@ -79,7 +81,7 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #222222;
+  background: var(--card-hover);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {

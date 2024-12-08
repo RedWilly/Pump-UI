@@ -78,20 +78,20 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
     <div className="w-full">
       <table className="w-full text-left">
         <thead>
-          <tr className="bg-[#1a1a1a]">
+          <tr className="bg-[var(--card2)]">
             <th className="px-4 py-2 text-sm text-gray-400">Holder</th>
             <th className="px-4 py-2 text-sm text-gray-400">Percentage</th>
           </tr>
         </thead>
         <tbody>
           {/* Bonding Curve Manager as the first entry */}
-          <tr className="border-b border-[#2a2a2a]">
+          <tr className="border-b border-[var(--card-hover)]">
             <td className="px-4 py-2">
               <a
                 href={`${process.env.NEXT_PUBLIC_BLOCKSCOUT_URL}/address/${bondingCurveAddress}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#60A5FA] text-sm flex items-center gap-1 transition-colors"
+                className="text-gray-400 hover:text-[var(--primary)] text-sm flex items-center gap-1 transition-colors"
               >
                 Bonding Curve <ExternalLinkIcon size={14} />
               </a>
@@ -101,14 +101,14 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
             </td>
           </tr>
           {paginatedHolders.map((holder, index) => (
-            <tr key={index} className="border-b border-[#2a2a2a]">
+            <tr key={index} className="border-b border-[var(--card-hover)]">
               <td className="px-4 py-2">
                 {holder.address === creatorAddress ? (
                   <a
                     href={`${process.env.NEXT_PUBLIC_BLOCKSCOUT_URL}/address/${holder.address}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#60A5FA] text-sm flex items-center gap-1 transition-colors"
+                    className="text-gray-400 hover:text-[var(--primary)] text-sm flex items-center gap-1 transition-colors"
                   >
                     Creator <ExternalLinkIcon size={14} />
                   </a>
@@ -117,7 +117,7 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
                     href={`${process.env.NEXT_PUBLIC_BLOCKSCOUT_URL}/address/${holder.address}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-[#60A5FA] text-sm flex items-center gap-1 transition-colors"
+                    className="text-gray-400 hover:text-[var(--primary)] text-sm flex items-center gap-1 transition-colors"
                   >
                     {shortenAddress(holder.address)} <ExternalLinkIcon size={14} />
                   </a>
@@ -142,7 +142,7 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
           <button
             onClick={() => onPageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
+            className="p-1 rounded bg-[var(--card2)] text-gray-400 hover:bg-[var(--card-hover)] disabled:opacity-50"
           >
             <ChevronLeftIcon size={20} />
           </button>
@@ -152,8 +152,8 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
               onClick={() => onPageChange(page)}
               className={`px-3 py-1 rounded text-sm ${
                 currentPage === page
-                  ? 'bg-[#60A5FA] text-black'
-                  : 'bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a]'
+                  ? 'bg-[var(--primary)] text-black'
+                  : 'bg-[var(--card2)] text-gray-400 hover:bg-[var(--card-hover)]'
               }`}
             >
               {page}
@@ -162,7 +162,7 @@ const TokenHolders: React.FC<TokenHoldersProps> = ({
           <button
             onClick={() => onPageChange(currentPage + 1)}
             disabled={currentPage === actualTotalPages}
-            className="p-1 rounded bg-[#1a1a1a] text-gray-400 hover:bg-[#2a2a2a] disabled:opacity-50"
+            className="p-1 rounded bg-[var(--card2)] text-gray-400 hover:bg-[var(--card-hover)] disabled:opacity-50"
           >
             <ChevronRightIcon size={20} />
           </button>

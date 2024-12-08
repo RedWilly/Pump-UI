@@ -124,7 +124,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick, onL
 
     return (
       <div onClick={handleClick} className="cursor-pointer">
-        <div className="bg-[#222222] rounded-lg overflow-hidden hover:bg-[#2a2a2a] transition-colors duration-200">
+        <div className="bg-[var(--card)] rounded-lg overflow-hidden hover:bg-[var(--card-hover)] transition-colors duration-200">
           <div className="p-4">
             <div className="flex gap-4 mb-4">
               <div className="w-24 h-24 flex-shrink-0">
@@ -145,11 +145,11 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick, onL
             <div className="space-y-3 mb-4">
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-400">Progress to DEX</span>
-                <span className="text-[#60A5FA]">Completed</span>
+                <span className="text-[var(--primary)]">Completed</span>
               </div>
-              <div className="w-full bg-[#333333] rounded-full h-2">
+              <div className="w-full bg-[var(--card-boarder)] rounded-full h-2">
                 <div
-                  className="bg-[#60A5FA] h-2 rounded-full transition-all duration-500 w-full"
+                  className="bg-[var(--primary)] h-2 rounded-full transition-all duration-500 w-full"
                 />
               </div>
             </div>
@@ -159,14 +159,14 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick, onL
                 href={uniswapLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 text-center py-2 text-sm bg-[#60A5FA] text-black rounded-md hover:bg-[#4B82EC] transition-colors"
+                className="flex-1 text-center py-2 text-sm bg-[var(--primary)] text-black rounded-md hover:bg-[var(--primary-hover)] transition-colors"
                 onClick={(e) => e.stopPropagation()}
               >
                 Trade
               </a>
               <Link
                 href={`/token/${token.address}`}
-                className="flex-1 text-center py-2 text-sm bg-[#333333] text-white rounded-md hover:bg-[#444444] transition-colors"
+                className="flex-1 text-center py-2 text-sm bg-[var(--card-boarder)] text-white rounded-md hover:bg-[#444444] transition-colors"
               >
                 View
               </Link>
@@ -179,7 +179,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick, onL
 
   return (
     <div onClick={handleClick} className="cursor-pointer">
-      <div className="bg-[#222222] rounded-lg overflow-hidden hover:bg-[#2a2a2a] transition-colors duration-200 relative">
+      <div className="bg-[var(--card)] rounded-lg overflow-hidden hover:bg-[var(--card-hover)] transition-colors duration-200 relative">
         <SocialLinks />
         <div className="p-4">
           <div className="flex gap-4 mb-4">
@@ -207,7 +207,7 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick, onL
             <div className="space-y-2">
               <div className="flex justify-between text-sm mb-1">
                 <span className="text-gray-400">Progress to DEX</span>
-                <span className={`${isCompleted ? 'text-[#60A5FA]' : 'text-white'}`}>
+                <span className={`${isCompleted ? 'text-[var(--primary)]' : 'text-white'}`}>
                   {isCompleted 
                     ? 'Completed' 
                     : liquidityData && liquidityData[2] 
@@ -215,9 +215,9 @@ const TokenCard: React.FC<TokenCardProps> = ({ token, isEnded, onTokenClick, onL
                       : '0%'}
                 </span>
               </div>
-              <div className="w-full bg-[#333333] rounded-full h-2">
+              <div className="w-full bg-[var(--card-boarder)] rounded-full h-2">
                 <div
-                  className="bg-[#60A5FA] h-2 rounded-full transition-all duration-500"
+                  className="bg-[var(--primary)] h-2 rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
